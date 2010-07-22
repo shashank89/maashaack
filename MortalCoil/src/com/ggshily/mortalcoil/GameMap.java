@@ -122,10 +122,21 @@ public class GameMap
 					}
 					else
 					{
-						_mapdata[startPoint] = CELL_EMPTY;
-						pointsHas2Directions.clear();
-						clearPath(startPoint, 0);
-						break;
+						if(hasMoreChoice())
+						{
+							Pair pair = pointsHas2Directions.get(pointsHas2Directions.size() - 1);
+							clearPath(pair.point, pair.pathIndex);
+							pointsHas2Directions.remove(pointsHas2Directions.size() - 1);
+							curPointIndex = pair.point;
+							direction = getDirections(curPointIndex)[1];
+						}
+						else
+						{
+							_mapdata[startPoint] = CELL_EMPTY;
+							pointsHas2Directions.clear();
+							clearPath(startPoint, 0);
+							break;
+						}
 					}
 				}
 			}
@@ -419,7 +430,7 @@ public class GameMap
 		// 001
 		// 000
 //		gm.setMap("x=23&y=23&board=...X.....XXXX...XX......X...X...XXX..X....XXX...X.....XXXX.X...X...X.X.X.X.X..XX..X.X...X.X.X.X.X..X....XX.XX......X......XXXXX......X......XX......X.....X...X....X....XX...X.........X....XX.X...X.......XX.....XXX...X.X.XXXXX........XXXX......X.....XXX.....X...X......X.....X.XXX.......XXX..X.....X.....XX.....X...X..............X.X...X.....X.XX..XX.X...XXXXXX......XX..XX....X..X..........X....X......X.XXX....X.X.......XXX......XXX...X...X........X...X.........X.XX.........X..XXX....X............XX.X...................XX...XX");
-		gm.setMap("x=7&y=5&board=XXX....X..............X............");
+		gm.setMap("x=10&y=10&board=..............XXXX...............X.............X......X.......X...X.X...X..............X.X.....X...X");
 //		gm.setMap("x=3&y=3&board=X....X...");
 		
 		System.out.println("width:" + gm._width);

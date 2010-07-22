@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import com.ggshily.mortalcoil.GameMap;
@@ -52,7 +51,9 @@ public class MortalCoil
 				        	String mapdata = content.substring(index + FLASHVARS.length() + 1, content.indexOf("\"", index + FLASHVARS.length() + 1));
 				        	gm.setMap(mapdata);
 				        	System.out.println(gm.getFormatMap());
+				        	long startTime = System.currentTimeMillis();
 				        	String solution = gm.getPath();
+				        	System.out.println("Finding time:" + (System.currentTimeMillis() - startTime) / 1000);
 				        	if(solution != null)
 				        	{
 								u = new URL("http://www.hacker.org/coil/index.php?name=gg_shily&password=kzhxkzhx&" + solution);
