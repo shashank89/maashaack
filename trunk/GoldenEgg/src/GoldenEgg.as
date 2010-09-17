@@ -15,6 +15,8 @@ package
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
 	import flash.system.LoaderContext;
+	import flash.ui.ContextMenu;
+	import flash.ui.Mouse;
 	import flash.utils.getDefinitionByName;
 	
 	[SWF(width="550", height="314", backgroundColor="#ffffff", frameRate="30",allowFullScreen="true")]
@@ -23,12 +25,15 @@ package
 		public static const ASSET_FILE : String = "./swf/asset.swf";
 		public static const MC_HAMMER : String = "chuizi";
 		public static const MC_EGGS : Array = ["egg1", "egg2", "egg3"];
+		public static const MC_EGGS_BG : Array = ["egg1_bg", "egg2_bg", "egg3_bg"];
 		public static const MC_RESULT : String = "mc_result";
+		public static const MC_ANIM : String = "lihua";
 		
 		private var main : MovieClip;
 		private var hammer : MovieClip;
 		private var result : MovieClip;
 		private var eggs : Array;
+		private var eggs_bg : Array;
 		private var maskSprite : Sprite;
 		
 		private var isKickingEgg : Boolean;
@@ -40,6 +45,21 @@ package
 
 		private function addedToStageHandler(e : Event) : void
 		{
+			try
+			{
+				var cm : ContextMenu = new ContextMenu();
+				cm.hideBuiltInItems();
+				contextMenu=cm;
+				
+				tabChildren = false;
+				tabEnabled = false;
+				
+				Mouse.hide();
+			}
+			catch(e:Error)
+			{
+			}
+			
 			var loader : Loader = new Loader();
 			Util.addEventListener(loader.contentLoaderInfo, Event.COMPLETE, loadCompleteHandler);
 			Util.addEventListener(loader.contentLoaderInfo, IOErrorEvent.IO_ERROR, IOErrorHandler);
@@ -62,10 +82,15 @@ package
 		private function init() : void
 		{
 			hammer = main[MC_HAMMER];
+			hammer.mouseEnabled = false;
+			
 			result = main[MC_RESULT];
 			result.gotoAndStop(1);
 			result.visible = false;
 			result.mouseEnabled = false;
+			
+			main[MC_ANIM].visible = false;
+			main[MC_ANIM].mouseEnabled = false;
 			
 			eggs = [];
 			for(var i : int = 0; i < MC_EGGS.length; i++)
@@ -75,6 +100,14 @@ package
 				Util.addEventListener(egg, MouseEvent.MOUSE_OVER, mouseOverHandler);
 				Util.addEventListener(egg, MouseEvent.MOUSE_OUT, mouseOutHandler);
 				eggs.push(egg);
+			}
+			
+			eggs_bg = [];
+			for(i = 0; i < MC_EGGS_BG.length; i++)
+			{
+				var bg : MovieClip = main[MC_EGGS_BG[i]];
+				bg.visible = false;
+				eggs_bg.push(bg);
 			}
 			
 			addEventListener(Event.ENTER_FRAME, tickFrame);
@@ -93,7 +126,7 @@ package
 
 		private function clickHandler(e : MouseEvent) : void
 		{
-			var index : int = eggs.indexOf(e.target);
+			var index : int = eggs.indexOf(e.currentTarget);
 			eggs[index].gotoAndPlay(2);
 			trace("select " + index);
 			
@@ -101,6 +134,8 @@ package
 			Util.addEventListener(loader, Event.COMPLETE, getResult);
 			Util.addEventListener(loader, IOErrorEvent.IO_ERROR, IOErrorHandler);
 			loader.load(new URLRequest(getUrl(index)));
+			
+			hammer.gotoAndPlay(2);
 			
 //			addMask();
 		}
@@ -137,12 +172,12 @@ package
 
 		private function mouseOverHandler(e : MouseEvent) : void
 		{
-			
+			eggs_bg[eggs.indexOf(e.currentTarget)].visible = true;
 		}
 
 		private function mouseOutHandler(e : MouseEvent) : void
 		{
-			
+			eggs_bg[eggs.indexOf(e.currentTarget)].visible = false;
 		}
 	}
 }
