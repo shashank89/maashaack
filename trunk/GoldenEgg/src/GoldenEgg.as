@@ -12,11 +12,14 @@ package
 	import flash.events.MouseEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
+	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	import flash.system.ApplicationDomain;
 	import flash.system.LoaderContext;
 	import flash.ui.ContextMenu;
 	import flash.ui.Mouse;
+	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
 	
 	[SWF(width="550", height="314", backgroundColor="#ffffff", frameRate="16",allowFullScreen="true")]
@@ -24,8 +27,9 @@ package
 	{
 		public static const ASSET_FILE : String = "./swf/asset.swf";
 		public static const MC_HAMMER : String = "chuizi";
-		public static const MC_EGGS : Array = ["egg1", "egg2", "egg3"];
-		public static const MC_EGGS_BG : Array = ["egg1_bg", "egg2_bg", "egg3_bg"];
+		public static const MC_EGGS : Array = ["egg3", "egg2", "egg1"];
+		public static const MC_EGGS_BG : Array = ["egg3_bg", "egg2_bg", "egg1_bg"];
+		public static const MC_EGGS_ANIM : Array = ["lihua2", "lihua1", "lihua0"];
 		public static const MC_RESULT : String = "mc_result";
 		public static const MC_ANIM : String = "lihua";
 		public static const RESULT_DESC : String = "mc_desc";
@@ -44,6 +48,7 @@ package
 		private var result : MovieClip;
 		private var eggs : Array;
 		private var eggs_bg : Array;
+		private var eggs_anim : Array;
 		private var maskSprite : Sprite;
 		
 		private var curIndex : int;
@@ -116,9 +121,6 @@ package
 			
 			maskSprite.mouseEnabled = false;
 			
-			main[MC_ANIM].visible = false;
-			main[MC_ANIM].mouseEnabled = false;
-			
 			eggs = [];
 			for(var i : int = 0; i < MC_EGGS.length; i++)
 			{
@@ -137,6 +139,14 @@ package
 				eggs_bg.push(bg);
 			}
 			
+			eggs_anim = [];
+			for(i = 0; i < MC_EGGS_ANIM.length; i++)
+			{
+				var anim : MovieClip = main[MC_EGGS_ANIM[i]];
+				anim.mouseEnabled = false;
+				eggs_anim.push(anim);
+			}
+			
 			addEventListener(Event.ENTER_FRAME, tickFrame);
 			
 			Util.addEventListener(result[BTN_RESTART], MouseEvent.CLICK, restartGame);
@@ -150,6 +160,10 @@ package
 				hammer.x = mouseX;
 				hammer.y = mouseY;
 			}
+			else
+			{
+				eggs_bg[curIndex].visible = false;
+			}
 			
 			isKickingEgg = hammer.currentFrame != 1;
 		}
@@ -159,6 +173,7 @@ package
 			if(hammer.currentFrame == hammer.totalFrames)
 			{
 				eggs[curIndex].gotoAndPlay(2);
+				eggs_anim[curIndex].gotoAndPlay(2);
 			}
 		}
 
@@ -169,14 +184,15 @@ package
 			eggs_bg[curIndex].visible = false;
 			
 			var loader : URLLoader = new URLLoader();
+			loader.dataFormat = URLLoaderDataFormat.BINARY;
 			Util.addEventListener(loader, Event.COMPLETE, getResult);
 			Util.addEventListener(loader, IOErrorEvent.IO_ERROR, IOErrorHandler);
 			loader.load(new URLRequest(getUrl(curIndex)));
 			
 			hammer.gotoAndPlay(2);
 			
-			main[MC_ANIM].visible = true;
-			main[MC_ANIM].gotoAndPlay(1);
+			/*main[MC_ANIM].visible = true;
+			main[MC_ANIM].gotoAndPlay(1);*/
 			
 //			getResult(null);
 			
@@ -185,7 +201,7 @@ package
 
 		private function closeGame(e : Event) : void
 		{
-			
+			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
 		}
 
 		private function restartGame(e : Event) : void
@@ -196,6 +212,10 @@ package
 			for each(var egg : MovieClip in eggs)
 			{
 				egg.gotoAndStop(1);
+			}
+			for each(var anim : MovieClip in eggs_anim)
+			{
+				anim.gotoAndStop(1);
 			}
 			
 			maskSprite.mouseEnabled = false;
@@ -224,18 +244,19 @@ package
 		private function getUrl(index : int) : String
 		{
 			var requestURL : String = url;
-			if(requestURL.charAt(requestURL.length - 1) != "/")
+			/*if(requestURL.charAt(requestURL.length - 1) != "/")
 			{
 				requestURL += "/";
-			}
-			requestURL += "&" + VAR_USERNAME + "=" + userName + "&" + VAR_CHANNEL + "="
-				+ channel + "&" + VAR_INDEX + "=" + index;
+			}*/
+			requestURL += "?" + VAR_USERNAME + "=" + userName + "&" + VAR_CHANNEL + "="
+				+ channel + "&" + "egg=" + (index + 1);
 			return requestURL;
 		}
 
 		private function getResult(e : Event) : void
 		{
-			result[RESULT_DESC][RESULT_TF].text = e.currentTarget.data;
+			var data : ByteArray = e.currentTarget.data;
+			result[RESULT_DESC][RESULT_TF].text = data.readUTFBytes(data.bytesAvailable);
 			result.visible = true;
 			result.gotoAndPlay(1);
 		}
@@ -243,6 +264,7 @@ package
 		private function mouseOverHandler(e : MouseEvent) : void
 		{
 			eggs_bg[eggs.indexOf(e.currentTarget)].visible = true;
+			trace("over");
 		}
 
 		private function mouseOutHandler(e : MouseEvent) : void
