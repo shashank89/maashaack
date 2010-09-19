@@ -7,6 +7,7 @@ package
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
+	import flash.events.DataEvent;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
@@ -201,12 +202,14 @@ package
 
 		private function closeGame(e : Event) : void
 		{
-			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
+			navigateToURL(new URLRequest("javascript:window.close();"), "_top");
+//			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
 		}
 
 		private function restartGame(e : Event) : void
 		{
-			result.gotoAndStop(1);
+			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
+			/*result.gotoAndStop(1);
 			result.visible = false;
 			
 			for each(var egg : MovieClip in eggs)
@@ -218,7 +221,7 @@ package
 				anim.gotoAndStop(1);
 			}
 			
-			maskSprite.mouseEnabled = false;
+			maskSprite.mouseEnabled = false;*/
 		}
 
 		private function addMask() : void
@@ -249,7 +252,7 @@ package
 				requestURL += "/";
 			}*/
 			requestURL += "?" + VAR_USERNAME + "=" + userName + "&" + VAR_CHANNEL + "="
-				+ channel + "&" + "egg=" + (index + 1);
+				+ channel + "&" + "egg=" + (index + 1) + "&id=" + (new Date().time);
 			return requestURL;
 		}
 
