@@ -43,6 +43,7 @@ package
 		public static const VAR_CHANNEL : String = "channel";
 		public static const VAR_INDEX : String = "index";
 		public static const VAR_ASSET : String = "asset";
+		public static const VAR_OPEN_URL : String = "open_url";
 		
 		private var main : MovieClip;
 		private var hammer : MovieClip;
@@ -51,6 +52,11 @@ package
 		private var eggs_bg : Array;
 		private var eggs_anim : Array;
 		private var maskSprite : Sprite;
+		
+		private var msg : String;
+		private var type : String;
+		private var pid : String;
+		private var openUrl : String;
 		
 		private var curIndex : int;
 		private var isKickingEgg : Boolean;
@@ -83,6 +89,7 @@ package
 			url = stage.loaderInfo.parameters[VAR_URL];
 			userName = stage.loaderInfo.parameters[VAR_USERNAME];
 			channel = stage.loaderInfo.parameters[VAR_CHANNEL];
+			openUrl = stage.loaderInfo.parameters[VAR_OPEN_URL];
 			
 			var assetFile : String = stage.loaderInfo.parameters[VAR_ASSET] || ASSET_FILE; 
 			
@@ -202,8 +209,12 @@ package
 
 		private function closeGame(e : Event) : void
 		{
-			navigateToURL(new URLRequest("javascript:window.close();"), "_top");
+//			navigateToURL(new URLRequest("javascript:window.close();"), "_top");
 //			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
+			if(type == "1")
+			{
+				navigateToURL(new URLRequest(openUrl + "?pid=" + pid), "_top");
+			}
 		}
 
 		private function restartGame(e : Event) : void
@@ -259,7 +270,27 @@ package
 		private function getResult(e : Event) : void
 		{
 			var data : ByteArray = e.currentTarget.data;
-			result[RESULT_DESC][RESULT_TF].text = data.readUTFBytes(data.bytesAvailable);
+			var resultStr : String = data.readUTFBytes(data.bytesAvailable);
+			
+			var arr : Array = resultStr.split("&");
+			for each(var str : String in arr)
+			{
+				if(str.indexOf("message=") == 0)
+				{
+					msg = str.substr("message=".length);
+				}
+				else if(str.indexOf("type=") == 0)
+				{
+					type = str.substr("type=".length);
+				}
+				else if(str.indexOf("pid=") == 0)
+				{
+					pid = str.substr("pid=".length);
+				}
+			}
+			
+			result[RESULT_DESC][RESULT_TF].text = msg;
+			
 			result.visible = true;
 			result.gotoAndPlay(1);
 		}
