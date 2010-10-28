@@ -17,7 +17,7 @@ package
 	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
-	[SWF(width="655", height="360", frameRate="16",allowFullScreen="true")]
+	[SWF(width="910", height="270", frameRate="16",allowFullScreen="true")]
 	public class Lottery extends Sprite
 	{
 		public static const ASSET_FILE : String = "./swf/asset.swf";
@@ -38,12 +38,14 @@ package
 		public static const VAR_INDEX : String = "index";
 		public static const VAR_ASSET : String = "asset";
 		public static const VAR_OPEN_URL : String = "open_url";
+		public static const VAR_IS_LOGIN : String = "isLogin";
+		public static const VAR_LOGIN_URL : String = "loginUrl";
 		
 		public static const OFFSET : int = -100;
-		public static const SLOT_NUMBER : int = 11;
+		public static const SLOT_NUMBER : int = 10;
 		public static const SLOT_WIDTH : int = 133;
 		public static const START_POSITION : int = 0;
-		public static const AREA_WIDTH : int = 1463;
+		public static const AREA_WIDTH : int = SLOT_WIDTH * SLOT_NUMBER;
 		
 		public static const SPEED_NORMAL : int = 4;
 		public static const SPEED_HIGH : int = 100;
@@ -61,6 +63,7 @@ package
 		private var type : String;
 		private var pid : String;
 		private var openUrl : String;
+		private var loginUrl : String;
 		
 		private var curIndex : int;
 		private var isMoving : Boolean;
@@ -69,6 +72,7 @@ package
 		private var url : String;
 		private var userName : String;
 		private var channel : String;
+		private var isLogin : String;
 		
 		public function Lottery()
 		{
@@ -94,6 +98,8 @@ package
 			userName = stage.loaderInfo.parameters[VAR_USERNAME];
 			channel = stage.loaderInfo.parameters[VAR_CHANNEL];
 			openUrl = stage.loaderInfo.parameters[VAR_OPEN_URL];
+			isLogin = stage.loaderInfo.parameters[VAR_IS_LOGIN];
+			loginUrl = stage.loaderInfo.parameters[VAR_LOGIN_URL];
 			
 			var assetFile : String = stage.loaderInfo.parameters[VAR_ASSET] || ASSET_FILE; 
 			
@@ -120,7 +126,7 @@ package
 		
 		private function init() : void
 		{
-			curSpeed = 0;//SPEED_NORMAL;
+			curSpeed = SPEED_NORMAL;
 			
 			for(var i : int = 0; i < SLOT_NUMBER; i++)
 			{
@@ -190,6 +196,12 @@ package
 		
 		private function startLottery(e : Event) : void
 		{
+			if(!isLogin)
+			{
+				navigateToURL(new URLRequest(loginUrl), "_top");
+				return;
+			}
+			
 			curSpeed = SPEED_HIGH;
 			
 			
@@ -212,7 +224,7 @@ package
 //			var data : ByteArray = e.currentTarget.data;
 			resultStr = e.currentTarget.data;//data.readUTFBytes(data.bytesAvailable);
 			resultStr = resultStr.substr(2);
-			resultStr = "message=xxxx&type=2&pid=123";
+//			resultStr = "message=xxxx&type=2&pid=123";
 			
 			var arr : Array = resultStr.split("&");
 			for each(var str : String in arr)
