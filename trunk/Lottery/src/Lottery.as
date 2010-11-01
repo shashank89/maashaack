@@ -38,8 +38,8 @@ package
 		public static const VAR_INDEX : String = "index";
 		public static const VAR_ASSET : String = "asset";
 		public static const VAR_OPEN_URL : String = "open_url";
-		public static const VAR_IS_LOGIN : String = "isLogin";
-		public static const VAR_LOGIN_URL : String = "loginUrl";
+		public static const VAR_IS_LOGIN : String = "islogin";
+		public static const VAR_LOGIN_URL : String = "loginurl";
 		
 		public static const OFFSET : int = -100;
 		public static const SLOT_NUMBER : int = 10;
