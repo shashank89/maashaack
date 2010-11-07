@@ -140,7 +140,8 @@ package
 			Util.addEventListener(main[MC_RESULT][BTN_CLOSE], MouseEvent.CLICK,
 				function(e : Event) : void
 				{
-					result.visible = true;
+					curSpeed = SPEED_NORMAL;
+					result.visible = false;
 					main[BTN_OK].visible = false;
 				});
 			Util.addEventListener(main[MC_RESULT][BTN_OPEN], MouseEvent.CLICK, closeGame);
