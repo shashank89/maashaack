@@ -137,7 +137,12 @@ package
 			Util.addEventListener(main[BTN_OK], MouseEvent.CLICK, startLottery);
 			Util.addEventListener(main[BTN_LEFT], MouseEvent.CLICK, leftClick);
 			Util.addEventListener(main[BTN_RIGHT], MouseEvent.CLICK, rightClick);
-			Util.addEventListener(main[MC_RESULT][BTN_CLOSE], MouseEvent.CLICK, closeGame);
+			Util.addEventListener(main[MC_RESULT][BTN_CLOSE], MouseEvent.CLICK,
+				function(e : Event) : void
+				{
+					result.visible = true;
+					main[BTN_OK].visible = false;
+				});
 			Util.addEventListener(main[MC_RESULT][BTN_OPEN], MouseEvent.CLICK, closeGame);
 			
 			main[MC_RESULT].visible = false;
@@ -196,11 +201,11 @@ package
 		
 		private function startLottery(e : Event) : void
 		{
-			if(!isLogin)
+			/*if(!isLogin)
 			{
 				navigateToURL(new URLRequest(loginUrl), "_top");
 				return;
-			}
+			}*/
 			
 			curSpeed = SPEED_HIGH;
 			
