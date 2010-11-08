@@ -72,7 +72,7 @@ package
 		private var url : String;
 		private var userName : String;
 		private var channel : String;
-		private var isLogin : String;
+		private var isLogin : Boolean;
 		
 		public function Lottery()
 		{
@@ -98,7 +98,7 @@ package
 			userName = stage.loaderInfo.parameters[VAR_USERNAME];
 			channel = stage.loaderInfo.parameters[VAR_CHANNEL];
 			openUrl = stage.loaderInfo.parameters[VAR_OPEN_URL];
-			isLogin = stage.loaderInfo.parameters[VAR_IS_LOGIN];
+			isLogin = stage.loaderInfo.parameters[VAR_IS_LOGIN] != "false";
 			loginUrl = stage.loaderInfo.parameters[VAR_LOGIN_URL];
 			
 			var assetFile : String = stage.loaderInfo.parameters[VAR_ASSET] || ASSET_FILE; 
@@ -141,8 +141,11 @@ package
 				function(e : Event) : void
 				{
 					curSpeed = SPEED_NORMAL;
+					result.mouseEnabled = false;
+					result.mouseChildren = false;
 					result.visible = false;
-					main[BTN_OK].visible = false;
+					removeChild(maskSprite);
+//					main[BTN_OK].visible = false;
 				});
 			Util.addEventListener(main[MC_RESULT][BTN_OPEN], MouseEvent.CLICK, closeGame);
 			
@@ -204,17 +207,19 @@ package
 		{
 			/*if(!isLogin)
 			{
-				navigateToURL(new URLRequest(loginUrl), "_top");
-				return;
+//				navigateToURL(new URLRequest(loginUrl), "_top");
+//				return;
 			}*/
 			
 			curSpeed = SPEED_HIGH;
 			
-			
-			var maskSprite : Sprite = new Sprite();
-			maskSprite.graphics.beginFill(0xFFFFFF, 0.0);
-			maskSprite.graphics.drawRect(0, 0, width, height);
-			maskSprite.graphics.endFill();
+			if(!maskSprite)
+			{
+				maskSprite = new Sprite();
+				maskSprite.graphics.beginFill(0xFFFFFF, 0.0);
+				maskSprite.graphics.drawRect(0, 0, width, height);
+				maskSprite.graphics.endFill();
+			}
 			addChild(maskSprite);
 			
 			var loader : URLLoader = new URLLoader();
@@ -274,6 +279,8 @@ package
 			result[RESULT_DESC][RESULT_TF].text = str;
 			result.visible = true;
 			result.gotoAndPlay(1);
+			result.mouseEnabled = true;
+			result.mouseChildren = true;
 			
 			result[BTN_OPEN].visible = type == "2";
 		}
