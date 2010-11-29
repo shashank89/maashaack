@@ -15,9 +15,10 @@ package
 	import flash.system.LoaderContext;
 	import flash.ui.ContextMenu;
 	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
 	import flash.utils.setTimeout;
 	
-	[SWF(width="910", height="270", frameRate="16",allowFullScreen="true")]
+	[SWF(width="910", height="270", backgroundColor="#fbd380", frameRate="16",allowFullScreen="true")]
 	public class Lottery extends Sprite
 	{
 		public static const ASSET_FILE : String = "./swf/asset.swf";
@@ -159,7 +160,7 @@ package
 		{
 			if(type == "2")
 			{
-				navigateToURL(new URLRequest(openUrl + "?pid=" + pid), "_top");
+				navigateToURL(new URLRequest(openUrl + "?pid=" + pid + "&id=" + getTimer()), "_top");
 			}
 		}
 		
