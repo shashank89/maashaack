@@ -22,6 +22,7 @@ package
 	import flash.ui.Mouse;
 	import flash.utils.ByteArray;
 	import flash.utils.getDefinitionByName;
+	import flash.utils.getTimer;
 	
 	[SWF(width="550", height="314", backgroundColor="#ffffff", frameRate="16",allowFullScreen="true")]
 	public class GoldenEgg extends Sprite
@@ -37,6 +38,8 @@ package
 		public static const RESULT_TF : String = "tf_desc";
 		public static const BTN_RESTART : String = "bn_restart";
 		public static const BTN_CLOSE : String = "bn_close";
+		public static const BTN_OPEN : String = "bn_open";
+		public static const BTN_LOGIN : String = "bn_login";
 		
 		public static const VAR_URL : String = "url";
 		public static const VAR_USERNAME : String = "username";
@@ -44,6 +47,8 @@ package
 		public static const VAR_INDEX : String = "index";
 		public static const VAR_ASSET : String = "asset";
 		public static const VAR_OPEN_URL : String = "open_url";
+        public static const VAR_IS_LOGIN:String = "islogin";
+        public static const VAR_LOGIN_URL:String = "loginurl";
 		
 		private var main : MovieClip;
 		private var hammer : MovieClip;
@@ -53,16 +58,18 @@ package
 		private var eggs_anim : Array;
 		private var maskSprite : Sprite;
 		
-		private var msg : String;
-		private var type : String;
-		private var pid : String;
+		private var msg : String = "";
+		private var type : String = "";
+		private var pid : String = "";
 		private var openUrl : String;
+        private var loginUrl:String = "";
 		
 		private var curIndex : int;
 		private var isKickingEgg : Boolean;
 		private var url : String;
 		private var userName : String;
 		private var channel : String;
+        private var isLogin:Boolean;
 		
 		public function GoldenEgg()
 		{
@@ -90,6 +97,8 @@ package
 			userName = stage.loaderInfo.parameters[VAR_USERNAME];
 			channel = stage.loaderInfo.parameters[VAR_CHANNEL];
 			openUrl = stage.loaderInfo.parameters[VAR_OPEN_URL];
+            isLogin = stage.loaderInfo.parameters[VAR_IS_LOGIN] != "false";
+            loginUrl = stage.loaderInfo.parameters[VAR_LOGIN_URL];
 			
 			var assetFile : String = stage.loaderInfo.parameters[VAR_ASSET] || ASSET_FILE; 
 			
@@ -159,6 +168,8 @@ package
 			
 			Util.addEventListener(result[BTN_RESTART], MouseEvent.CLICK, restartGame);
 			Util.addEventListener(result[BTN_CLOSE], MouseEvent.CLICK, closeGame);
+			Util.addEventListener(result[BTN_OPEN], MouseEvent.CLICK, closeGame);
+			Util.addEventListener(result[BTN_LOGIN], MouseEvent.CLICK, closeGame);
 		}
 
 		private function tickFrame(e : Event) : void
@@ -211,9 +222,15 @@ package
 		{
 //			navigateToURL(new URLRequest("javascript:window.close();"), "_top");
 //			navigateToURL(new URLRequest("javascript:window.location.reload();"), "_top");
-			if(type == "1")
+			if(!isLogin)
+
 			{
-				navigateToURL(new URLRequest(openUrl + "?pid=" + pid), "_top");
+				navigateToURL(new URLRequest(loginUrl), "_top");
+				return;
+			}
+			if(type == "2")
+			{
+				navigateToURL(new URLRequest(openUrl + "?pid=" + pid + "&id=" + getTimer()), "_top");
 			}
 		}
 
@@ -272,6 +289,7 @@ package
 			var data : ByteArray = e.currentTarget.data;
 			var resultStr : String = data.readUTFBytes(data.bytesAvailable);
 			
+			resultStr = resultStr.substr(2);
 			var arr : Array = resultStr.split("&");
 			for each(var str : String in arr)
 			{
@@ -290,9 +308,21 @@ package
 			}
 			
 			result[RESULT_DESC][RESULT_TF].text = msg;
+			result[BTN_OPEN].visible = type == "2";
 			
 			result.visible = true;
 			result.gotoAndPlay(1);
+            if (isLogin)
+            {
+                result[BTN_OPEN].visible = type == "2";
+                result[BTN_LOGIN].visible = false;
+            }
+            else
+            {
+                result[BTN_OPEN].visible = false;
+                result[BTN_LOGIN].visible = true;
+                result[RESULT_DESC][RESULT_TF].text = "请登录";
+            }
 		}
 
 		private function mouseOverHandler(e : MouseEvent) : void
