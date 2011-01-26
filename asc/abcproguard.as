@@ -97,6 +97,31 @@ package abcdump
         }
     }
     
+	class QualifyName
+	{
+		var name : String;
+		var namespace : String;
+		
+		function QualifyName(namespace:Object = null, name:Object = null)
+		{
+			if(namespace)
+			{
+				this.namespace = namespace;
+			}
+			else
+			{
+				this.namespace = "*";
+			}
+			
+			this.name = name;
+		}
+		
+		public function toString()
+		{
+			return (namespace != null && namespace.toString.length > 0) ? namespace + ":" + name : name;
+		}
+	}
+    
     class TypeName
     {
         var name;
@@ -139,6 +164,8 @@ package abcdump
         var kind:int
         var name
         var metadata:Array
+		
+		public function proguard(abc : Abc) : void {}
     }
 
     dynamic class LabelInfo
@@ -397,6 +424,18 @@ package abcdump
             b |= code.readByte()<<16
             return b
         }
+		
+		override public function proguard(abc : Abc) : void
+		{
+			var classIndex : int = abc.classNames.indexOf(name.toString());
+			var index : int = abc.strings.indexOf(name.toString());
+			if(classIndex < 0 && index > 0)
+			{
+				abc.replacedStrings.push(abc.strings[index], "x");
+				infoPrint("strings index :" + index + " (" + abc.strings[index] + ") replaced by \"x\"");
+				abc.strings[index] = "x";
+			}
+		}
     }
     
     class SlotInfo extends MemberInfo
@@ -485,6 +524,12 @@ package abcdump
             for each (var m in members)
                 m.dump(abc, indent, attr)
         }
+		
+		public function proguard(abc : Abc) : void
+		{
+			for each(var m : MemberInfo in members)
+				m.proguard(abc);
+		}
     }
 
     class Abc
@@ -504,6 +549,8 @@ package abcdump
 		
 		var namespacesKind:Array
 		var namesKind:Array
+		var classNames:Array
+		var replacedStrings:Array
         
         var defaults:Array = new Array(constantKinds.length)
         
@@ -624,7 +671,9 @@ package abcdump
             n = readU32()
             strings = [""]
             for (i=1; i < n; i++)
+			{
                 strings[i] = data.readUTFBytes(readU32())
+			}
 
             infoPrint("Cpool strings count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
             start = data.position
@@ -687,12 +736,12 @@ package abcdump
                 {
                 case CONSTANT_Qname:
                 case CONSTANT_QnameA:
-                    names[i] = new QName(namespaces[readU32()], strings[readU32()])
+                    names[i] = new QualifyName(namespaces[readU32()], strings[readU32()])
                     break;
                 
                 case CONSTANT_RTQname:
                 case CONSTANT_RTQnameA:
-                    names[i] = new QName(strings[readU32()])
+                    names[i] = new QualifyName(strings[readU32()])
                     break;
                 
                 case CONSTANT_RTQnameL:
@@ -702,7 +751,7 @@ package abcdump
                 
                 case CONSTANT_NameL:
                 case CONSTANT_NameLA:
-                    names[i] = new QName(new Namespace(""), null)
+                    names[i] = new QualifyName(new Namespace(""), null)
                     break;
                 
                 case CONSTANT_Multiname:
@@ -740,7 +789,7 @@ package abcdump
         function parseMethodInfos()
         {
             var start:int = data.position
-            names[0] = new QName(publicNs,"*")
+            names[0] = new QualifyName(publicNs,"*")
             var method_count:int = readU32()
             methods = []
             for (var i:int=0; i < method_count; i++)
@@ -902,6 +951,7 @@ package abcdump
         {
             var start:int = data.position
             var count:int = instances.length
+			classNames = [""]
             classes = []
             for (var i:int=0; i < count; i++)
             {
@@ -913,6 +963,8 @@ package abcdump
                 t.init.name = t.itraits.name + "$cinit"
                 t.init.kind = TRAIT_Method
                 parseTraits(t)
+				
+				classNames[i] = t.itraits.name.toString();
             }           
             infoPrint("ClassInfo count " + count + " size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+"%")
         }
@@ -930,8 +982,7 @@ package abcdump
                 t.base = names[0] // Object
                 t.init = methods[readU32()]
                 t.init.name = t.name + "$init"
-                t.init.kind = TRAIT_Method   
-				print(data.position);
+                t.init.kind = TRAIT_Method 
                 parseTraits(t, true)
             }
             infoPrint("ScriptInfo count " + count + " size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
@@ -1014,8 +1065,26 @@ package abcdump
             }
         }
 		
-		function progurad()
+		function proguard()
 		{
+			infoPrint("proguard:");
+			
+			replacedStrings = [];
+			
+			for each(var m : MethodInfo in methods)
+			{
+				m.proguard(this);
+			}
+			
+			// replace strings
+			for each(var n : Object in names)
+			{
+				var index : int = replacedStrings.indexOf(n.toString());
+				if(index >= 0 && index % 2 == 0)
+				{
+					n.name = replacedStrings[index + 1];
+				}
+			}
 		}
 		
 		function writeU32(data : ByteArray, n : int)
@@ -1063,6 +1132,8 @@ package abcdump
 		{
 			var i:int, j:int, n:int
 			
+            var start:int = data.position
+			
             // ints
 			n = ints.length
 			writeU32(data, n)
@@ -1081,6 +1152,9 @@ package abcdump
 			for(i = 1; i < n; ++i)
 				data.writeDouble(doubles[i])
 			
+            infoPrint("Cpool numbers size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
+            start = data.position
+			
             // strings
 			n = strings.length
 			writeU32(data, n)
@@ -1089,6 +1163,9 @@ package abcdump
 				writeU32(data, strings[i].length)
 				data.writeUTFBytes(strings[i])
 			}
+			
+            infoPrint("Cpool strings count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
+            start = data.position
 			
             // namespaces
 			n = namespaces.length
@@ -1112,6 +1189,9 @@ package abcdump
 				}
 			}
 			
+            infoPrint("Cpool namespaces count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
+            start = data.position
+            
             // namespace sets
 			n = nssets.length
 			writeU32(data, n)
@@ -1124,6 +1204,9 @@ package abcdump
 					writeU32(data, namespaces.indexOf(nsset[j]))
 			}
 			
+            infoPrint("Cpool nssets count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
+            start = data.position
+            
 			// multinames
 			n = names.length
 			writeU32(data, n)
@@ -1134,13 +1217,13 @@ package abcdump
                 {
                 case CONSTANT_Qname:
                 case CONSTANT_QnameA:
-					writeU32(data, getNsIndexByUri(names[i].uri));
-					writeU32(data, strings.indexOf(names[i].localName));
+					writeU32(data, getNsIndexByUri(names[i].namespace));
+					writeU32(data, strings.indexOf(names[i].name));
                     break;
                 
                 case CONSTANT_RTQname:
                 case CONSTANT_RTQnameA:
-					writeU32(data, strings.indexOf(names[i].localName));
+					writeU32(data, strings.indexOf(names[i].name));
                     break;
                 
                 case CONSTANT_RTQnameL:
@@ -1153,7 +1236,7 @@ package abcdump
                 
                 case CONSTANT_Multiname:
                 case CONSTANT_MultinameA:
-					writeU32(data, strings.indexOf(names[i].name));
+					writeU32(data, strings.indexOf(names[i].name.toString()));
 					writeU32(data, nssets.indexOf(names[i].nsset));
                     break;
 
@@ -1163,17 +1246,19 @@ package abcdump
                     break;
                     
                 case CONSTANT_TypeName:
-					writeU32(data, strings.indexOf(names[i].name));
+					writeU32(data, strings.indexOf(names[i].name.toString()));
 					var count : int = names[i].types.length;
 					writeU32(data, count);
 					for(var t : int = 0; t < count; ++t)
 						writeU32(data, names.indexOf(names[i].types[t]));
                     break;
-                    
                 default:
                     throw new Error("invalid kind " + data[data.position-1])
 				}
 			}
+            infoPrint("Cpool names count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
+            start = data.position
+
 		}
 		
 		function writeMethodInfos(data : ByteArray)
@@ -1336,7 +1421,6 @@ package abcdump
 			{
 				var t : Traits = scripts[i];
 				writeU32(data, methods.indexOf(t.init));
-				print(data.position);
 				writeTraits(data, t, true);
 			}
 			infoPrint("ScriptInfo write size:" + count + "/" + (data.position - start));
@@ -1703,9 +1787,10 @@ package abcdump
         case 46<<16|16:
             var abc:Abc = new Abc(data)
 			
+			abc.proguard();
+			
 			var output : ByteArray = new ByteArray();
 			output.endian = "littleEndian";
-			
 			abc.write(output);
 			output.writeFile(file + ".pgd");
 			
