@@ -99,8 +99,8 @@ package abcdump
     
 	class QualifyName
 	{
-		var name : String;
-		var namespace : String;
+		var name : Object;
+		var namespace : Object;
 		
 		function QualifyName(namespace:Object = null, name:Object = null)
 		{
@@ -126,6 +126,7 @@ package abcdump
     {
         var name;
         var types:Array;
+		var nameIndex:int;
         function TypeName(name, types)
         {
             this.name = name;
@@ -146,7 +147,12 @@ package abcdump
     dynamic class MetaData
     {
         var name:String
+		
 		var count : int;
+		var nameIndex : int;
+		var namesIndex : Array;
+		var valuesIndex : Array;
+		
         public function toString():String 
         {
             var last:String
@@ -203,6 +209,7 @@ package abcdump
 		var tag:int;
 		var optionalValuesIndex:Array;
 		var optionalValuesType:Array;
+		var nameIndex:int;
 
         public function toString():String
         {
@@ -548,7 +555,9 @@ package abcdump
         var names:Array
 		
 		var namespacesKind:Array
+		var namespacesStringIndex:Array
 		var namesKind:Array
+		var namesStringIndex:Array
 		var classNames:Array
 		var replacedStrings:Array
         
@@ -681,7 +690,8 @@ package abcdump
             // namespaces
             n = readU32()
             namespaces = [publicNs]
-			namespacesKind = [0]
+			namespacesKind = [0];
+			namespacesStringIndex = [];
             for (i=1; i < n; i++)
 			{
 				namespacesKind[i] = data.readByte()
@@ -694,14 +704,14 @@ package abcdump
                 case CONSTANT_StaticProtectedNs:
                 case CONSTANT_StaticProtectedNs2:
                 {
-					var index : int = readU32()
-                    namespaces[i] = new Namespace(strings[index])
+					namespacesStringIndex[i] = readU32();
+                    namespaces[i] = new Namespace(strings[namespacesStringIndex[i] ])
                     break;
                 }
                 case CONSTANT_PrivateNs:
-					var index : int = readU32()
+					namespacesStringIndex[i] = readU32();
                     //namespaces[i] = new Namespace(strings[index], "private")
-					namespaces[i] = new Namespace(strings[index])
+					namespaces[i] = new Namespace(strings[namespacesStringIndex[i] ])
                     break;
                 }
 			}
@@ -729,6 +739,7 @@ package abcdump
             namespaces[0] = anyNs
             strings[0] = "*" // any name
 			namesKind = [0]
+			namesStringIndex = []
             for (i=1; i < n; i++)
 			{
 				namesKind[i] = data.readByte()
@@ -736,12 +747,15 @@ package abcdump
                 {
                 case CONSTANT_Qname:
                 case CONSTANT_QnameA:
-                    names[i] = new QualifyName(namespaces[readU32()], strings[readU32()])
+					var index : int = readU32();
+					namesStringIndex[i] = readU32();
+                    names[i] = new QualifyName(namespaces[index], strings[namesStringIndex[i]])
                     break;
                 
                 case CONSTANT_RTQname:
                 case CONSTANT_RTQnameA:
-                    names[i] = new QualifyName(strings[readU32()])
+					namesStringIndex[i] = readU32();
+                    names[i] = new QualifyName(strings[namesStringIndex[i]])
                     break;
                 
                 case CONSTANT_RTQnameL:
@@ -756,7 +770,8 @@ package abcdump
                 
                 case CONSTANT_Multiname:
                 case CONSTANT_MultinameA:
-                    var name = strings[readU32()]
+					namesStringIndex[i] = readU32();
+                    var name = strings[namesStringIndex[i]]
                     names[i] = new Multiname(nssets[readU32()], name)
                     break;
 
@@ -766,12 +781,14 @@ package abcdump
                     break;
                     
                 case CONSTANT_TypeName:
-                    var name = names[readU32()];
+					var index = readU32();
+                    var name = names[index];
                     var count = readU32();
                     var types = [];
                     for( var t=0; t < count; ++t )
                         types.push(names[readU32()]);
                     names[i] = new TypeName(name, types);
+					names[i].nameIndex = index;
                     break;
                     
                 default:
@@ -801,7 +818,8 @@ package abcdump
                 m.paramTypes = []
                 for (var j:int=0; j < param_count; j++)
                     m.paramTypes[j] = names[readU32()]
-                m.debugName = strings[readU32()]
+				m.nameIndex = readU32();
+                m.debugName = strings[m.nameIndex]
                 m.flags = data.readByte()
                 if (m.flags & HAS_OPTIONAL)
                 {
@@ -853,14 +871,23 @@ package abcdump
             {
                 // MetadataInfo
                 var m = metadata[i] = new MetaData()
-                m.name = strings[readU32()];
+				m.nameIndex = readU32();
+                m.name = strings[m.nameIndex];
                 var values_count:int = readU32();
 				m.count = values_count;
+				m.namesIndex = [];
                 var names:Array = []
                 for(var q:int = 0; q < values_count; ++q)
-                    names[q] = strings[readU32()] // name 
+				{
+					m.namesIndex[q] = readU32();
+                    names[q] = strings[m.namesIndex[q]] // name 
+				}
+				m.valuesIndex = [];
                 for(var q:int = 0; q < values_count; ++q)
-                    m[names[q]] = strings[readU32()] // value
+				{
+					m.valuesIndex[q] = readU32();
+                    m[names[q]] = strings[m.valuesIndex[q]] // value
+				}
             }
             infoPrint("MetadataInfo count " +count+ " size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
         }
@@ -1076,15 +1103,6 @@ package abcdump
 				m.proguard(this);
 			}
 			
-			// replace strings
-			for each(var n : Object in names)
-			{
-				var index : int = replacedStrings.indexOf(n.toString());
-				if(index >= 0 && index % 2 == 0)
-				{
-					n.name = replacedStrings[index + 1];
-				}
-			}
 		}
 		
 		function writeU32(data : ByteArray, n : int)
@@ -1182,9 +1200,7 @@ package abcdump
                 case CONSTANT_StaticProtectedNs:
                 case CONSTANT_StaticProtectedNs2:
                 case CONSTANT_PrivateNs:
-					var prefix : String = namespaces[i];
-					var index = strings.indexOf(prefix);
-					writeU32(data, index);
+					writeU32(data, namespacesStringIndex[i]);
 					break;
 				}
 			}
@@ -1217,13 +1233,13 @@ package abcdump
                 {
                 case CONSTANT_Qname:
                 case CONSTANT_QnameA:
-					writeU32(data, getNsIndexByUri(names[i].namespace));
-					writeU32(data, strings.indexOf(names[i].name));
+					writeU32(data, namespaces.indexOf(names[i].namespace));
+					writeU32(data, namesStringIndex[i]);
                     break;
                 
                 case CONSTANT_RTQname:
                 case CONSTANT_RTQnameA:
-					writeU32(data, strings.indexOf(names[i].name));
+					writeU32(data, namesStringIndex[i]);
                     break;
                 
                 case CONSTANT_RTQnameL:
@@ -1236,7 +1252,7 @@ package abcdump
                 
                 case CONSTANT_Multiname:
                 case CONSTANT_MultinameA:
-					writeU32(data, strings.indexOf(names[i].name.toString()));
+					writeU32(data, namesStringIndex[i]);
 					writeU32(data, nssets.indexOf(names[i].nsset));
                     break;
 
@@ -1246,7 +1262,7 @@ package abcdump
                     break;
                     
                 case CONSTANT_TypeName:
-					writeU32(data, strings.indexOf(names[i].name.toString()));
+					writeU32(data, names[i].nameIndex);
 					var count : int = names[i].types.length;
 					writeU32(data, count);
 					for(var t : int = 0; t < count; ++t)
@@ -1274,7 +1290,7 @@ package abcdump
 				writeU32(data, names.indexOf(m.returnType));
 				for(var j : int = 0; j < param_count; ++j)
 					writeU32(data, names.indexOf(m.paramTypes[j]));
-				writeU32(data, strings.indexOf(m.debugName));
+				writeU32(data, m.nameIndex);
 				data.writeByte(m.flags);
                 if (m.flags & HAS_OPTIONAL)
                 {
@@ -1309,15 +1325,15 @@ package abcdump
 			for(var i : int = 0; i < count; ++i)
 			{
 				var m : MetaData = metadata[i];
-				writeU32(data, strings.indexOf(m.name));
+				writeU32(data, m.nameIndex);
 				writeU32(data, m.count);
-				for(var name : String in m)
+				for(var j : int = 0; j < m.count; ++j)
 				{
-					writeU32(data, strings.indexOf(name));
+					writeU32(data, m.namesIndex[j]);
 				}
-				for each(var value : String in m)
+				for(var j : int = 0; j < m.count; ++j)
 				{
-					writeU32(data, strings.indexOf(value));
+					writeU32(data, m.valuesIndex[j]);
 				}
 			}
 			infoPrint("MetadataInfo write size:" + count + "/" + (data.position - start));
@@ -1383,6 +1399,7 @@ package abcdump
                 case TRAIT_Method:
                 case TRAIT_Getter:
                 case TRAIT_Setter:
+					print(member.id);
 					writeU32(data, member.id);
 					writeU32(data, methods.indexOf(member));
                     break;
@@ -1412,6 +1429,7 @@ package abcdump
 			}
 			infoPrint("ClassInfo write size:" + count + "/" + (data.position - start));
 		}
+		
 		function writeScriptInfos(data : ByteArray)
 		{
 			var start : int = data.position;
