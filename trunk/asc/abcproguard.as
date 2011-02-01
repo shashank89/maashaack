@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package abcdump
+package abcproguard
 {
     import flash.utils.ByteArray
     import avmplus.System
@@ -45,15 +45,15 @@ package abcdump
     include "abc-constants.as"
     
     var usage = [
-    "Displays the contents of abc or swf files",
+    "Proguard the byte code in abc or swf files",
     "",
     "Usage:",
     "",
-    "    abcdump [options] file ...",
+    "    abcproguard [options] file ...",
     "",
     "Each file can be an ABC or SWF/SWC format file",
     "",
-    "Options:",
+    "Options(unused):",
     "",
     " -a   Extract the ABC blocks from the SWF/SWC, but do not",
     "      otherwise display their contents.  The file names are",
@@ -80,6 +80,25 @@ package abcdump
         if (doExtractInfo)
             print((doExtractAbs ? "// " : "") + s)
     }
+	
+	interface ISWFTag
+	{
+		function write(data : ByteArray);
+	}
+	
+	class SWFTag implements ISWFTag
+	{
+		private var _data : ByteArray;
+		
+		function SWFTag(data : ByteArray)
+		{
+			_data = data;
+		}
+		
+		public function write(data : ByteArray)
+		{
+		}
+	}
 
     class Multiname
     {
@@ -539,7 +558,7 @@ package abcdump
 		}
     }
 
-    class Abc
+    class Abc implements ISWFTag
     {
         private var data:ByteArray
         
@@ -1132,7 +1151,7 @@ package abcdump
 			}
 		}
 		
-		function write(data : ByteArray)
+		public function write(data : ByteArray)
 		{
 			data.writeInt(magic)
 			
@@ -1611,6 +1630,11 @@ package abcdump
     
     class Swf
     {
+		public var rect : Rect;
+		public var frameRate : int;
+		public var frameCount : int;
+		public var tags : Array;
+	
         private var bitPos:int
         private var bitBuf:int
         
@@ -1619,14 +1643,20 @@ package abcdump
         function Swf(data:ByteArray)
         {
             this.data = data
-            infoPrint("size "+decodeRect())
-            infoPrint("frame rate "+(data.readUnsignedByte()<<8|data.readUnsignedByte()))
-            infoPrint("frame count "+data.readUnsignedShort())
+			rect = decodeRect();
+			frameRate = data.readUnsignedByte()<<8|data.readUnsignedByte();
+			frameCount = data.readUnsignedShort();
+			
+            infoPrint("size "+rect)
+            infoPrint("frame rate "+frameRate)
+            infoPrint("frame count "+frameCount)
             decodeTags()            
         }
         
         private function decodeTags()
         {
+			tags = [];
+		
             var type:int, h:int, length:int
             var offset:int
     
@@ -1742,7 +1772,63 @@ package abcdump
                 }
             }
         }
-    }
+		
+		function writeSBits(data : ByteArray, value : int, numBits : int) : void
+		{
+			if(numBits > 32)
+				throw new Error("Number of bits > 32");
+			
+			value |= (value >>> 31) << (32 - numBits);
+			
+			writeUbits(data, value, numBits);
+		}
+		
+		function writeUBits(data : ByteArray, value : int, numBits : int) : void
+		{
+			if(numBits == 0)
+				return;
+			
+			var bitsLeft : int = numBits;
+			
+			if(bitPos == 0)
+			{
+				bitPos = 8;
+				bitBuf = 0;
+			}
+			
+			while(true)
+			{
+				var shift : int = bitsLeft - bitPos;
+				if(shift > 0)
+				{
+					bitBuf |= value >> (bitsLeft - bitPos);
+					data.writeByte(bitBuf & 0xFF);
+					
+					bitsLeft -= bitPos;
+					
+					bitPos = 8;
+					bitBuf = 0;
+				}
+				else
+				{
+					bitBuf |= value << (-shift);
+					
+					bitPos -= bitsLeft;
+					break;
+				}
+			}
+		}
+		
+		function flushData(data : ByteArray) : void
+		{
+			data.writeByte(bitBuf & 0xFF);
+		}
+		
+		function write(data : ByteArray) : void
+		{
+			
+		}
+	}
 
     function help()
     {
