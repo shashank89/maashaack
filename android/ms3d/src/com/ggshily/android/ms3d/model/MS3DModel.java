@@ -425,7 +425,7 @@ class MS3DModel {
         currentTime = dataInputStream.readFloat();
         totalFrames = dataInputStream.readInt();
 
-        joints = decodeJoints(dataInputStream);
+        joints = decodeJoints(dataInputStream, animationFPS);
         
         MS3DComment.decodeMS3DComment(dataInputStream);
         
@@ -543,13 +543,13 @@ class MS3DModel {
 		toArr[2][3] = from[2][3];
 	}
 
-    private static MS3DJoint[] decodeJoints(DataInput input) throws IOException {
+    private static MS3DJoint[] decodeJoints(DataInput input, float fps) throws IOException {
         int numJoints = input.readUnsignedShort();
 
         MS3DJoint[] joints = new MS3DJoint[numJoints];
 
         for (int jc = 0; jc < numJoints; jc++) {
-            joints[jc] = MS3DJoint.decodeMS3DJoint(input);
+            joints[jc] = MS3DJoint.decodeMS3DJoint(input, fps);
         }
         return joints;
     }

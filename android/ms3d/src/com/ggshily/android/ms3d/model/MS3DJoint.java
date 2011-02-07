@@ -29,7 +29,7 @@ class MS3DJoint {
 	
 	public float[] color = {0.0f, 0.0f, 0.0f};
 
-    public static MS3DJoint decodeMS3DJoint(DataInput input) throws IOException {
+    public static MS3DJoint decodeMS3DJoint(DataInput input, float fps) throws IOException {
         int flags = input.readUnsignedByte();
         String name = MS3DModel.decodeZeroTerminatedString(input, 32);
         String parentName = MS3DModel.decodeZeroTerminatedString(input, 32);
@@ -51,7 +51,7 @@ class MS3DJoint {
 
         KeyFrameRotation[] keyFrameRotations = new KeyFrameRotation[numKeyFramesRot];
         for (int i = 0; i < keyFrameRotations.length; i++) {
-            float time = input.readFloat();
+            float time = input.readFloat() * fps;
             float rotX = input.readFloat();
             float rotY = input.readFloat();
             float rotZ = input.readFloat();
@@ -60,7 +60,7 @@ class MS3DJoint {
 
         KeyFramePosition[] keyFramePositions = new KeyFramePosition[numKeyFramesTrans];
         for (int i = 0; i < keyFramePositions.length; i++) {
-            float time = input.readFloat();
+            float time = input.readFloat() * fps;
             float x = input.readFloat();
             float y = input.readFloat();
             float z = input.readFloat();

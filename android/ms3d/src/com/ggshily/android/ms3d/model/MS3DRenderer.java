@@ -124,8 +124,8 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 
-		// GLU.gluLookAt(gl, eyeX, eyeY, eyeZ, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-		// GLU.gluLookAt(gl, 75, 75, 75, 0f, 0f, 0f, 0f, 0.0f, 0.0f);
+//		 GLU.gluLookAt(gl, eyeX, eyeY, eyeZ, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+//		 GLU.gluLookAt(gl, 75, 75, 0, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -159,12 +159,13 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	public void draw(GL10 gl)
 	{
-//		currentFrame += 1 / model.animationFPS;
+		// based on frame
+		currentFrame += 1f;
 		
 		if(currentFrame > model.totalFrames)
 			currentFrame = 0.0f;
 		
-//		updateFrame(currentFrame);
+		updateFrame(currentFrame);
 		
 		gl.glFrontFace(GL10.GL_CCW);
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mFVertexBuffer);
@@ -200,7 +201,8 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		float far = translationZ + radius;
 		if(far < near)
 			far = 4096.f;
-		GLU.gluPerspective(gl, 45f, ratio, near, far);
+//		GLU.gluPerspective(gl, 45f, ratio, near, far);
+		GLU.gluPerspective(gl, 45f, ratio, 5f, 3000f); // for the case some texture is wrong sometimes
 
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
@@ -318,6 +320,10 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		mFVertexBuffer.position(0);
 		mTexBuffer.position(0);
 		mIndexBuffer.position(0);
+		
+		mFVertexBuffer.clear();
+		mTexBuffer.clear();
+		mIndexBuffer.clear();
 		
 		MS3DGroup group;
 		MS3DTriangle t;
