@@ -24,6 +24,7 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	private int mTextureID;
 	private MS3DModel model;
 	private int triangleNum;
+	private boolean isIdle;
 
 	private FloatBuffer mFVertexBuffer;
 	private FloatBuffer mTexBuffer;
@@ -160,7 +161,8 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	public void draw(GL10 gl)
 	{
 		// based on frame
-		currentFrame += 1f;
+		if(!isIdle)
+			currentFrame += 1f;
 		
 		if(currentFrame > model.totalFrames)
 			currentFrame = 0.0f;
@@ -356,5 +358,15 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		mTexBuffer.position(0);
 		mIndexBuffer.position(0);
 		System.out.println("update frame time:" + (SystemClock.uptimeMillis() - start));
+	}
+
+	public boolean isIdle()
+	{
+		return isIdle;
+	}
+
+	public void setIdle(boolean isIdle)
+	{
+		this.isIdle = isIdle;
 	}
 }

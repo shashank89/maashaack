@@ -170,8 +170,7 @@ public class Graphics3D extends Activity implements OnClickListener,
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0)
 	{
-		mRenderer.setRotateSpeedX(0);
-		mRenderer.setRotateSpeedY(0);
+		mRenderer.setIdle(!mRenderer.isIdle());
 		return false;
 	}
 }
