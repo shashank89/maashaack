@@ -50,7 +50,7 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	private int width;
 	private int height;
 	private float currentFrame;
-	private int bitmapRes;
+	private int texRes;
 	private int modelRes;
 	
 	// text info
@@ -74,11 +74,11 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	private short[] mIndexArray;
 
-	public MS3DRenderer(Context context, int bitmapRes, int modelRes)
+	public MS3DRenderer(Context context, int texRes, int modelRes)
 	{
 		mContext = context;
 		
-		this.bitmapRes = bitmapRes;
+		this.texRes = texRes;
 		this.modelRes = modelRes;
 		
 		mProjector = new Projector();
@@ -335,11 +335,11 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	private void loadRes()
 	{
-		InputStream is = mContext.getResources().openRawResource(bitmapRes);
+		InputStream is = mContext.getResources().openRawResource(texRes);
 		Bitmap bitmap;
 		try
 		{
-			System.out.println("start decode bitmap:" + bitmapRes);
+			System.out.println("start decode bitmap:" + texRes);
 			bitmap = BitmapFactory.decodeStream(is);
 			System.out.println("finished decode bitmap");
 		}

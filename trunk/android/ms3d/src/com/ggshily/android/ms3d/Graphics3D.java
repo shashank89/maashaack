@@ -3,6 +3,7 @@ package com.ggshily.android.ms3d;
 import javax.microedition.khronos.opengles.GL;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Display;
@@ -20,6 +21,15 @@ import com.ggshily.android.opengles.text.MatrixTrackingGL;
 public class Graphics3D extends Activity implements OnClickListener,
 		OnLongClickListener, OnTouchListener, OnGestureListener
 {
+
+	public static final float FLING_MIN_DISTANCE = 5;
+	public static final float FLING_MIN_VELOCITY = 5;
+	
+	public static final int DEFAULT_MODEL = R.raw.model;
+	public static final int DEFAULT_TEX   = R.raw.wood;
+//	public static final int DEFAULT_MODEL = R.raw.skinr;
+//	public static final int DEFAULT_TEX   = R.raw.skin;
+	
 	private MS3DRenderer mRenderer;
 
 	private GestureDetector gestureDetector;
@@ -27,10 +37,6 @@ public class Graphics3D extends Activity implements OnClickListener,
 	private float angleX;
 
 	private float angleY;
-
-	private static final float FLING_MIN_DISTANCE = 5;
-
-	private static final float FLING_MIN_VELOCITY = 5;
 	
 	private static int SCREEN_WIDTH;
 	private static int SCREEN_HEIGHT;
@@ -40,6 +46,14 @@ public class Graphics3D extends Activity implements OnClickListener,
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+        Intent intent = getIntent();
+        int modelRes = intent.getIntExtra("model", -1);
+        int texRes = intent.getIntExtra("tex", -1);
+        if(modelRes == -1)
+        	modelRes = DEFAULT_MODEL;
+        if(texRes == -1)
+        	texRes = DEFAULT_TEX;
 		
 		// We don't need a title either.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -51,8 +65,7 @@ public class Graphics3D extends Activity implements OnClickListener,
                 return new MatrixTrackingGL(gl);
             }});
 		// mRenderer = new Renderer();
-		mRenderer = new MS3DRenderer(getApplication(), R.raw.wood, R.raw.model);
-//		mRenderer = new MS3DRenderer(getApplication(), R.raw.skin, R.raw.skinr);
+		mRenderer = new MS3DRenderer(getApplication(), texRes, modelRes);
 		mView.setRenderer(mRenderer);
 		
 		System.out.println("start game");
