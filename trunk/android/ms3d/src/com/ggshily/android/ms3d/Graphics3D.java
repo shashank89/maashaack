@@ -46,6 +46,7 @@ public class Graphics3D extends Activity implements OnClickListener,
 		
 		// mRenderer = new Renderer();
 		mRenderer = new MS3DRenderer(getApplication(), R.raw.wood, R.raw.model);
+//		mRenderer = new MS3DRenderer(getApplication(), R.raw.skin, R.raw.skinr);
 		mView.setRenderer(mRenderer);
 		
 		System.out.println("start game");
