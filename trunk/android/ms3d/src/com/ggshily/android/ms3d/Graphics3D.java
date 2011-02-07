@@ -1,5 +1,7 @@
 package com.ggshily.android.ms3d;
 
+import javax.microedition.khronos.opengles.GL;
+
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 
 import com.ggshily.android.ms3d.model.MS3DRenderer;
+import com.ggshily.android.opengles.MatrixTrackingGL;
 
 public class Graphics3D extends Activity implements OnClickListener,
 		OnLongClickListener, OnTouchListener, OnGestureListener
@@ -43,7 +46,11 @@ public class Graphics3D extends Activity implements OnClickListener,
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		GLSurfaceView mView = new GLSurfaceView(getApplication());
-		
+
+		mView.setGLWrapper(new GLSurfaceView.GLWrapper() {
+            public GL wrap(GL gl) {
+                return new MatrixTrackingGL(gl);
+            }});
 		// mRenderer = new Renderer();
 		mRenderer = new MS3DRenderer(getApplication(), R.raw.wood, R.raw.model);
 //		mRenderer = new MS3DRenderer(getApplication(), R.raw.skin, R.raw.skinr);

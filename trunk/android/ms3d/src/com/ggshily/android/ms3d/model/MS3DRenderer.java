@@ -10,9 +10,14 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import com.ggshily.android.opengles.LabelMaker;
+import com.ggshily.android.opengles.NumericSprite;
+import com.ggshily.android.opengles.Projector;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.SystemClock;
@@ -20,6 +25,10 @@ import android.os.SystemClock;
 public class MS3DRenderer extends AbstractOpenGLRenderer
 {
 
+	public  static final int SAMPLE_PERIOD_FRAMES = 12;
+
+	private static final float SAMPLE_FACTOR = 1.0f / SAMPLE_PERIOD_FRAMES;
+	
 	private Context mContext;
 	private int mTextureID;
 	private MS3DModel model;
@@ -39,6 +48,21 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	private float currentFrame;
 	private int bitmapRes;
 	private int modelRes;
+	
+	// text info
+	private LabelMaker mLabels;
+	private Paint mLabelPaint;
+	private int mLabelMsPF;
+	private NumericSprite mNumericSprite;
+	private Projector mProjector;
+	private long mStartTime;
+	private int mFrames;
+	private int mMsPerFrame;
+	private int mLabelVertex;
+	private int mLabelTriangle;
+	private int mLabelGroup;
+	private int mLabelMaterial;
+	private int mLabelJoint;
 
 	public MS3DRenderer(Context context, int bitmapRes, int modelRes)
 	{
@@ -46,6 +70,13 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		
 		this.bitmapRes = bitmapRes;
 		this.modelRes = modelRes;
+		
+		mProjector = new Projector();
+		
+		mLabelPaint = new Paint();
+		mLabelPaint.setTextSize(16);
+		mLabelPaint.setAntiAlias(true);
+		mLabelPaint.setARGB(0xff, 0x00, 0x00, 0x00);
 	}
 
 	@Override
@@ -96,6 +127,39 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		loadRes();
 
 		initModel();
+		
+		initTextLabels(gl);
+	}
+
+	private void initTextLabels(GL10 gl)
+	{
+		if(mLabels != null)
+		{
+			mLabels.shutdown(gl);
+		}
+		else
+		{
+			mLabels = new LabelMaker(true, 256, 256);
+		}
+		mLabels.initialize(gl);
+		mLabels.beginAdding(gl);
+		mLabelVertex = mLabels.add(gl, model.vertices.length + " vertices", mLabelPaint);
+		mLabelTriangle = mLabels.add(gl, model.triangles.length + " triangles", mLabelPaint);
+		mLabelGroup = mLabels.add(gl, model.groups.length + " groups", mLabelPaint);
+		mLabelMaterial = mLabels.add(gl, model.materials.length + " materials", mLabelPaint);
+		mLabelJoint = mLabels.add(gl, model.joints.length + " joints", mLabelPaint);
+		mLabelMsPF = mLabels.add(gl, "ms/f", mLabelPaint);
+		mLabels.endAdding(gl);
+		
+		if(mNumericSprite != null)
+		{
+			mNumericSprite.shutdown(gl);
+		}
+		else
+		{
+			mNumericSprite = new NumericSprite();
+		}
+		mNumericSprite.initialize(gl, mLabelPaint);
 	}
 
 	@Override
@@ -154,11 +218,58 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		}
 //		gl.glScalef(1.0f, 1.0f, 1.0f);
 
-		draw(gl);
+		drawModel(gl);
 		
+		drawTextLables(gl);
 	}
 
-	public void draw(GL10 gl)
+	private void drawTextLables(GL10 gl)
+	{
+		mProjector.getCurrentModelView(gl);
+		mLabels.beginDrawing(gl, width, height);
+		
+		float startY = 1;
+		mLabels.draw(gl, 1, startY, mLabelVertex);
+		startY += mLabels.getHeight(mLabelVertex) + 1;
+		mLabels.draw(gl, 1, startY, mLabelTriangle);
+		startY += mLabels.getHeight(mLabelTriangle) + 1;
+		mLabels.draw(gl, 1, startY, mLabelGroup);
+		startY += mLabels.getHeight(mLabelGroup) + 1;
+		mLabels.draw(gl, 1, startY, mLabelMaterial);
+		startY += mLabels.getHeight(mLabelMaterial) + 1;
+		mLabels.draw(gl, 1, startY, mLabelJoint);
+		startY += mLabels.getHeight(mLabelJoint) + 1;
+		
+		float msPFX = width - mLabels.getWidth(mLabelMsPF) - 1;
+		mLabels.draw(gl, msPFX, 0, mLabelMsPF);
+		
+		mLabels.endDrawing(gl);
+		
+		drawMsPF(gl, msPFX);
+	}
+
+	private void drawMsPF(GL10 gl, float rightMargin)
+	{
+        long time = SystemClock.uptimeMillis();
+        if (mStartTime == 0) {
+            mStartTime = time;
+        }
+        if (mFrames++ == SAMPLE_PERIOD_FRAMES) {
+            mFrames = 0;
+            long delta = time - mStartTime;
+            mStartTime = time;
+            mMsPerFrame = (int) (delta * SAMPLE_FACTOR);
+        }
+        if (mMsPerFrame > 0) {
+            mNumericSprite.setValue(mMsPerFrame);
+            float numWidth = mNumericSprite.width();
+            float x = rightMargin - numWidth;
+            mNumericSprite.draw(gl, x, 0, width, height);
+        }
+    
+	}
+
+	public void drawModel(GL10 gl)
 	{
 		// based on frame
 		if(!isIdle)
