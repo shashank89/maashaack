@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="ms3d">ms3d</string>
+    <string name="main">main</string>
+    <string name="Cross">Cross</string>
+    <string name="Ninjia">Ninjia</string>
     <string name="hello">Hello World, Graphics3D!</string>
     <string name="app_name">Graphics3D</string>
 </resources>
