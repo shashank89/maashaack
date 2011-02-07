@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author Nikolaj Ougaard
  */
-class MS3DGroup {
+public class MS3DGroup {
     public int flags;                                   // SELECTED | HIDDEN
     public String name;                                 //
     public int numTriangles;                            //

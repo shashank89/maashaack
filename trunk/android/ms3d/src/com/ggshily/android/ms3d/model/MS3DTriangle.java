@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author Nikolaj Ougaard
  */
-class MS3DTriangle {
+public class MS3DTriangle {
     public int flags;                                   // SELECTED | SELECTED2 | HIDDEN
     public int[] vertexIndices = new int[3];
     public float[][] vertexNormals = new float[3][3];

@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author Nikolaj Ougaard
  */
-class MS3DMaterial {
+public class MS3DMaterial {
     public String name;
     public float[] ambient = new float[4];
     public float[] diffuse = new float[4];
