@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ggshily.android.opengles;
+package com.ggshily.android.opengles.text;
 
 import javax.microedition.khronos.opengles.GL10;
 

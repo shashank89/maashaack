@@ -9,7 +9,7 @@ import java.io.InputStream;
  *
  * @author Nikolaj Ougaard
  */
-class MS3DModel {
+public class MS3DModel {
     public MS3DHeader header;
     public MS3DVertex[] vertices;
     public MS3DTriangle[] triangles;

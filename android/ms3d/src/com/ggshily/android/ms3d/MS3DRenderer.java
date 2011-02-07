@@ -1,4 +1,4 @@
-package com.ggshily.android.ms3d.model;
+package com.ggshily.android.ms3d;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,9 +10,13 @@ import java.nio.ShortBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import com.ggshily.android.opengles.LabelMaker;
-import com.ggshily.android.opengles.NumericSprite;
-import com.ggshily.android.opengles.Projector;
+import com.ggshily.android.ms3d.model.MS3DGroup;
+import com.ggshily.android.ms3d.model.MS3DModel;
+import com.ggshily.android.ms3d.model.MS3DTriangle;
+import com.ggshily.android.opengles.AbstractOpenGLRenderer;
+import com.ggshily.android.opengles.text.LabelMaker;
+import com.ggshily.android.opengles.text.NumericSprite;
+import com.ggshily.android.opengles.text.Projector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,7 +31,7 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	public  static final int SAMPLE_PERIOD_FRAMES = 12;
 
-	private static final float SAMPLE_FACTOR = 1.0f / SAMPLE_PERIOD_FRAMES;
+	public static final float SAMPLE_FACTOR = 1.0f / SAMPLE_PERIOD_FRAMES;
 	
 	private Context mContext;
 	private int mTextureID;
@@ -63,6 +67,12 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	private int mLabelGroup;
 	private int mLabelMaterial;
 	private int mLabelJoint;
+
+	private float[] mVerticesArray;
+
+	private float[] mTexArray;
+
+	private short[] mIndexArray;
 
 	public MS3DRenderer(Context context, int bitmapRes, int modelRes)
 	{
@@ -415,6 +425,10 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		ByteBuffer ibb = ByteBuffer.allocateDirect(triangleNum * 3 * 2);
 		ibb.order(ByteOrder.nativeOrder());
 		mIndexBuffer = ibb.asShortBuffer();
+		
+		mVerticesArray = new float[triangleNum * 3 * 3];
+		mTexArray = new float[triangleNum * 3 * 2];
+		mIndexArray = new short[triangleNum * 3];
 
 		/*
 		 * float[] vertex = new float[3]; for (int i = 0; i < length; i++) {
@@ -441,6 +455,7 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		MS3DGroup group;
 		MS3DTriangle t;
 		int vertexIndex = 0;
+		float[] vertex = new float[3];
 		for (int i = 0; i < model.groups.length; i++)
 		{
 			group = model.groups[i];
@@ -449,21 +464,30 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 				t = model.triangles[group.triangleIndices[l]];
 				for (int j = 0; j < 3; j++)
 				{
-					mTexBuffer.put(t.s[j]);
-					mTexBuffer.put(t.t[j]);
+					/*mTexBuffer.put(t.s[j]);
+					mTexBuffer.put(t.t[j]);*/
+					mTexArray[vertexIndex * 2 + 0] = t.s[j];
+					mTexArray[vertexIndex * 2 + 1] = t.t[j];
 					// mIndexBuffer.put((short) t.vertexIndices[j]);
 
-					mIndexBuffer.put((short) (vertexIndex++));
+					/*mIndexBuffer.put((short) (vertexIndex++));*/
+					mIndexArray[vertexIndex] = (short) vertexIndex;
+					
 					int indice = t.vertexIndices[j];
-					float[] vertex = new float[3];
 					model.transformVertex(model.vertices[indice], vertex);
 					for (int k = 0; k < 3; k++)
 					{
-						mFVertexBuffer.put(vertex[k]);
+						/*mFVertexBuffer.put(vertex[k]);*/
+						mVerticesArray[vertexIndex * 3 + k] = vertex[k];
 					}
+					vertexIndex++;
 				}
 			}
 		}
+		
+		mFVertexBuffer.put(mVerticesArray);
+		mTexBuffer.put(mTexArray);
+		mIndexBuffer.put(mIndexArray);
 
 		mFVertexBuffer.position(0);
 		mTexBuffer.position(0);

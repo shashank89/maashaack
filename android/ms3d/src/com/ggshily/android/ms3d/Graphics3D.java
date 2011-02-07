@@ -15,8 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 
-import com.ggshily.android.ms3d.model.MS3DRenderer;
-import com.ggshily.android.opengles.MatrixTrackingGL;
+import com.ggshily.android.opengles.text.MatrixTrackingGL;
 
 public class Graphics3D extends Activity implements OnClickListener,
 		OnLongClickListener, OnTouchListener, OnGestureListener
@@ -41,7 +40,7 @@ public class Graphics3D extends Activity implements OnClickListener,
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
+		
 		// We don't need a title either.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 

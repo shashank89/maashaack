@@ -8,7 +8,7 @@ import java.io.IOException;
  *
  * @author Pepijn Van Eeckhoudt
  */
-class MS3DJoint {
+public class MS3DJoint {
     public int numPositionKeys;
     public int numRotationKeys;
 	public int flags;                              // SELECTED | DIRTY

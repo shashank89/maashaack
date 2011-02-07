@@ -8,7 +8,7 @@ import java.io.IOException;
  * 
  * @author Nikolaj Ougaard
  */
-class MS3DVertex
+public class MS3DVertex
 {
     /**
      * Byte size of vertex

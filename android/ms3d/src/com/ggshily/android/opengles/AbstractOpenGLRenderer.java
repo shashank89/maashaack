@@ -1,4 +1,4 @@
-package com.ggshily.android.ms3d.model;
+package com.ggshily.android.opengles;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
