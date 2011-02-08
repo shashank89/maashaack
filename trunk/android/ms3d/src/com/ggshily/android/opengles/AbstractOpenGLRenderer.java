@@ -124,4 +124,34 @@ public abstract class AbstractOpenGLRenderer implements GLSurfaceView.Renderer
 		this.rotateAccZ = rotateAccZ;
 	}
 
+	public float getTranslationX()
+	{
+		return translationX;
+	}
+
+	public void setTranslationX(float translationX)
+	{
+		this.translationX = translationX;
+	}
+
+	public float getTranslationY()
+	{
+		return translationY;
+	}
+
+	public void setTranslationY(float translationY)
+	{
+		this.translationY = translationY;
+	}
+
+	public float getTranslationZ()
+	{
+		return translationZ;
+	}
+
+	public void setTranslationZ(float translationZ)
+	{
+		this.translationZ = translationZ;
+	}
+
 }
