@@ -11,15 +11,13 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.GestureDetector.OnDoubleTapListener;
 import android.view.GestureDetector.OnGestureListener;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 
 import com.ggshily.android.opengles.text.MatrixTrackingGL;
 
-public class Graphics3D extends Activity implements OnClickListener,
-		OnLongClickListener, OnTouchListener, OnGestureListener
+public class Graphics3D extends Activity implements OnTouchListener, OnGestureListener, OnDoubleTapListener
 {
 
 	public static final float FLING_MIN_DISTANCE = 5;
@@ -37,6 +35,8 @@ public class Graphics3D extends Activity implements OnClickListener,
 	private float angleX;
 
 	private float angleY;
+	private float lastDoubleTapDistance = -1f;
+	private float lastTranslationZ;
 	
 	private static int SCREEN_WIDTH;
 	private static int SCREEN_HEIGHT;
@@ -72,29 +72,16 @@ public class Graphics3D extends Activity implements OnClickListener,
 
 		mView.setClickable(true);
 		mView.setLongClickable(true);
-		mView.setOnClickListener(this);
-		mView.setOnLongClickListener(this);
 		mView.setOnTouchListener(this);
 
 		gestureDetector = new GestureDetector(this);
+		gestureDetector.setOnDoubleTapListener(this);
 
 		setContentView(mView);
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		SCREEN_WIDTH = display.getWidth();
 		SCREEN_HEIGHT = display.getHeight();
-	}
-
-	@Override
-	public void onClick(View arg0)
-	{
-	}
-
-	@Override
-	public boolean onLongClick(View arg0)
-	{
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -113,7 +100,8 @@ public class Graphics3D extends Activity implements OnClickListener,
 		
 		angleX = mRenderer.getAngleX();
 		angleY = mRenderer.getAngleY();
-		
+
+		lastDoubleTapDistance = -1;
 		return false;
 	}
 
@@ -147,7 +135,7 @@ public class Graphics3D extends Activity implements OnClickListener,
 			mRenderer.setRotateSpeedX(-velocityY / 50);
 			mRenderer.setRotateAccX(1);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -164,19 +152,33 @@ public class Graphics3D extends Activity implements OnClickListener,
 		float distanceX = e1.getX() - e2.getX();
 		float distanceY = e1.getY() - e2.getY();
 		
-		System.out.println("distanceX " + distanceX);
-		System.out.println("distanceY " + distanceY);
-		
-//		if(Math.abs(distanceX) > Math.abs(distanceY))
+		if(e1.getPointerCount() == 1 && e2.getPointerCount() == 1)
 		{
 			mRenderer.setAngleY((float) (angleY - (float)distanceX * 180 / SCREEN_WIDTH));
-			System.out.println("angleY " + mRenderer.getAngleY());
-		}
-//		else
-		{
 			mRenderer.setAngleX((float) (angleX + (float)distanceY * 180 / SCREEN_HEIGHT));
 		}
-		return false;
+		else
+		{
+			MotionEvent e = e1.getPointerCount() > 1 ? e1 : null;
+			e = e2.getPointerCount() > 1 ? e2 : null;
+			if(e != null && e.getAction() == MotionEvent.ACTION_MOVE)
+			{
+				float disX = e.getHistoricalX(0, 0) - e.getHistoricalX(1, 0);
+				float disY = e.getHistoricalY(0, 0) - e.getHistoricalY(1, 0);
+				if(lastDoubleTapDistance < 0)
+				{
+					lastDoubleTapDistance = (float) Math.sqrt(disX * disX + disY * disY);
+					lastTranslationZ = mRenderer.getTranslationZ();
+				}
+				else
+				{
+					disX = e.getX(0) - e.getX(1);
+					disY = e.getY(0) - e.getY(1);
+					mRenderer.setTranslationZ(lastTranslationZ - ((float) Math.sqrt(disX * disX + disY * disY) - lastDoubleTapDistance) / 5);
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -190,6 +192,27 @@ public class Graphics3D extends Activity implements OnClickListener,
 	public boolean onSingleTapUp(MotionEvent arg0)
 	{
 		mRenderer.setIdle(!mRenderer.isIdle());
+		lastDoubleTapDistance = -1;
+		return false;
+	}
+
+	@Override
+	public boolean onDoubleTap(MotionEvent e)
+	{
+		System.out.println("double tap :" + e.getPointerCount() + e.getAction());
+		return true;
+	}
+
+	@Override
+	public boolean onDoubleTapEvent(MotionEvent e)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean onSingleTapConfirmed(MotionEvent arg0)
+	{
+		lastDoubleTapDistance = -1;
 		return false;
 	}
 }
