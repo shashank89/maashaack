@@ -44,8 +44,10 @@ public class MS3DModel {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void transformVertex(MS3DVertex vertex, float[] out)
+	public void transformVertex(MS3DVertex vertex/*, float[] out*/)
 	{
+		float[] out = vertex.realPos;
+		
 		int[] jointIndices = new int[4];
 		int[] jointWeights = new int[4];
 		fillJointIndicesAndWeights(vertex, jointIndices, jointWeights);

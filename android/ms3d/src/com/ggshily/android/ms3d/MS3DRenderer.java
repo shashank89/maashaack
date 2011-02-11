@@ -29,7 +29,7 @@ import android.os.SystemClock;
 public class MS3DRenderer extends AbstractOpenGLRenderer
 {
 
-	public  static final int SAMPLE_PERIOD_FRAMES = 12;
+	public  static final int SAMPLE_PERIOD_FRAMES = 6;
 
 	public static final float SAMPLE_FACTOR = 1.0f / SAMPLE_PERIOD_FRAMES;
 	
@@ -72,7 +72,9 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	private float[] mTexArray;
 
-	private short[] mIndexArray;
+//	private short[] mIndexArray;
+
+	private boolean updateTexBuffer = true;
 
 	public MS3DRenderer(Context context, int texRes, int modelRes)
 	{
@@ -294,8 +296,9 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mFVertexBuffer);
 		gl.glEnable(GL10.GL_TEXTURE_2D);
 		gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, mTexBuffer);
-		gl.glDrawElements(GL10.GL_TRIANGLES, triangleNum * 3,
-				GL10.GL_UNSIGNED_SHORT, mIndexBuffer);
+		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, triangleNum * 3);
+		/*gl.glDrawElements(GL10.GL_TRIANGLES, triangleNum * 3,
+				GL10.GL_UNSIGNED_SHORT, mIndexBuffer);*/
 	}
 
 	@Override
@@ -412,23 +415,24 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		{
 			triangleNum += model.groups[i].numTriangles;
 		}
+		
+		mVerticesArray = new float[triangleNum * 3 * 3];
+		mTexArray = new float[triangleNum * 3 * 2];
+//		mIndexArray = new short[triangleNum * 3];
 
 		// ByteBuffer vbb = ByteBuffer.allocateDirect(length * 3 * 4);
 		ByteBuffer vbb = ByteBuffer.allocateDirect(triangleNum * 3 * 3 * 4);
 		vbb.order(ByteOrder.nativeOrder());
 		mFVertexBuffer = vbb.asFloatBuffer();
+		mFVertexBuffer = FloatBuffer.wrap(mVerticesArray);
 
 		ByteBuffer tbb = ByteBuffer.allocateDirect(triangleNum * 3 * 2 * 4);
 		tbb.order(ByteOrder.nativeOrder());
 		mTexBuffer = tbb.asFloatBuffer();
 
-		ByteBuffer ibb = ByteBuffer.allocateDirect(triangleNum * 3 * 2);
-		ibb.order(ByteOrder.nativeOrder());
-		mIndexBuffer = ibb.asShortBuffer();
-		
-		mVerticesArray = new float[triangleNum * 3 * 3];
-		mTexArray = new float[triangleNum * 3 * 2];
-		mIndexArray = new short[triangleNum * 3];
+//		ByteBuffer ibb = ByteBuffer.allocateDirect(triangleNum * 3 * 2);
+//		ibb.order(ByteOrder.nativeOrder());
+//		mIndexBuffer = ibb.asShortBuffer();
 
 		/*
 		 * float[] vertex = new float[3]; for (int i = 0; i < length; i++) {
@@ -437,25 +441,37 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		 */
 
 		updateFrame(-1.0f);
+		updateTexBuffer = false;
 	}
 
 	private void updateFrame(float frame)
 	{
 		long start = SystemClock.uptimeMillis();
 		model.setFrame(frame);
+		System.out.println("cacl joint time:" + (SystemClock.uptimeMillis() - start));
 		
 		mFVertexBuffer.position(0);
-		mTexBuffer.position(0);
-		mIndexBuffer.position(0);
+//		mIndexBuffer.position(0);
 		
-		mFVertexBuffer.clear();
-		mTexBuffer.clear();
-		mIndexBuffer.clear();
+//		mFVertexBuffer.clear();
+//		mIndexBuffer.clear();
+		
+		if(updateTexBuffer)
+		{
+			mTexBuffer.position(0);
+			mTexBuffer.clear();
+		}
 		
 		MS3DGroup group;
 		MS3DTriangle t;
+		int len = model.vertices.length;
+		for(int i = 0; i < len; ++i)
+		{
+			model.transformVertex(model.vertices[i]);
+		}
+		
 		int vertexIndex = 0;
-		float[] vertex = new float[3];
+//		float[] vertex = new float[3];
 		for (int i = 0; i < model.groups.length; i++)
 		{
 			group = model.groups[i];
@@ -464,34 +480,39 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 				t = model.triangles[group.triangleIndices[l]];
 				for (int j = 0; j < 3; j++)
 				{
-					/*mTexBuffer.put(t.s[j]);
-					mTexBuffer.put(t.t[j]);*/
-					mTexArray[vertexIndex * 2 + 0] = t.s[j];
-					mTexArray[vertexIndex * 2 + 1] = t.t[j];
-					// mIndexBuffer.put((short) t.vertexIndices[j]);
-
-					/*mIndexBuffer.put((short) (vertexIndex++));*/
-					mIndexArray[vertexIndex] = (short) vertexIndex;
-					
+					if(updateTexBuffer)
+					{
+						/*mTexBuffer.put(t.s[j]);
+										mTexBuffer.put(t.t[j]);*/
+						mTexArray[vertexIndex * 2 + 0] = t.s[j];
+						mTexArray[vertexIndex * 2 + 1] = t.t[j];
+						// mIndexBuffer.put((short) t.vertexIndices[j]);
+					}
 					int indice = t.vertexIndices[j];
-					model.transformVertex(model.vertices[indice], vertex);
+					/*model.transformVertex(model.vertices[indice], vertex);*/
 					for (int k = 0; k < 3; k++)
 					{
 						/*mFVertexBuffer.put(vertex[k]);*/
-						mVerticesArray[vertexIndex * 3 + k] = vertex[k];
+						mVerticesArray[vertexIndex * 3 + k] = model.vertices[indice].realPos[k];/*vertex[k];*/
 					}
 					vertexIndex++;
 				}
 			}
 		}
+		System.out.println("cacl vertex time:" + (SystemClock.uptimeMillis() - start));
 		
-		mFVertexBuffer.put(mVerticesArray);
-		mTexBuffer.put(mTexArray);
-		mIndexBuffer.put(mIndexArray);
+//		mFVertexBuffer.put(mVerticesArray);
+//		mIndexBuffer.put(mIndexArray);
 
 		mFVertexBuffer.position(0);
-		mTexBuffer.position(0);
-		mIndexBuffer.position(0);
+		
+		if(updateTexBuffer)
+		{
+			mTexBuffer.put(mTexArray);
+			mTexBuffer.position(0);
+		}
+		
+		//		mIndexBuffer.position(0);
 		System.out.println("update frame time:" + (SystemClock.uptimeMillis() - start));
 	}
 

@@ -23,6 +23,8 @@ public class MS3DVertex
 
 	public int[] weights = {0, 0, 0};
 	public int extra;
+	
+	public float[] realPos = new float[3];
 
     /**
      * This method creates a new MS3DVertex.
