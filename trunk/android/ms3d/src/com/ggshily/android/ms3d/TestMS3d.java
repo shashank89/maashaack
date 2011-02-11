@@ -4,10 +4,13 @@
 package com.ggshily.android.ms3d;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 /**
  * @author cf
@@ -47,6 +50,9 @@ public class TestMS3d extends Activity
 		    	startActivity(result);
 			}
 		});
+		
+		TextView tv = (TextView) findViewById(R.id.TextView01);
+		tv.append(Integer.toString(((ActivityManager) getSystemService(Context.ACTIVITY_SERVICE)).getDeviceConfigurationInfo().reqGlEsVersion));
 		
 		/*setListAdapter(new SimpleAdapter(this, getData(),
 				android.R.layout.simple_list_item_1, new String[] {"title"},

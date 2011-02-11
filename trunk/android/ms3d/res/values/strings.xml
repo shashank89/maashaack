@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="glversion">glversion</string>
     <string name="ms3d">ms3d</string>
     <string name="main">main</string>
     <string name="Cross">Cross</string>

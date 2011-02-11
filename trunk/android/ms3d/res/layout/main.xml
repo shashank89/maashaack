@@ -4,13 +4,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-<Button android:id="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Cross"></Button>
+
+<TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hello"></TextView><Button android:id="@+id/Button01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Cross"></Button>
 <Button android:id="@+id/Button02" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/Ninjia" android:clickable="true"></Button>
+
 
 
 
