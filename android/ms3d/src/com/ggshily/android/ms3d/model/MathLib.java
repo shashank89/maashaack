@@ -44,7 +44,7 @@ public class MathLib
 		quaternion[3] = cr*cp*cy+sr*sp*sy; // W
 	}
 	
-	public static void AngleMatrix (float[] angles, float[][] matrix )
+	public static void AngleMatrix (float[] angles, float[] matrix )
 	{
 		float		angle;
 		float		sr, sp, sy, cr, cp, cy;
@@ -60,92 +60,93 @@ public class MathLib
 		cr = (float) Math.cos(angle);
 
 		// matrix = (Z * Y) * X
-		matrix[0][0] = cp*cy;
-		matrix[1][0] = cp*sy;
-		matrix[2][0] = -sp;
-		matrix[0][1] = sr*sp*cy+cr*-sy;
-		matrix[1][1] = sr*sp*sy+cr*cy;
-		matrix[2][1] = sr*cp;
-		matrix[0][2] = (cr*sp*cy+-sr*-sy);
-		matrix[1][2] = (cr*sp*sy+-sr*cy);
-		matrix[2][2] = cr*cp;
-		matrix[0][3] = 0.0f;
-		matrix[1][3] = 0.0f;
-		matrix[2][3] = 0.0f;
+		matrix[0 * 4 + 0] = cp*cy;
+		matrix[1 * 4 + 0] = cp*sy;
+		matrix[2 * 4 + 0] = -sp;
+		matrix[0 * 4 + 1] = sr*sp*cy+cr*-sy;
+		matrix[1 * 4 + 1] = sr*sp*sy+cr*cy;
+		matrix[2 * 4 + 1] = sr*cp;
+		matrix[0 * 4 + 2] = (cr*sp*cy+-sr*-sy);
+		matrix[1 * 4 + 2] = (cr*sp*sy+-sr*cy);
+		matrix[2 * 4 + 2] = cr*cp;
+		matrix[0 * 4 + 3] = 0.0f;
+		matrix[1 * 4 + 3] = 0.0f;
+		matrix[2 * 4 + 3] = 0.0f;
 	}
 
-	public static void R_ConcatTransforms (float[][] in1, float[][] in2, float[][] out)
+	public static void R_ConcatTransforms (float[] in1, float[] in2, float[] out)
 	{
-		out[0][0] = in1[0][0] * in2[0][0] + in1[0][1] * in2[1][0] +
-					in1[0][2] * in2[2][0];
-		out[0][1] = in1[0][0] * in2[0][1] + in1[0][1] * in2[1][1] +
-					in1[0][2] * in2[2][1];
-		out[0][2] = in1[0][0] * in2[0][2] + in1[0][1] * in2[1][2] +
-					in1[0][2] * in2[2][2];
-		out[0][3] = in1[0][0] * in2[0][3] + in1[0][1] * in2[1][3] +
-					in1[0][2] * in2[2][3] + in1[0][3];
-		out[1][0] = in1[1][0] * in2[0][0] + in1[1][1] * in2[1][0] +
-					in1[1][2] * in2[2][0];
-		out[1][1] = in1[1][0] * in2[0][1] + in1[1][1] * in2[1][1] +
-					in1[1][2] * in2[2][1];
-		out[1][2] = in1[1][0] * in2[0][2] + in1[1][1] * in2[1][2] +
-					in1[1][2] * in2[2][2];
-		out[1][3] = in1[1][0] * in2[0][3] + in1[1][1] * in2[1][3] +
-					in1[1][2] * in2[2][3] + in1[1][3];
-		out[2][0] = in1[2][0] * in2[0][0] + in1[2][1] * in2[1][0] +
-					in1[2][2] * in2[2][0];
-		out[2][1] = in1[2][0] * in2[0][1] + in1[2][1] * in2[1][1] +
-					in1[2][2] * in2[2][1];
-		out[2][2] = in1[2][0] * in2[0][2] + in1[2][1] * in2[1][2] +
-					in1[2][2] * in2[2][2];
-		out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] +
-					in1[2][2] * in2[2][3] + in1[2][3];
+		out[0 * 4 + 0] = in1[0 * 4 + 0] * in2[0 * 4 + 0] + in1[0 * 4 + 1] * in2[1 * 4 + 0] +
+					in1[0 * 4 + 2] * in2[2 * 4 + 0];
+		out[0 * 4 + 1] = in1[0 * 4 + 0] * in2[0 * 4 + 1] + in1[0 * 4 + 1] * in2[1 * 4 + 1] +
+					in1[0 * 4 + 2] * in2[2 * 4 + 1];
+		out[0 * 4 + 2] = in1[0 * 4 + 0] * in2[0 * 4 + 2] + in1[0 * 4 + 1] * in2[1 * 4 + 2] +
+					in1[0 * 4 + 2] * in2[2 * 4 + 2];
+		out[0 * 4 + 3] = in1[0 * 4 + 0] * in2[0 * 4 + 3] + in1[0 * 4 + 1] * in2[1 * 4 + 3] +
+					in1[0 * 4 + 2] * in2[2 * 4 + 3] + in1[0 * 4 + 3];
+		out[1 * 4 + 0] = in1[1 * 4 + 0] * in2[0 * 4 + 0] + in1[1 * 4 + 1] * in2[1 * 4 + 0] +
+					in1[1 * 4 + 2] * in2[2 * 4 + 0];
+		out[1 * 4 + 1] = in1[1 * 4 + 0] * in2[0 * 4 + 1] + in1[1 * 4 + 1] * in2[1 * 4 + 1] +
+					in1[1 * 4 + 2] * in2[2 * 4 + 1];
+		out[1 * 4 + 2] = in1[1 * 4 + 0] * in2[0 * 4 + 2] + in1[1 * 4 + 1] * in2[1 * 4 + 2] +
+					in1[1 * 4 + 2] * in2[2 * 4 + 2];
+		out[1 * 4 + 3] = in1[1 * 4 + 0] * in2[0 * 4 + 3] + in1[1 * 4 + 1] * in2[1 * 4 + 3] +
+					in1[1 * 4 + 2] * in2[2 * 4 + 3] + in1[1 * 4 + 3];
+		out[2 * 4 + 0] = in1[2 * 4 + 0] * in2[0 * 4 + 0] + in1[2 * 4 + 1] * in2[1 * 4 + 0] +
+					in1[2 * 4 + 2] * in2[2 * 4 + 0];
+		out[2 * 4 + 1] = in1[2 * 4 + 0] * in2[0 * 4 + 1] + in1[2 * 4 + 1] * in2[1 * 4 + 1] +
+					in1[2 * 4 + 2] * in2[2 * 4 + 1];
+		out[2 * 4 + 2] = in1[2 * 4 + 0] * in2[0 * 4 + 2] + in1[2 * 4 + 1] * in2[1 * 4 + 2] +
+					in1[2 * 4 + 2] * in2[2 * 4 + 2];
+		out[2 * 4 + 3] = in1[2 * 4 + 0] * in2[0 * 4 + 3] + in1[2 * 4 + 1] * in2[1 * 4 + 3] +
+					in1[2 * 4 + 2] * in2[2 * 4 + 3] + in1[2 * 4 + 3];
 	}
 
-	public static void VectorRotate (float[] in1,  float[][] in2, float[] out)
+	public static void VectorRotate (float[] in1,  float[] in2, float[] out)
 	{
-		out[0] = in1[0] * in2[0][0] + in1[1] * in2[0][1] + in1[2] * in2[0][2];
-		out[1] = in1[0] * in2[1][0] + in1[1] * in2[1][1] + in1[2] * in2[1][2];
-		out[2] = in1[0] * in2[2][0] + in1[1] * in2[2][1] + in1[2] * in2[2][2];
+		out[0] = in1[0] * in2[0 * 4 + 0] + in1[1] * in2[0 * 4 + 1] + in1[2] * in2[0 * 4 + 2];
+		out[1] = in1[0] * in2[1 * 4 + 0] + in1[1] * in2[1 * 4 + 1] + in1[2] * in2[1 * 4 + 2];
+		out[2] = in1[0] * in2[2 * 4 + 0] + in1[1] * in2[2 * 4 + 1] + in1[2] * in2[2 * 4 + 2];
 	}
 
 	// rotate by the inverse of the matrix
-	public static void VectorIRotate (float[] in1, float[][] in2, float[] out)
+	public static void VectorIRotate (float[] in1, float[] in2, float[] out)
 	{
-		out[0] = in1[0]*in2[0][0] + in1[1]*in2[1][0] + in1[2]*in2[2][0];
-		out[1] = in1[0]*in2[0][1] + in1[1]*in2[1][1] + in1[2]*in2[2][1];
-		out[2] = in1[0]*in2[0][2] + in1[1]*in2[1][2] + in1[2]*in2[2][2];
+		out[0] = in1[0]*in2[0 * 4 + 0] + in1[1]*in2[1 * 4 + 0] + in1[2]*in2[2 * 4 + 0];
+		out[1] = in1[0]*in2[0 * 4 + 1] + in1[1]*in2[1 * 4 + 1] + in1[2]*in2[2 * 4 + 1];
+		out[2] = in1[0]*in2[0 * 4 + 2] + in1[1]*in2[1 * 4 + 2] + in1[2]*in2[2 * 4 + 2];
 	}
 
-	public static void VectorTransform (float[] in1, float[][] in2, float[] out)
+	public static void VectorTransform (float[] in1, float[] in2, float[] out)
 	{
-		out[0] = in1[0] * in2[0][0] + in1[1] * in2[0][1] + in1[2] * in2[0][2] + in2[0][3];
-		out[1] = in1[0] * in2[1][0] + in1[1] * in2[1][1] + in1[2] * in2[1][2] +	in2[1][3];
-		out[2] = in1[0] * in2[2][0] + in1[1] * in2[2][1] + in1[2] * in2[2][2] +	in2[2][3];
+		out[0] = in1[0] * in2[0 * 4 + 0] + in1[1] * in2[0 * 4 + 1] + in1[2] * in2[0 * 4 + 2] + in2[0 * 4 + 3];
+		out[1] = in1[0] * in2[1 * 4 + 0] + in1[1] * in2[1 * 4 + 1] + in1[2] * in2[1 * 4 + 2] + in2[1 * 4 + 3];
+		out[2] = in1[0] * in2[2 * 4 + 0] + in1[1] * in2[2 * 4 + 1] + in1[2] * in2[2 * 4 + 2] + in2[2 * 4 + 3];
 	}
 
-	public static void VectorITransform (float[] in1, float[][] in2, float[] out)
+	private static float[] tmp = new float[3];
+	
+	public static void VectorITransform (float[] in1, float[] in2, float[] out)
 	{
-		float[] tmp = new float[3];
-		tmp[0] = in1[0] - in2[0][3];
-		tmp[1] = in1[1] - in2[1][3];
-		tmp[2] = in1[2] - in2[2][3];
+		tmp[0] = in1[0] - in2[0 * 4 + 3];
+		tmp[1] = in1[1] - in2[1 * 4 + 3];
+		tmp[2] = in1[2] - in2[2 * 4 + 3];
 		VectorIRotate(tmp, in2, out);
 	}
 	
-	public static void QuaternionMatrix( float[] quaternion, float[][] matrix )
+	public static void QuaternionMatrix( float[] quaternion, float[] matrix )
 	{
-		matrix[0][0] = 1.0f - 2.0f * quaternion[1] * quaternion[1] - 2.0f * quaternion[2] * quaternion[2];
-		matrix[1][0] = 2.0f * quaternion[0] * quaternion[1] + 2.0f * quaternion[3] * quaternion[2];
-		matrix[2][0] = 2.0f * quaternion[0] * quaternion[2] - 2.0f * quaternion[3] * quaternion[1];
+		matrix[0 * 4 + 0] = 1.0f - 2.0f * quaternion[1] * quaternion[1] - 2.0f * quaternion[2] * quaternion[2];
+		matrix[1 * 4 + 0] = 2.0f * quaternion[0] * quaternion[1] + 2.0f * quaternion[3] * quaternion[2];
+		matrix[2 * 4 + 0] = 2.0f * quaternion[0] * quaternion[2] - 2.0f * quaternion[3] * quaternion[1];
 
-		matrix[0][1] = 2.0f * quaternion[0] * quaternion[1] - 2.0f * quaternion[3] * quaternion[2];
-		matrix[1][1] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[2] * quaternion[2];
-		matrix[2][1] = 2.0f * quaternion[1] * quaternion[2] + 2.0f * quaternion[3] * quaternion[0];
+		matrix[0 * 4 + 1] = 2.0f * quaternion[0] * quaternion[1] - 2.0f * quaternion[3] * quaternion[2];
+		matrix[1 * 4 + 1] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[2] * quaternion[2];
+		matrix[2 * 4 + 1] = 2.0f * quaternion[1] * quaternion[2] + 2.0f * quaternion[3] * quaternion[0];
 
-		matrix[0][2] = 2.0f * quaternion[0] * quaternion[2] + 2.0f * quaternion[3] * quaternion[1];
-		matrix[1][2] = 2.0f * quaternion[1] * quaternion[2] - 2.0f * quaternion[3] * quaternion[0];
-		matrix[2][2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
+		matrix[0 * 4 + 2] = 2.0f * quaternion[0] * quaternion[2] + 2.0f * quaternion[3] * quaternion[1];
+		matrix[1 * 4 + 2] = 2.0f * quaternion[1] * quaternion[2] - 2.0f * quaternion[3] * quaternion[0];
+		matrix[2 * 4 + 2] = 1.0f - 2.0f * quaternion[0] * quaternion[0] - 2.0f * quaternion[1] * quaternion[1];
 	}
 	
 	public static void QuaternionSlerp( float[] p, float[] q, float t, float[] qt )

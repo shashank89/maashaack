@@ -2,21 +2,10 @@ package com.ggshily.android.ms3d;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.ShortBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import com.ggshily.android.ms3d.model.MS3DGroup;
-import com.ggshily.android.ms3d.model.MS3DModel;
-import com.ggshily.android.ms3d.model.MS3DTriangle;
-import com.ggshily.android.opengles.AbstractOpenGLRenderer;
-import com.ggshily.android.opengles.text.LabelMaker;
-import com.ggshily.android.opengles.text.NumericSprite;
-import com.ggshily.android.opengles.text.Projector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,6 +14,14 @@ import android.graphics.Paint;
 import android.opengl.GLU;
 import android.opengl.GLUtils;
 import android.os.SystemClock;
+
+import com.ggshily.android.ms3d.model.MS3DModel;
+import com.ggshily.android.ms3d.model.MS3DTriangle;
+import com.ggshily.android.ms3d.model.MS3DVertex;
+import com.ggshily.android.opengles.AbstractOpenGLRenderer;
+import com.ggshily.android.opengles.text.LabelMaker;
+import com.ggshily.android.opengles.text.NumericSprite;
+import com.ggshily.android.opengles.text.Projector;
 
 public class MS3DRenderer extends AbstractOpenGLRenderer
 {
@@ -41,7 +38,6 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	private FloatBuffer mFVertexBuffer;
 	private FloatBuffer mTexBuffer;
-	private ShortBuffer mIndexBuffer;
 
 	private float[] dim = { 0.0f, 0.0f, 0.0f };
 	private float[] center = { 0.0f, 0.0f, 0.0f };
@@ -76,12 +72,15 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 
 	private boolean updateTexBuffer = true;
 
-	public MS3DRenderer(Context context, int texRes, int modelRes)
+	private int modelNum;
+
+	public MS3DRenderer(Context context, int texRes, int modelRes, int modelNum)
 	{
 		mContext = context;
 		
 		this.texRes = texRes;
 		this.modelRes = modelRes;
+		this.modelNum = modelNum;
 		
 		mProjector = new Projector();
 		
@@ -197,40 +196,45 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		/*
 		 * Now we're ready to draw some 3D objects
 		 */
-
-		gl.glMatrixMode(GL10.GL_MODELVIEW);
-		gl.glLoadIdentity();
-
-//		 GLU.gluLookAt(gl, eyeX, eyeY, eyeZ, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-//		 GLU.gluLookAt(gl, 75, 75, 0, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
-
-		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-
-		gl.glActiveTexture(GL10.GL_TEXTURE0);
-		gl.glEnable(GL10.GL_TEXTURE_WRAP_S);
-		gl.glEnable(GL10.GL_TEXTURE_WRAP_T);
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, mTextureID);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-				GL10.GL_REPEAT);
-		gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-				GL10.GL_REPEAT);
-
-		gl.glTranslatef(-translationX, -translationY, -translationZ);
-		updateAngle();
-		gl.glRotatef(angleX, 1.0f, .0f, .0f);
-		gl.glRotatef(angleY, .0f, 1.0f, .0f);
-		gl.glRotatef(angleZ, .0f, .0f, 1.0f);
-		gl.glTranslatef(-center[0], -center[1], -center[2]);
-
-		zoom += 0.01f;
-		if(zoom > 2)
+		for(int i = 0; i < modelNum; i++)
 		{
-			zoom = 1.0f;
+			for(int j = 0; j < modelNum; j++)
+			{
+				gl.glMatrixMode(GL10.GL_MODELVIEW);
+				gl.glLoadIdentity();
+		
+		//		 GLU.gluLookAt(gl, eyeX, eyeY, eyeZ, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		//		 GLU.gluLookAt(gl, 75, 75, 0, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
+		
+				gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+				gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
+		
+				gl.glActiveTexture(GL10.GL_TEXTURE0);
+				gl.glEnable(GL10.GL_TEXTURE_WRAP_S);
+				gl.glEnable(GL10.GL_TEXTURE_WRAP_T);
+				gl.glBindTexture(GL10.GL_TEXTURE_2D, mTextureID);
+				gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+						GL10.GL_REPEAT);
+				gl.glTexParameterx(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+						GL10.GL_REPEAT);
+		
+				gl.glTranslatef(-translationX - dim[0] * i, -translationY - dim[1] * j, -translationZ * modelNum);
+				updateAngle();
+				gl.glRotatef(angleX, 1.0f, .0f, .0f);
+				gl.glRotatef(angleY, .0f, 1.0f, .0f);
+				gl.glRotatef(angleZ, .0f, .0f, 1.0f);
+				gl.glTranslatef(-center[0], -center[1], -center[2]);
+		
+				zoom += 0.01f;
+				if(zoom > 2)
+				{
+					zoom = 1.0f;
+				}
+		//		gl.glScalef(1.0f, 1.0f, 1.0f);
+		
+				drawModel(gl);
+			}
 		}
-//		gl.glScalef(1.0f, 1.0f, 1.0f);
-
-		drawModel(gl);
 		
 		drawTextLables(gl);
 	}
@@ -285,12 +289,14 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	{
 		// based on frame
 		if(!isIdle)
+		{
 			currentFrame += 1f;
-		
-		if(currentFrame > model.totalFrames)
-			currentFrame = 0.0f;
-		
-		updateFrame(currentFrame);
+			
+			if(currentFrame > model.totalFrames)
+				currentFrame = 0.0f;
+			
+			updateFrame(currentFrame);
+		}
 		
 		gl.glFrontFace(GL10.GL_CCW);
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, mFVertexBuffer);
@@ -418,27 +424,10 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		
 		mVerticesArray = new float[triangleNum * 3 * 3];
 		mTexArray = new float[triangleNum * 3 * 2];
-//		mIndexArray = new short[triangleNum * 3];
 
-		// ByteBuffer vbb = ByteBuffer.allocateDirect(length * 3 * 4);
-		ByteBuffer vbb = ByteBuffer.allocateDirect(triangleNum * 3 * 3 * 4);
-		vbb.order(ByteOrder.nativeOrder());
-		mFVertexBuffer = vbb.asFloatBuffer();
 		mFVertexBuffer = FloatBuffer.wrap(mVerticesArray);
 
-		ByteBuffer tbb = ByteBuffer.allocateDirect(triangleNum * 3 * 2 * 4);
-		tbb.order(ByteOrder.nativeOrder());
-		mTexBuffer = tbb.asFloatBuffer();
-
-//		ByteBuffer ibb = ByteBuffer.allocateDirect(triangleNum * 3 * 2);
-//		ibb.order(ByteOrder.nativeOrder());
-//		mIndexBuffer = ibb.asShortBuffer();
-
-		/*
-		 * float[] vertex = new float[3]; for (int i = 0; i < length; i++) {
-		 * model.transformVertex(model.vertices[i], vertex); for (int j = 0; j <
-		 * 3; j++) { mFVertexBuffer.put(vertex[j]); } }
-		 */
+		mTexBuffer = FloatBuffer.wrap(mTexArray);
 
 		updateFrame(-1.0f);
 		updateTexBuffer = false;
@@ -450,28 +439,16 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 		model.setFrame(frame);
 		System.out.println("cacl joint time:" + (SystemClock.uptimeMillis() - start));
 		
-		mFVertexBuffer.position(0);
-//		mIndexBuffer.position(0);
-		
-//		mFVertexBuffer.clear();
-//		mIndexBuffer.clear();
-		
-		if(updateTexBuffer)
-		{
-			mTexBuffer.position(0);
-			mTexBuffer.clear();
-		}
-		
-		MS3DGroup group;
 		MS3DTriangle t;
 		int len = model.vertices.length;
 		for(int i = 0; i < len; ++i)
 		{
-			model.transformVertex(model.vertices[i]);
+			model.transformVertex(i);
 		}
+		System.out.println("update vetex time:" + (SystemClock.uptimeMillis() - start));
 		
+		/*MS3DGroup group;
 		int vertexIndex = 0;
-//		float[] vertex = new float[3];
 		for (int i = 0; i < model.groups.length; i++)
 		{
 			group = model.groups[i];
@@ -482,37 +459,51 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 				{
 					if(updateTexBuffer)
 					{
-						/*mTexBuffer.put(t.s[j]);
-										mTexBuffer.put(t.t[j]);*/
 						mTexArray[vertexIndex * 2 + 0] = t.s[j];
 						mTexArray[vertexIndex * 2 + 1] = t.t[j];
-						// mIndexBuffer.put((short) t.vertexIndices[j]);
 					}
 					int indice = t.vertexIndices[j];
-					/*model.transformVertex(model.vertices[indice], vertex);*/
 					for (int k = 0; k < 3; k++)
 					{
-						/*mFVertexBuffer.put(vertex[k]);*/
-						mVerticesArray[vertexIndex * 3 + k] = model.vertices[indice].realPos[k];/*vertex[k];*/
+						mVerticesArray[vertexIndex * 3 + k] = model.vertices[indice].realPos[k];//vertex[k];
 					}
 					vertexIndex++;
 				}
 			}
-		}
-		System.out.println("cacl vertex time:" + (SystemClock.uptimeMillis() - start));
+		}*/
 		
-//		mFVertexBuffer.put(mVerticesArray);
-//		mIndexBuffer.put(mIndexArray);
-
-		mFVertexBuffer.position(0);
-		
-		if(updateTexBuffer)
+		MS3DVertex v;
+		int tmp;
+		len = model.triangles.length;
+		for(int i = 0; i < len; i++)
 		{
-			mTexBuffer.put(mTexArray);
-			mTexBuffer.position(0);
+			t = model.triangles[i];
+			tmp = i * 3;
+			if(updateTexBuffer)
+			{
+				mTexArray[(tmp + 0) * 2 + 0] = t.s[0];
+				mTexArray[(tmp + 0) * 2 + 1] = t.t[0];
+				mTexArray[(tmp + 1) * 2 + 0] = t.s[1];
+				mTexArray[(tmp + 1) * 2 + 1] = t.t[1];
+				mTexArray[(tmp + 2) * 2 + 0] = t.s[2];
+				mTexArray[(tmp + 2) * 2 + 1] = t.t[2];
+			}
+			
+			v = model.vertices[t.vertexIndices[0]];
+			mVerticesArray[(tmp + 0) * 3 + 0] = v.realPos[0];
+			mVerticesArray[(tmp + 0) * 3 + 1] = v.realPos[1];
+			mVerticesArray[(tmp + 0) * 3 + 2] = v.realPos[2];
+			
+			v = model.vertices[t.vertexIndices[1]];
+			mVerticesArray[(tmp + 1) * 3 + 0] = v.realPos[0];
+			mVerticesArray[(tmp + 1) * 3 + 1] = v.realPos[1];
+			mVerticesArray[(tmp + 1) * 3 + 2] = v.realPos[2];
+			
+			v = model.vertices[t.vertexIndices[2]];
+			mVerticesArray[(tmp + 2) * 3 + 0] = v.realPos[0];
+			mVerticesArray[(tmp + 2) * 3 + 1] = v.realPos[1];
+			mVerticesArray[(tmp + 2) * 3 + 2] = v.realPos[2];
 		}
-		
-		//		mIndexBuffer.position(0);
 		System.out.println("update frame time:" + (SystemClock.uptimeMillis() - start));
 	}
 
