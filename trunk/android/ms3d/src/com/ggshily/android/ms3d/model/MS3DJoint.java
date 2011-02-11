@@ -21,10 +21,10 @@ public class MS3DJoint {
 
     public KeyFrameRotation[] rotationKeys;      // local animation matrices
     public KeyFramePosition[] positionKeys;  // local animation matrices
-	public float[][] matLocalSkeleton = new float[3][4];
-	public float[][] matGlobalSkeleton = new float[3][4];
-	public float[][] matLocal = new float[3][4];
-	public float[][] matGlobal = new float[3][4];
+	public float[] matLocalSkeleton = new float[12];
+	public float[] matGlobalSkeleton = new float[12];
+	public float[] matLocal = new float[12];
+	public float[] matGlobal = new float[12];
 	public int parentIndex;
 	
 	public float[] color = {0.0f, 0.0f, 0.0f};

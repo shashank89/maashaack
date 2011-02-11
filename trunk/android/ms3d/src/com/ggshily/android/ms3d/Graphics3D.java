@@ -50,6 +50,7 @@ public class Graphics3D extends Activity implements OnTouchListener, OnGestureLi
         Intent intent = getIntent();
         int modelRes = intent.getIntExtra("model", -1);
         int texRes = intent.getIntExtra("tex", -1);
+        int modelNum = intent.getIntExtra("modelNum", 1);
         if(modelRes == -1)
         	modelRes = DEFAULT_MODEL;
         if(texRes == -1)
@@ -65,7 +66,7 @@ public class Graphics3D extends Activity implements OnTouchListener, OnGestureLi
                 return new MatrixTrackingGL(gl);
             }});
 		// mRenderer = new Renderer();
-		mRenderer = new MS3DRenderer(getApplication(), texRes, modelRes);
+		mRenderer = new MS3DRenderer(getApplication(), texRes, modelRes, modelNum);
 		mView.setRenderer(mRenderer);
 		
 		System.out.println("start game");

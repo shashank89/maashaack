@@ -26,6 +26,8 @@ public class MS3DModel {
     
     public float[] maxs = {0.0f, 0.0f, 0.0f};
     public float[] mins = {0.0f, 0.0f, 0.0f};
+	private int[] jointIndices = new int[4];
+	private int[] jointWeights = new int[4];
 
     public MS3DModel(MS3DHeader header, MS3DVertex[] vertices, MS3DTriangle[] triangles, MS3DGroup[] groups, MS3DMaterial[] materials, MS3DJoint[] joints) {
         this.header = header;
@@ -44,13 +46,12 @@ public class MS3DModel {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void transformVertex(MS3DVertex vertex/*, float[] out*/)
+	public void transformVertex(int index/*, float[] out*/)
 	{
+		MS3DVertex vertex = vertices[index];
 		float[] out = vertex.realPos;
 		
-		int[] jointIndices = new int[4];
-		int[] jointWeights = new int[4];
-		fillJointIndicesAndWeights(vertex, jointIndices, jointWeights);
+		fillJointIndicesAndWeights(vertex);
 		
 		if(jointIndices[0] < 0 || jointIndices[0] >= joints.length || currentTime < 0.0f)
 		{
@@ -100,9 +101,7 @@ public class MS3DModel {
 
 	public void transformNormal(MS3DVertex vertex, float[] normal, float[] out)
 	{
-		int[] jointIndices = new int[4];
-		int[] jointWeights = new int[4];
-		fillJointIndicesAndWeights(vertex, jointIndices, jointWeights);
+		fillJointIndicesAndWeights(vertex);
 
 		if (jointIndices[0] < 0 || jointIndices[0] >= (int) joints.length || currentTime < 0.0f)
 		{
@@ -161,13 +160,14 @@ public class MS3DModel {
 		{
 			MS3DJoint joint = joints[i];
 			MathLib.AngleMatrix(joint.rotation, joint.matLocalSkeleton);
-			joint.matLocalSkeleton[0][3]= joint.position[0];
-			joint.matLocalSkeleton[1][3]= joint.position[1];
-			joint.matLocalSkeleton[2][3]= joint.position[2];
+			joint.matLocalSkeleton[0 * 4 + 3]= joint.position[0];
+			joint.matLocalSkeleton[1 * 4 + 3]= joint.position[1];
+			joint.matLocalSkeleton[2 * 4 + 3]= joint.position[2];
 			
 			if (joint.parentIndex == -1)
 			{
-				copyArray2D(joint.matLocalSkeleton, joint.matGlobalSkeleton);
+				System.arraycopy(joint.matLocalSkeleton, 0, joint.matGlobalSkeleton, 0, 12);
+//				copyArray2D(joint.matLocalSkeleton, joint.matGlobalSkeleton);
 			}
 			else
 			{
@@ -255,8 +255,10 @@ public class MS3DModel {
 			for(i = 0; i < joints.length; i++)
 			{
 				joint = joints[i];
-				copyArray2D(joint.matLocalSkeleton, joint.matLocal);
-				copyArray2D(joint.matGlobalSkeleton, joint.matGlobal);
+				System.arraycopy(joint.matLocalSkeleton, 0, joint.matLocal, 0, 12);
+				System.arraycopy(joint.matGlobalSkeleton, 0, joint.matGlobal, 0, 12);
+				/*copyArray2D(joint.matLocalSkeleton, joint.matLocal);
+				copyArray2D(joint.matGlobalSkeleton, joint.matGlobal);*/
 //				joint.matLocal = joint.matLocalSkeleton;
 //				joint.matGloblal = joint.matGlobalSkeleton;
 			}
@@ -388,11 +390,11 @@ public class MS3DModel {
 		}
 
 		// make a matrix from pos/quat
-		float[][] matAnimate = new float[3][4];
+		float[] matAnimate = new float[12];
 		MathLib.QuaternionMatrix(quat, matAnimate);
-		matAnimate[0][3] = pos[0];
-		matAnimate[1][3] = pos[1];
-		matAnimate[2][3] = pos[2];
+		matAnimate[0 * 4 + 3] = pos[0];
+		matAnimate[1 * 4 + 3] = pos[1];
+		matAnimate[2 * 4 + 3] = pos[2];
 
 		// animate the local joint matrix using: matLocal = matLocalSkeleton * matAnimate
 		MathLib.R_ConcatTransforms(joint.matLocalSkeleton, matAnimate, joint.matLocal);
@@ -401,7 +403,8 @@ public class MS3DModel {
 		// matGlobal = matGlobal(parent) * matLocal
 		if(joint.parentIndex == -1)
 		{
-			copyArray2D(joint.matLocal, joint.matGlobal);
+			System.arraycopy(joint.matLocal, 0, joint.matGlobal, 0, 12);
+//			copyArray2D(joint.matLocal, joint.matGlobal);
 		}
 		else
 		{
@@ -510,7 +513,7 @@ public class MS3DModel {
 		}
 	}
 	
-	public static void fillJointIndicesAndWeights(MS3DVertex vertex, int[] jointIndices, int[] jointWeights)
+	public void fillJointIndicesAndWeights(MS3DVertex vertex)
 	{
 		jointIndices[0] = vertex.boneId;
 		jointIndices[1] = vertex.boneIds[0];
