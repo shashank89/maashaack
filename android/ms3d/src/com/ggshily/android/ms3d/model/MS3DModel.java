@@ -26,8 +26,13 @@ public class MS3DModel {
     
     public float[] maxs = {0.0f, 0.0f, 0.0f};
     public float[] mins = {0.0f, 0.0f, 0.0f};
-	private int[] jointIndices = new int[4];
-	private int[] jointWeights = new int[4];
+    
+    // for temporary calculation
+	private static final int[] jointIndices = new int[4];
+	private static final int[] jointWeights = new int[4];
+	private static final float[] weights = new float[4];
+	private static final float[] tmp = new float[3];
+	private static final float[] vert = new float[3];
 
     public MS3DModel(MS3DHeader header, MS3DVertex[] vertices, MS3DTriangle[] triangles, MS3DGroup[] groups, MS3DMaterial[] materials, MS3DJoint[] joints) {
         this.header = header;
@@ -45,19 +50,26 @@ public class MS3DModel {
 	{
 		// TODO Auto-generated constructor stub
 	}
+	
+	public void updateVertices()
+	{
+		int len = vertices.length;
+		for(int i = 0; i < len; ++i)
+		{
+			transformVertex(i);
+		}
+	}
 
 	public void transformVertex(int index/*, float[] out*/)
 	{
 		MS3DVertex vertex = vertices[index];
-		float[] out = vertex.realPos;
-		
 		fillJointIndicesAndWeights(vertex);
 		
 		if(jointIndices[0] < 0 || jointIndices[0] >= joints.length || currentTime < 0.0f)
 		{
-			out[0] = vertex.location[0];
-			out[1] = vertex.location[1];
-			out[2] = vertex.location[2];
+			vertex.realPos[0] = vertex.location[0];
+			vertex.realPos[1] = vertex.location[1];
+			vertex.realPos[2] = vertex.location[2];
 		}
 		else
 		{
@@ -72,30 +84,89 @@ public class MS3DModel {
 			}
 
 			// init
-			out[0] = 0.0f;
-			out[1] = 0.0f;
-			out[2] = 0.0f;
+			vertex.realPos[0] = 0.0f;
+			vertex.realPos[1] = 0.0f;
+			vertex.realPos[2] = 0.0f;
 
-			float[] weights = { (float) jointWeights[0] / 100.0f, (float) jointWeights[1] / 100.0f, (float) jointWeights[2] / 100.0f, (float) jointWeights[3] / 100.0f };
 			if (numWeights == 0)
 			{
 				numWeights = 1;
 				weights[0] = 1.0f;
 			}
+			else
+			{
+				weights[0] = (float) jointWeights[0] / 100.0f;
+				weights[1] = (float) jointWeights[1] / 100.0f;
+				weights[2] = (float) jointWeights[2] / 100.0f;
+				weights[3] = (float) jointWeights[3] / 100.0f;
+			}
 			// add weighted vertices
+			MS3DJoint joint  = joints[vertex.boneId];
 			for (int i = 0; i < numWeights; i++)
 			{
-				MS3DJoint joint  = joints[vertex.boneId];
 				
-				float[] tmp = new float[3];
-				float[] vert = new float[3];
+				tmp[0] = 0;
+				tmp[1] = 0;
+				tmp[2] = 0;
+				vert[0] = 0;
+				vert[1] = 0;
+				vert[2] = 0;
+				
 				MathLib.VectorITransform(vertex.location, joint.matGlobalSkeleton, tmp);
 				MathLib.VectorTransform(tmp, joint.matGlobal, vert);
 	
-				out[0] += vert[0] * weights[i];
-				out[1] += vert[1] * weights[i];
-				out[2] += vert[2] * weights[i];
+				vertex.realPos[0] += vert[0] * weights[i];
+				vertex.realPos[1] += vert[1] * weights[i];
+				vertex.realPos[2] += vert[2] * weights[i];
 			}
+		}
+	}
+	
+	public void updateTexBuffer(float[] texBuffer)
+	{
+		MS3DTriangle t;
+		int tmp;
+		int len = triangles.length;
+		for(int i = 0; i < len; i++)
+		{
+			t = triangles[i];
+			tmp = i * 3;
+			texBuffer[(tmp + 0) * 2 + 0] = t.s[0];
+			texBuffer[(tmp + 0) * 2 + 1] = t.t[0];
+			texBuffer[(tmp + 1) * 2 + 0] = t.s[1];
+			texBuffer[(tmp + 1) * 2 + 1] = t.t[1];
+			texBuffer[(tmp + 2) * 2 + 0] = t.s[2];
+			texBuffer[(tmp + 2) * 2 + 1] = t.t[2];
+		}
+	}
+	
+	public void updateVertexBuff(float[] vertexBuff)
+	{
+
+		MS3DTriangle t;
+		int len;
+		MS3DVertex v;
+		int tmp;
+		len = triangles.length;
+		for(int i = 0; i < len; i++)
+		{
+			t = triangles[i];
+			tmp = i * 3;
+			
+			v = vertices[t.vertexIndices[0]];
+			vertexBuff[(tmp + 0) * 3 + 0] = v.realPos[0];
+			vertexBuff[(tmp + 0) * 3 + 1] = v.realPos[1];
+			vertexBuff[(tmp + 0) * 3 + 2] = v.realPos[2];
+			
+			v = vertices[t.vertexIndices[1]];
+			vertexBuff[(tmp + 1) * 3 + 0] = v.realPos[0];
+			vertexBuff[(tmp + 1) * 3 + 1] = v.realPos[1];
+			vertexBuff[(tmp + 1) * 3 + 2] = v.realPos[2];
+			
+			v = vertices[t.vertexIndices[2]];
+			vertexBuff[(tmp + 2) * 3 + 0] = v.realPos[0];
+			vertexBuff[(tmp + 2) * 3 + 1] = v.realPos[1];
+			vertexBuff[(tmp + 2) * 3 + 2] = v.realPos[2];
 		}
 	}
 

@@ -16,8 +16,6 @@ import android.opengl.GLUtils;
 import android.os.SystemClock;
 
 import com.ggshily.android.ms3d.model.MS3DModel;
-import com.ggshily.android.ms3d.model.MS3DTriangle;
-import com.ggshily.android.ms3d.model.MS3DVertex;
 import com.ggshily.android.opengles.AbstractOpenGLRenderer;
 import com.ggshily.android.opengles.text.LabelMaker;
 import com.ggshily.android.opengles.text.NumericSprite;
@@ -437,14 +435,12 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 	{
 		long start = SystemClock.uptimeMillis();
 		model.setFrame(frame);
+		System.out.println("frame:" + frame);
 		System.out.println("cacl joint time:" + (SystemClock.uptimeMillis() - start));
 		
-		MS3DTriangle t;
-		int len = model.vertices.length;
-		for(int i = 0; i < len; ++i)
-		{
-			model.transformVertex(i);
-		}
+		start = SystemClock.uptimeMillis();
+		model.updateVertices();
+		
 		System.out.println("update vetex time:" + (SystemClock.uptimeMillis() - start));
 		
 		/*MS3DGroup group;
@@ -471,40 +467,15 @@ public class MS3DRenderer extends AbstractOpenGLRenderer
 				}
 			}
 		}*/
-		
-		MS3DVertex v;
-		int tmp;
-		len = model.triangles.length;
-		for(int i = 0; i < len; i++)
+
+		start = SystemClock.uptimeMillis();
+
+		if(updateTexBuffer)
 		{
-			t = model.triangles[i];
-			tmp = i * 3;
-			if(updateTexBuffer)
-			{
-				mTexArray[(tmp + 0) * 2 + 0] = t.s[0];
-				mTexArray[(tmp + 0) * 2 + 1] = t.t[0];
-				mTexArray[(tmp + 1) * 2 + 0] = t.s[1];
-				mTexArray[(tmp + 1) * 2 + 1] = t.t[1];
-				mTexArray[(tmp + 2) * 2 + 0] = t.s[2];
-				mTexArray[(tmp + 2) * 2 + 1] = t.t[2];
-			}
-			
-			v = model.vertices[t.vertexIndices[0]];
-			mVerticesArray[(tmp + 0) * 3 + 0] = v.realPos[0];
-			mVerticesArray[(tmp + 0) * 3 + 1] = v.realPos[1];
-			mVerticesArray[(tmp + 0) * 3 + 2] = v.realPos[2];
-			
-			v = model.vertices[t.vertexIndices[1]];
-			mVerticesArray[(tmp + 1) * 3 + 0] = v.realPos[0];
-			mVerticesArray[(tmp + 1) * 3 + 1] = v.realPos[1];
-			mVerticesArray[(tmp + 1) * 3 + 2] = v.realPos[2];
-			
-			v = model.vertices[t.vertexIndices[2]];
-			mVerticesArray[(tmp + 2) * 3 + 0] = v.realPos[0];
-			mVerticesArray[(tmp + 2) * 3 + 1] = v.realPos[1];
-			mVerticesArray[(tmp + 2) * 3 + 2] = v.realPos[2];
+			model.updateTexBuffer(mTexArray);
 		}
-		System.out.println("update frame time:" + (SystemClock.uptimeMillis() - start));
+		model.updateVertexBuff(mVerticesArray);
+		System.out.println("update vertex buff time:" + (SystemClock.uptimeMillis() - start));
 	}
 
 	public boolean isIdle()
