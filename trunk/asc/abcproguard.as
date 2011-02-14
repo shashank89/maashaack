@@ -229,6 +229,7 @@ package abcproguard
 		var optionalValuesIndex:Array;
 		var optionalValuesType:Array;
 		var nameIndex:int;
+		var optCode:ByteArray
 
         public function toString():String
         {
@@ -451,15 +452,162 @@ package abcproguard
             return b
         }
 		
+		/**
+		 * NOTE: did not test yet.
+		 */
+		static function writeS24(data : ByteArray, value : int) : void
+		{
+			data.writeByte(value & 0xFF);
+			data.writeByte((value >> 8) & 0xFF);
+			data.writeByte((value >> 16) & (value >>> 31 << 7));
+		}
+		
 		override public function proguard(abc : Abc) : void
 		{
-			var classIndex : int = abc.classNames.indexOf(name.toString());
-			var index : int = abc.strings.indexOf(name.toString());
-			if(classIndex < 0 && index > 0)
+			if(false)
 			{
-				abc.replacedStrings.push(abc.strings[index], "x");
-				infoPrint("strings index :" + index + " (" + abc.strings[index] + ") replaced by \"x\"");
-				abc.strings[index] = "x";
+				var classIndex : int = abc.classNames.indexOf(name.toString());
+				var index : int = abc.strings.indexOf(name.toString());
+				if(classIndex < 0 && index > 0)
+				{
+					abc.replacedStrings.push(abc.strings[index], "x");
+					infoPrint("strings index :" + index + " (" + abc.strings[index] + ") replaced by \"x\"");
+					abc.strings[index] = "x";
+				}
+			}
+			
+			if(code)
+			{
+				optCode = new ByteArray();
+			
+				code.position = 0;
+				while(code.bytesAvailable > 0)
+				{
+					var opcode = code.readUnsignedByte();
+					switch(opcode)
+					{
+                        case OP_debugfile:
+                        case OP_pushstring:
+                        case OP_pushnamespace:
+                        case OP_pushint:
+                        case OP_pushuint:
+                        case OP_pushdouble:
+						
+                        case OP_getsuper: 
+                        case OP_setsuper: 
+                        case OP_initproperty: 
+                        case OP_setproperty: 
+                        case OP_getlex: 
+                        case OP_findproperty:
+                        case OP_finddef:
+                        case OP_deleteproperty: 
+                        case OP_istype: 
+                        case OP_coerce: 
+                        case OP_astype: 
+                        case OP_getdescendants:
+                        case OP_newfunction:
+                        case OP_newclass: 
+							optCode.writeByte(opcode);
+							Abc.writeU32(optCode, readU32());
+							break;
+						case OP_findpropstrict:
+							var nameIndex : int = readU32();
+							if(abc.isConst(nameIndex) < 0)
+							{
+								optCode.writeByte(opcode);
+								Abc.writeU32(optCode, nameIndex);
+							}
+							break;
+						case OP_getproperty:
+							var nameIndex : int = readU32();
+							var constIndex : int = abc.isConst(nameIndex);
+							if(constIndex > 0)
+							{
+								optCode.writeByte(OP_pushstring);
+								Abc.writeU32(optCode, constIndex);
+							}
+							else
+							{
+								optCode.writeByte(opcode);
+								Abc.writeU32(optCode, nameIndex);
+							}
+							break;
+                        case OP_constructprop:
+                        case OP_callproperty:
+                        case OP_callproplex:
+                        case OP_callsuper:
+                        case OP_callsupervoid:
+                        case OP_callpropvoid:
+                        case OP_callstatic:
+							Abc.writeU32(optCode, readU32());
+							Abc.writeU32(optCode, readU32());
+							break;
+                        case OP_lookupswitch:
+							writeS24(optCode, readS24());
+							var maxindex : int = readU32();
+							writeU32(optCode, maxindex);
+							for(var i : int = 0; i <= maxindex; ++i)
+							{
+								writeS24(optCode, readS24());
+							}
+							break;
+                        case OP_jump:
+                        case OP_iftrue:     case OP_iffalse:
+                        case OP_ifeq:       case OP_ifne:
+                        case OP_ifge:       case OP_ifnge:
+                        case OP_ifgt:       case OP_ifngt:
+                        case OP_ifle:       case OP_ifnle:
+                        case OP_iflt:       case OP_ifnlt:
+                        case OP_ifstricteq: case OP_ifstrictne:
+							writeS24(optCode, readS24());
+							break;
+                        case OP_inclocal:
+                        case OP_declocal:
+                        case OP_inclocal_i:
+                        case OP_declocal_i:
+                        case OP_getlocal:
+                        case OP_kill:
+                        case OP_setlocal:
+                        case OP_debugline:
+                        case OP_getglobalslot:
+                        case OP_getslot:
+                        case OP_setglobalslot:
+                        case OP_setslot:
+                        case OP_pushshort:
+                        case OP_newcatch:
+							writeU32(optCode, readU32());
+                            break
+                        case OP_debug:
+							optCode.writeByte(code.readUnsignedByte() & 0xFF);
+							writeU32(optCode, readU32());
+							optCode.writeByte(code.readUnsignedByte() & 0xFF);
+							writeU32(optCode, readU32());
+							break;
+                        case OP_newobject:
+                        case OP_newarray:
+                        case OP_call:
+                        case OP_construct:
+                        case OP_constructsuper:
+                        case OP_applytype:
+							writeU32(optCode, readU32());
+							break;
+                        case OP_pushbyte:
+                        case OP_getscopeobject:
+							optCode.writeByte(code.readByte());
+							break;
+                        case OP_hasnext2:
+							writeU32(optCode, readU32());
+							writeU32(optCode, readU32());
+							break;
+						default:
+							throw new Error("UNKNOWN OPCODE:" + opcode);
+							break;
+					}
+				}
+				
+				var tmp : ByteArray = code;
+				code = optCode;
+				optCode = tmp;
 			}
 		}
     }
@@ -579,6 +727,7 @@ package abcproguard
 		var namesStringIndex:Array
 		var classNames:Array
 		var replacedStrings:Array
+		var constNames:Array = []; // save all const names. NOTE: maybe should check const names in another way
         
         var defaults:Array = new Array(constantKinds.length)
         
@@ -941,7 +1090,8 @@ package abcproguard
             var namecount = readU32()
             for (var i:int=0; i < namecount; i++)
             {
-                var name = names[readU32()]
+				var nameIndex : int = readU32();
+                var name = names[nameIndex]
                 var tag = data.readByte()
                 var kind = tag & 0xf
                 var member
@@ -960,6 +1110,12 @@ package abcproguard
 						{
 							slot.valueType = data.readByte();
                             slot.value = defaults[slot.valueType][slot.valueIndex]
+						}
+						
+						if(kind == TRAIT_Const)
+						{
+							constNames.push(name.toString(), slot.valueIndex);
+							print("got const " + nameIndex + " " + name + " value:" + slot.value + " value index:" + slot.valueIndex);
 						}
                     }
                     else // (kind == TRAIT_Class)
@@ -1111,6 +1267,26 @@ package abcproguard
             }
         }
 		
+		/**
+		 * check the given name is a const or not. (should check static?)
+		 */
+		function isConst(index : int) : int
+		{
+			if(names[index])
+			{
+				var str : String = names[index];
+				for(var i : int = 0; i < constNames.length; i += 2)
+				{
+					var name : String = constNames[i];
+					if(name == str)
+					{
+						return constNames[i + 1];
+					}
+				}
+			}
+			return -1;
+		}
+		
 		function proguard()
 		{
 			infoPrint("proguard:");
@@ -1124,7 +1300,7 @@ package abcproguard
 			
 		}
 		
-		function writeU32(data : ByteArray, n : int)
+		public static function writeU32(data : ByteArray, n : int)
 		{
 			while(true)
 			{
