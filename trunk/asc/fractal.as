@@ -194,7 +194,8 @@ include "PNGEncoder.as"
 // main
 
 import com.adobe.images.PNGEncoder;
+
 import com.ggshily.fractal.Fractal;
 
-PNGEncoder.encode(new Fractal()).writeFile("output.png");
-print("success generate output.pgn!");
+PNGEncoder.encode(new Fractal(1920 * 2, 1280 * 2)).writeFile("output.png");
+print("Done, check the output.pgn!");
