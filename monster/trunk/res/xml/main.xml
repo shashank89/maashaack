@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<root>
+	<f id="file_swf_land" path="./swf/land.jpg" group="firstload"/>
+	<f id="file_swf_res" path="./Res.swf" group="firstload"/>
+	<f id="file_swf_ui" path="./swf/UI01.swf" group="firstload"/>
+	<f id="file_swf_monster" path="./swf/monster.swf" group="firstload"/>
+
+	<f id="file_material" path="./xml/material.xml" group="firstload"/>
+	<f id="file_building" path="./xml/building.xml" group="firstload"/>
+	<f id="file_monster" path="./xml/monster.xml" group="firstload"/>
+</root>
