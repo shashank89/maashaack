@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 编辑使用 XMLSpy v2006 U (http://www.altova.com) 由 any (any) -->
+<root ConfigClass="ConfigConstuction" beanClass="Building">
+	<building typeId="10000000" ConfigClass="ConfigConstructionTownHall" swfClass="building1" x="-20" y="24" column="35" row="35">
+		<level id="1" exp="100">
+		</level>
+		<level id="2" exp="100" costCoin="100" time="2000">
+		  <costResource type="2000000" value="1000"/>
+		  <costResource type="2000001" value="1000"/>
+		  <costResource type="2000002" value="1000"/>
+		  <costResource type="2000003" value="1000"/>
+		</level>
+	</building>
+	<building typeId="10000001" ConfigClass="ConfigConstructionMaterial" swfClass="building2" name="采石场1" x="-20" y="24" column="35" row="35" produceMaterialId="2000000">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="2"/>
+		<level id="1" exp="100" costCoin="100" time="30" productivePerHour="1000" capacity="2000">
+			<costResource type="2000001" value="10000"/>
+			<costResource type="2000002" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000002" ConfigClass="ConfigConstructionMaterial" swfClass="building3" name="伐木场1" x="-20" y="24" column="35" row="35" produceMaterialId="2000001">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="2"/>
+		<level id="1" exp="100" costCoin="100" time="30" productivePerHour="1000" capacity="2000">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000002" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000003" ConfigClass="ConfigConstructionMaterial" swfClass="building4" name="晶石矿场1" x="-20" y="24" column="35" row="35" produceMaterialId="2000002">
+		<limitation level="1" number="2"/>
+		<limitation level="2" number="3"/>
+		<level id="1" exp="100" costCoin="100" time="30" productivePerHour="1000" capacity="2000">
+			<costResource type="2000001" value="10000"/>
+			<costResource type="2000000" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000004" ConfigClass="ConfigConstructionMaterial" swfClass="building5" name="沼气溶炉1" x="-20" y="24" column="35" row="35" produceMaterialId="2000003">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="2"/>
+		<level id="1" exp="100" costCoin="100" time="30" productivePerHour="1000" capacity="2000">
+			<costResource type="2000001" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000005" ConfigClass="ConfigConstructionStorage"  swfClass="building6" name="仓库" x="-20" y="24" column="35" row="35">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="3"/>
+		<level id="1" exp="100" costCoin="100" time="30" capacityPlus="10000">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000006" ConfigClass="ConfigConstuctionMonsterUnlocker"  swfClass="monster_unlocker" name="怪物实验室" x="-20" y="24" column="35" row="35">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="3"/>
+		<level id="1" exp="100" costCoin="100" time="30">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000007" ConfigClass="ConfigConstructionMonsterHatchery"  swfClass="monster_hatchery" name="孵卵池" x="-20" y="24" column="35" row="35">
+		<limitation level="1" number="2"/>
+		<limitation level="2" number="3"/>
+		<level id="1" exp="100" costCoin="100" time="30" queneNumber="2">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+		<level id="2" exp="100" costCoin="100" time="30" queneNumber="3">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+	<building typeId="10000008" ConfigClass="ConfigConstructionMonsterHousing"  swfClass="monster_housing" beanClass="BuildingMonsterHousing" name="兽栏" x="-20" y="24" column="35" row="35">
+		<limitation level="1" number="1"/>
+		<limitation level="2" number="3"/>
+		<level id="1" exp="100" costCoin="100" time="30" housing="200">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+		<level id="2" exp="100" costCoin="100" time="30" housing="300">
+			<costResource type="2000000" value="10000"/>
+			<costResource type="2000003" value="100"/>
+			<condition typeId="Acadamy" level="1"/>
+		</level>
+	</building>
+</root>

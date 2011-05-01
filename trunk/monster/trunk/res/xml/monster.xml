@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root ConfigClass="ConfigMonster" beanClass="Building">
+    <monster typeId="3000000" swfClass="monster1"  name="伐木场1" x="0" y= "0" column="8" row="8">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+    <monster typeId="3000001" swfClass="monster2" name="伐木场1" x="0" y= "0" column="8" row="8" unlockTime="10" needUnlockerLevel="1">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+    <monster typeId="3000002" swfClass="monster3" name="伐木场1" x="0" y= "0" column="8" row="8" unlockTime="10" needUnlockerLevel="1">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+    <monster typeId="3000003" swfClass="monster4" name="伐木场1" x="0" y= "0" column="8" row="8" unlockTime="10" needUnlockerLevel="1">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+    <monster typeId="3000004" swfClass="monster5" name="伐木场1" x="0" y= "0" column="8" row="8" unlockTime="10" needUnlockerLevel="2">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+    <monster typeId="3000005" swfClass="monster6" name="伐木场1" x="0" y= "0" column="8" row="8" unlockTime="10" needUnlockerLevel="3">
+	  <level id="1" speed="10" health="10" damage="10" costCoin="100"  housing="10" time="10" range="10" cooldown="5">
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	    <favoriteTarget typeId=""/>
+	  </level>
+	</monster>
+</root>
