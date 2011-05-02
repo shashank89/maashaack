@@ -49,9 +49,13 @@ package com.ggshily.game.monsters.map
 		private var _mouseDown : Boolean;
 		private var _buildArea : Rectangle;
 		private var _dragBounds : Rectangle;
+		
+		private var _mapLayer : Sprite;
+		private var _uiLayer : Sprite;
 		private var _bottomLayer : Sprite;
 		private var _buildingLayer : Sprite;
 		private var _topLayer : Sprite;
+		
 		private var _buildingMapObject : ObjectConstruction;
 		private var _canBuild : Boolean;
 		private var _mouseOverConstruction : ObjectConstruction;
@@ -76,19 +80,21 @@ package com.ggshily.game.monsters.map
 			_frame = new RhombusGrid(ConfigMapInfo.instance.cell, 400, 400);
 			_frame.setGrid(400, 400);
 			
-			_bottomLayer = new Sprite();
-			_buildingLayer = new Sprite();
-			_topLayer = new Sprite();
+			_mapLayer = new Sprite();
+			_uiLayer = new Sprite();
 			
-			_displayContent.addChild(_bottomLayer);
-			_displayContent.addChild(_buildingLayer);
-			_displayContent.addChild(_topLayer);
+			_bottomLayer = _mapLayer.addChild(new Sprite()) as Sprite;
+			_buildingLayer = _mapLayer.addChild(new Sprite()) as Sprite;
+			_topLayer = _mapLayer.addChild(new Sprite()) as Sprite;
 			
-			_bottomLayer.mouseChildren = false;
-			_buildingLayer.mouseChildren = false;
+			_displayContent.addChild(_mapLayer);
+			_displayContent.addChild(_uiLayer);
+			
+			_mapLayer.mouseChildren = false;
 			
 			_constructionMenu = new PanelConstructionMenu(world);
-			_topLayer.addChild(_constructionMenu.displayContent);
+			_uiLayer.addChild(_constructionMenu.displayContent);
+			_uiLayer.visible = false;
 			
 			Debug.TRACE(land);
 			for(var i : int = 0; i < 10; ++i)
@@ -108,11 +114,11 @@ package com.ggshily.game.monsters.map
 			
 //			_displayContent.mouseChildren = false;
 			
-			_displayContent.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
-			_displayContent.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
-			_displayContent.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
-			_displayContent.addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
-			_displayContent.addEventListener(MouseEvent.CLICK, mouseClickHandler);
+			_mapLayer.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+			_mapLayer.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+			_mapLayer.addEventListener(MouseEvent.MOUSE_OUT, mouseOutHandler);
+			_mapLayer.addEventListener(MouseEvent.MOUSE_MOVE, mouseMoveHandler);
+			_mapLayer.addEventListener(MouseEvent.CLICK, mouseClickHandler);
 			
 //			var bg : Sprite = new Sprite();
 //			bg.graphics.beginFill(0x00FFFF);
@@ -276,6 +282,7 @@ package com.ggshily.game.monsters.map
 				else if(_mouseOverConstruction != null && _mouseOverConstruction.state == Building.STATE_IDLE)
 				{
 					_constructionMenu.setConstruction(_mouseOverConstruction);
+					_uiLayer.visible = true;
 					/*
 					_mouseOverBuilding.onClick();
 					*/

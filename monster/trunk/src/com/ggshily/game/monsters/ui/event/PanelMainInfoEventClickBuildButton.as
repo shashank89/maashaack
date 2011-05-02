@@ -14,14 +14,7 @@ package com.ggshily.game.monsters.ui.event
 		
 		override public function process(world:WorldBase):void
 		{
-			if((world.getObjectChild(WorldOwnCity.CHILD_GAME_MAP) as GameMap).state == GameMap.STATE_BUILD_CONSTRUCTION)
-			{
-				// cancle building
-			}
-			else
-			{
-				world.showPanel(new PanelConstructionShop(world));
-			}
+			world.showPanel(new PanelConstructionShop(world));
 		}
 	}
 }

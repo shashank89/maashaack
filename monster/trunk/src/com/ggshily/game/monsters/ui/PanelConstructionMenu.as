@@ -69,6 +69,8 @@ package com.ggshily.game.monsters.ui
 			{
 				dispatchEvent(new PanelConstructionMenuEventUpgrade());
 			}
+			
+			hide();
 		}
 	}
 }
