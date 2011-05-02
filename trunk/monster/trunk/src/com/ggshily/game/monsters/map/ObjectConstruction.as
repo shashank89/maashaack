@@ -54,7 +54,7 @@ package com.ggshily.game.monsters.map
 //			building.alpha = .8;
 			building.x = -config.xOffset;
 			building.y = -config.yOffset;
-			building.scaleX = building.scaleY = .3;
+			building.scaleX = building.scaleY = .5;
 			
 			addDisplayObject(building);
 			_grid = config.grid.clone() as RhombusGrid;
