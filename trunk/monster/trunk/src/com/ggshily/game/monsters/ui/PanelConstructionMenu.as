@@ -63,11 +63,11 @@ package com.ggshily.game.monsters.ui
 		{
 			if(e.currentTarget.name == "Move")
 			{
-				dispatchEvent(new PanelConstructionMenuEventMove());
+				dispatchEvent(new PanelConstructionMenuEventMove(_construction));
 			}
 			else if(e.currentTarget.name == "Upgrade")
 			{
-				dispatchEvent(new PanelConstructionMenuEventUpgrade());
+				dispatchEvent(new PanelConstructionMenuEventUpgrade(_construction));
 			}
 			
 			hide();

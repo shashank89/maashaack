@@ -13,6 +13,7 @@ package com.ggshily.game.monsters.map
 		private var _targetGrid : Grid;
 		private var _lastUpdateTime : Number;
 		private var _parentFrame : Grid;
+		private var _path : Vector.<Point>;
 		
 		public function ObjectMonster(config:ConfigConstruction)
 		{
@@ -40,9 +41,9 @@ package com.ggshily.game.monsters.map
 		
 		override public function tick(currentTime:Number):void
 		{
-			if(!_targetGrid.intersectsGrid(_grid))
+			if(!_targetGrid.intersectsGrid(_grid) && _path.length > 0)
 			{
-				var targetPoint : Point = new Point(_targetGrid.x + _grid.xoffset, _targetGrid.y + _targetGrid.yoffset);
+				var targetPoint : Point = _path[0];
 				
 				var result : Point = targetPoint.subtract(new Point(_grid.x, _grid.y));
 				result.normalize(0.1);
@@ -54,6 +55,11 @@ package com.ggshily.game.monsters.map
 				
 				_displayContent.x = _grid.x;
 				_displayContent.y = _grid.y;
+				
+				if(Math.abs(_grid.x - _path[0].x) < 0.5)
+				{
+					_path.shift();
+				}
 			}
 			else
 			{
@@ -69,6 +75,11 @@ package com.ggshily.game.monsters.map
 			}
 			
 			_lastUpdateTime = currentTime;
+		}
+		
+		public function setPath(path : Vector.<Point>) : void
+		{
+			_path = path;
 		}
 		
 		public function setTargetGrid(grid : Grid) : void
