@@ -1,6 +1,7 @@
 package com.ggshily.game.monsters.map
 {
 	import com.ggshily.game.geom.Grid;
+	import com.ggshily.game.geom.Rhombus;
 	import com.ggshily.game.geom.RhombusGrid;
 	import com.ggshily.game.monsters.bean.Building;
 	import com.ggshily.game.monsters.config.ConfigConstruction;
@@ -16,10 +17,15 @@ package com.ggshily.game.monsters.map
 	import com.ggshily.game.monsters.user.UserManager;
 	import com.ggshily.game.util.Util;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.BitmapDataChannel;
 	import flash.display.DisplayObject;
+	import flash.display.PixelSnapping;
 	import flash.display.Sprite;
 	import flash.events.EventDispatcher;
 	import flash.events.MouseEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getDefinitionByName;
 	
@@ -96,8 +102,8 @@ package com.ggshily.game.monsters.map
 			_uiLayer.addChild(_constructionMenu.displayContent);
 			_uiLayer.visible = false;
 			
-			Debug.TRACE(land);
-			for(var i : int = 0; i < 10; ++i)
+			Debug.TRACE(bg);
+			/*for(var i : int = 0; i < 10; ++i)
 			{
 				for(var j : int = 0; j < 10; ++j)
 				{
@@ -108,7 +114,35 @@ package com.ggshily.game.monsters.map
 					pic.x = j * 200;
 					pic.y = i * 100;
 				}
+			}*/
+			var grass : BitmapData = (new grass0()).bitmapData;
+			var land : BitmapData = (new land()).bitmapData;
+			
+			var bg : BitmapData = new BitmapData(2000, 1000);
+			for(var i : int = 0; i < 10; ++i)
+			{
+				for(var j : int = 0; j < 10; ++j)
+				{
+					bg.copyPixels(grass, grass.rect, new Point(i * 200, j * 100), null, null, true);
+				}
 			}
+			
+			var ground : BitmapData = new BitmapData(2000, 1000);
+			for(i = 0; i < 10; ++i)
+			{
+				for(j = 0; j < 10; ++j)
+				{
+					ground.copyPixels(land, land.rect, new Point(i * 200, j * 100), null, null, true);
+				}
+			}
+			
+			var b1 : BitmapData = new BitmapData(2000, 1000, true, 0);
+			b1.perlinNoise(100, 50, 2, 1, true, false, BitmapDataChannel.ALPHA, true, null);
+			ground.copyPixels(bg, bg.rect, new Point(), b1, new Point(), true);
+			bg.copyPixels(ground, ground.rect, new Point(), null, null, true);
+			_bottomLayer.addChild(new Bitmap(bg));
+			b1.dispose();
+			ground.dispose();
 			
 			ObjectConstruction.drawBg1(_buildingLayer.graphics, _frame, false);
 			
@@ -292,10 +326,10 @@ package com.ggshily.game.monsters.map
 			_mouseDown = false;
 		}
 		
-		public function moveConstruction() : void
+		public function moveConstruction(construction : ObjectConstruction) : void
 		{
-			_buildingLayer.removeChild(_mouseOverConstruction.displayContent);
-			_buildingMapObject = _mouseOverConstruction;
+			_buildingLayer.removeChild(construction.displayContent);
+			_buildingMapObject = construction;
 			_buildingMapObject.drawBg();
 			_constructions.splice(_constructions.indexOf(_buildingMapObject), 1);
 			_topLayer.addChild(_buildingMapObject.displayContent);
@@ -421,8 +455,9 @@ package com.ggshily.game.monsters.map
 				}
 			}
 			var monster : ObjectMonster = addMonster(typeId, housing);
-			monster.setPostionCell(hatchery.grid.cellX, hatchery.grid.cellY, _frame);
+			monster.setPostionCell(hatchery.grid.cellX + hatchery.grid.column, hatchery.grid.cellY + hatchery.grid.row / 2, _frame);
 			monster.setTargetGrid(housing.grid);
+			monster.setPath(getPath(monster, housing, hatchery));
 			
 			return housing;
 		}
@@ -430,7 +465,6 @@ package com.ggshily.game.monsters.map
 		public function addMonster(typeId : int, housing : ObjectConstructionMonsterHousing) : ObjectMonster
 		{
 			var monster : ObjectMonster = housing.addMonster(typeId);
-			monster.setPostionCell(housing.grid.cellX, housing.grid.cellY, _frame);
 			
 			_constructions.push(monster);
 			_displayContent.addChild(monster.displayContent);
@@ -438,6 +472,110 @@ package com.ggshily.game.monsters.map
 			sort();
 			
 			return monster;
+		}
+		
+		private function getPath(monster : ObjectMonster, housing : ObjectConstructionMonsterHousing, hatchery : ObjectConstructionMonsterHatchery) : Vector.<Point>
+		{
+			var path : Vector.<Point> = new Vector.<Point>();
+			
+			var startPoint : Point = new Point(monster.grid.cellX, monster.grid.cellY);
+			var targetPoint : Point = new Point(housing.grid.cellX, housing.grid.cellY);
+			
+			var x : Number;
+			var y : Number
+			var grid : Grid;
+			var construction : ObjectConstruction;
+			var collide : Boolean;
+			var reach : Boolean = false;
+			while(!reach)
+			{
+				var subtract : Point = targetPoint.subtract(startPoint);
+				if(Math.abs(subtract.x) > Math.abs(subtract.y))
+				{
+					var xoffset : int = subtract.x / Math.abs(subtract.x);
+					
+					subtract.normalize(0.1);
+					
+					x = startPoint.x;
+					while(y != targetPoint.y)
+					{
+						x += xoffset;
+						y = startPoint.y + int((x - startPoint.x) * subtract.y / subtract.x);
+						
+						grid = new RhombusGrid(ConfigMapInfo.instance.cell as Rhombus, 1, 1);
+						grid.setPosCell(x, y, _frame);
+						
+						collide = false;
+						for each(construction in _constructions)
+						{
+							if(construction != hatchery
+								&& construction != housing
+								&& !(construction is ObjectMonster)
+								&& construction.grid.intersectsGrid(grid))
+							{
+								startPoint = new Point(subtract.x > 0 ? construction.grid.cellX - 1 : construction.grid.cellX + construction.grid.column + 1, 
+										subtract.y > 0 ? construction.grid.cellY + construction.grid.row + 1 : construction.grid.cellY - 1);
+								path.push(getCellCenterWorldPosition(startPoint.x, startPoint.y));
+								collide = true;
+								break;
+							}
+						}
+						if(collide)
+						{
+							break;
+						}
+					}
+				}
+				else
+				{
+					var yoffset : int = subtract.y / Math.abs(subtract.y);
+					
+					subtract.normalize(0.1);
+					
+					y = startPoint.y;
+					while(x != targetPoint.x)
+					{
+						y += yoffset;
+						x = startPoint.x +  int((y - startPoint.y) * subtract.x / subtract.y);
+						
+						grid = new RhombusGrid(ConfigMapInfo.instance.cell as Rhombus, 1, 1);
+						grid.setPosCell(x, y, _frame);
+						
+						collide = false;
+						for each(construction in _constructions)
+						{
+							if(construction != hatchery
+								&& construction != housing
+								&& !(construction is ObjectMonster)
+								&& construction.grid.intersectsGrid(grid))
+							{
+								startPoint = new Point(subtract.x > 0 ? construction.grid.cellX + construction.grid.column + 1 : construction.grid.cellX - 1, 
+									subtract.y > 0 ? construction.grid.cellY - 1 : construction.grid.cellY + construction.grid.row + 1);
+								path.push(getCellCenterWorldPosition(startPoint.x, startPoint.y));
+								collide = true;
+								break;
+							}
+						}
+						if(collide)
+						{
+							break;
+						}
+					}
+				}
+				
+				reach = x == targetPoint.x && y == targetPoint.y;
+			}
+			
+			path.push(getCellCenterWorldPosition(targetPoint.x, targetPoint.y));
+			
+			return path;
+		}
+		
+		private function getCellCenterWorldPosition(cellX : int, cellY : int) : Point
+		{
+			var grid : Grid = new RhombusGrid(ConfigMapInfo.instance.cell, 1, 1);
+			grid.setPosCell(cellX, cellY, _frame);
+			return new Point(grid.x + grid.xoffset, grid.y + grid.yoffset);
 		}
 		
 		private function sort() : void
