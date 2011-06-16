@@ -1,6 +1,7 @@
 package
 {
 	import com.ggshily.game.sudoku.Checker;
+	import com.ggshily.game.sudoku.Generator;
 	
 	import flash.display.Sprite;
 	
@@ -10,7 +11,24 @@ package
 	{
 		public function Test()
 		{
-			testCheck();
+			var data : Vector.<int> = Generator.generate();
+			formateTrace(data);
+			trace(Checker.check(data));
+			
+//			testCheck();
+		}
+		
+		private function formateTrace(data : Vector.<int>) : void
+		{
+			for(var i : int = 0; i < 9; ++i)
+			{
+				var temp : String = "";
+				for (var j : int = 0; j < 9; ++j)
+				{
+					temp += data[i * 9 + j] + ", ";
+				}
+				trace(temp);
+			}
 		}
 		
 		private function testCheck() : void
