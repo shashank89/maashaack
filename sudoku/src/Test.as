@@ -2,20 +2,82 @@ package
 {
 	import com.ggshily.game.sudoku.Checker;
 	import com.ggshily.game.sudoku.Generator;
+	import com.ggshily.game.sudoku.Resolver;
 	
 	import flash.display.Sprite;
-	
-	import flashx.textLayout.utils.CharacterUtil;
+	import flash.events.Event;
+	import flash.net.URLLoader;
+	import flash.net.URLLoaderDataFormat;
+	import flash.net.URLRequest;
+	import flash.utils.getTimer;
 
 	public class Test extends Sprite
 	{
 		public function Test()
 		{
-			var data : Vector.<int> = Generator.generate();
+			var urlLoader : URLLoader = new URLLoader();
+			urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
+			urlLoader.addEventListener(Event.COMPLETE, onLoadComplete);
+			urlLoader.load(new URLRequest("http://www.sudoku.name/"));
+			
+			trace(getTimer());
+			var data : Vector.<int> = Generator.generateFinishedPuzzle();
+			trace(getTimer());
 			formateTrace(data);
 			trace(Checker.check(data));
 			
+			trace("generate puzzle");
+			var puzzle : Vector.<int> = Generator.generatePuzzle(data);
+			formateTrace(puzzle);
+			
+			
+			puzzle = Vector.<int>(
+				[   6,  9,  0,  2,  0,  4,  1,  0,  0,
+					0,  8,  0,  9,  0,  0,  3,  4,  0,
+					1,  0,  0,  0,  8,  0,  0,  5,  0,
+					8,  1,  0,  0,  6,  0,  9,  0,  0, 
+					0,  0,  4,  8,  0,  9,  2,  0,  0,
+					0,  0,  9,  4,  0,  0,  0,  8,  7,
+					0,  7,  0,  0,  9,  0,  0,  0,  1,
+					0,  5,  8,  0,  0,  7,  0,  6,  0,
+					0,  0,  1,  6,  0,  8,  0,  9,  5]);
+			trace("resolving puzzle");
+			var solutions : Vector.<Vector.<int>> = Resolver.resolve(puzzle);
+			trace("get " + solutions.length + " solutions");
+			for(var i : int = 0; i < solutions.length; ++i)
+			{
+				trace("solution #" + i);
+				formateTrace(solutions[i]);
+			}
+			
 //			testCheck();
+		}
+		
+		protected function onLoadComplete(event:Event):void
+		{
+			var html : String = event.target.data;
+			var data : Vector.<int> = new Vector.<int>();
+			for(var i : int = 0; i < 81; ++i)
+			{
+				var cell : int = html.indexOf("cell" + (i + 1));
+				var text : String = html.substring(html.indexOf("<", cell), html.indexOf(">", html.indexOf("<", cell)));
+				if(text.indexOf("value") == -1)
+				{
+					data.push(0);
+				}
+				else
+				{
+					data.push(int(text.substring(text.indexOf("value") + 7, text.indexOf("value") + 8)));
+				}
+			}
+			formateTrace(data);
+			var solutions : Vector.<Vector.<int>> = Resolver.resolve(data);
+			trace("get " + solutions.length + " solutions");
+			for(i = 0; i < solutions.length; ++i)
+			{
+				trace("solution #" + i);
+				formateTrace(solutions[i]);
+			}
 		}
 		
 		private function formateTrace(data : Vector.<int>) : void

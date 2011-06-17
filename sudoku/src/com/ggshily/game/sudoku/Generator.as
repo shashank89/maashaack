@@ -2,13 +2,36 @@ package com.ggshily.game.sudoku
 {
 	public class Generator
 	{
+		public static const DIFFICUTY_NORMAL : int = 0;
+		public static const DIFFICUTY_MEDIUM : int = 1;
+		public static const DIFFICUTY_HARD : int = 2;
+		
 		private static const NUMBERS : Vector.<int> = Vector.<int>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 		
 		public function Generator()
 		{
 		}
 		
-		public static function generate() : Vector.<int>
+		public static function generatePuzzle(data : Vector.<int>, difficuty : int = DIFFICUTY_NORMAL) : Vector.<int>
+		{
+			var puzzle : Vector.<int> = new Vector.<int>().concat(data);
+			
+			var clearCount : int = Math.random() * 10 + 30;
+			
+			while(clearCount > 0)
+			{
+				var index : int = Math.random() * 81;
+				if(puzzle[index] > 0)
+				{
+					puzzle[index] = 0;
+					clearCount--;
+				}
+			}
+			
+			return puzzle;
+		}
+		
+		public static function generateFinishedPuzzle() : Vector.<int>
 		{
 			var data : Vector.<int>;
 			
@@ -42,6 +65,10 @@ package com.ggshily.game.sudoku
 				if(finish)
 				{
 					break;
+				}
+				else
+				{
+//					trace("generate fail");
 				}
 			}
 			
