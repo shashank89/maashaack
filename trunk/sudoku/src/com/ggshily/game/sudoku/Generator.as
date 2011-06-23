@@ -16,12 +16,12 @@ package com.ggshily.game.sudoku
 		{
 			var puzzle : Vector.<int> = new Vector.<int>().concat(data);
 			
-			var clearCount : int = Math.random() * 10 + 30;
+			var clearCount : int = Math.random() * 20 + 40;
 			
 			while(clearCount > 0)
 			{
 				var index : int = Math.random() * 81;
-				if(puzzle[index] > 0)
+				if(canBeCleared(puzzle, index))
 				{
 					puzzle[index] = 0;
 					clearCount--;
@@ -29,6 +29,46 @@ package com.ggshily.game.sudoku
 			}
 			
 			return puzzle;
+		}
+		
+		public static function canBeCleared(puzzle : Vector.<int>, index : int) : Boolean
+		{
+			if(puzzle[index] <= 0)
+			{
+				return false;
+			}
+			
+			var result : int = 0;
+			var x : int = index % 9;
+			var y : int = index / 9;
+			for(var i : int = 0; i < 9; ++i)
+			{
+				result |= 1 << puzzle[i + y * 9];
+			}
+			if(result == 0)
+			{
+				return false;
+			}
+			
+			for(i = 0, result = 0; i < 9; ++i)
+			{
+				result |= 1 << puzzle[i * 9 + x];
+			}
+			if(result == 0)
+			{
+				return false;
+			}
+			
+			for(i = 0, result = 0; i < 9; ++i)
+			{
+				result |= 1 << (puzzle[int(x / 3) * 3 + int(y / 3) * 3 * 9 + int(i / 3) * 9 + i % 3]);
+			}
+			if(result == 0)
+			{
+				return false;
+			}
+			
+			return true;
 		}
 		
 		public static function generateFinishedPuzzle() : Vector.<int>

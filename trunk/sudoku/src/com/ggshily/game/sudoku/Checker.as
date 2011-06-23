@@ -9,7 +9,7 @@ package com.ggshily.game.sudoku
 		}
 		
 		/**
-		 * the square data in one dimension
+		 * @param data the square data in one dimension
 		 * 
 		 * @return if finish this puzzle return true, vise versa
 		 * 
