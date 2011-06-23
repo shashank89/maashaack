@@ -9,6 +9,7 @@ package
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
 	import flash.utils.getTimer;
 
 	public class Test extends Sprite
@@ -18,7 +19,11 @@ package
 			var urlLoader : URLLoader = new URLLoader();
 			urlLoader.dataFormat = URLLoaderDataFormat.TEXT;
 			urlLoader.addEventListener(Event.COMPLETE, onLoadComplete);
-			urlLoader.load(new URLRequest("http://www.sudoku.name/"));
+			
+			var request : URLRequest = new URLRequest("http://www.sudoku.name/");
+			request.method = URLRequestMethod.POST;
+			request.data = {puzzle_num:"#1",Submit:"New game"};
+//			urlLoader.load(request);
 			
 			trace(getTimer());
 			var data : Vector.<int> = Generator.generateFinishedPuzzle();
@@ -31,7 +36,7 @@ package
 			formateTrace(puzzle);
 			
 			
-			puzzle = Vector.<int>(
+			/*puzzle = Vector.<int>(
 				[   6,  9,  0,  2,  0,  4,  1,  0,  0,
 					0,  8,  0,  9,  0,  0,  3,  4,  0,
 					1,  0,  0,  0,  8,  0,  0,  5,  0,
@@ -40,7 +45,7 @@ package
 					0,  0,  9,  4,  0,  0,  0,  8,  7,
 					0,  7,  0,  0,  9,  0,  0,  0,  1,
 					0,  5,  8,  0,  0,  7,  0,  6,  0,
-					0,  0,  1,  6,  0,  8,  0,  9,  5]);
+					0,  0,  1,  6,  0,  8,  0,  9,  5]);*/
 			trace("resolving puzzle");
 			var solutions : Vector.<Vector.<int>> = Resolver.resolve(puzzle);
 			trace("get " + solutions.length + " solutions");
@@ -70,6 +75,7 @@ package
 					data.push(int(text.substring(text.indexOf("value") + 7, text.indexOf("value") + 8)));
 				}
 			}
+			trace("got puzzle from web:");
 			formateTrace(data);
 			var solutions : Vector.<Vector.<int>> = Resolver.resolve(data);
 			trace("get " + solutions.length + " solutions");
