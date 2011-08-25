@@ -21,6 +21,41 @@ package com.firedragon.game.lianliankan
 			_height = height;
 		}
 		
+		public function select(start:Point, target:Point):Vector.<Point>
+		{
+			if(!start.equals(target) && !isBlankCell(start) && !isBlankCell(target) && isEqual(start, target))
+			{
+				var path:Vector.<Point> = getPath(start, target);
+				if(path.length > 0)
+				{
+					setBlankCell(start, target);
+				}
+				return path;
+			}
+			else
+			{
+				return new Vector.<Point>();
+			}
+		}
+		
+		private function setBlankCell(...args):void
+		{
+			for each(var point:Point in args)
+			{
+				_data[point.x + point.y * _width] = BLANK_CELL;
+			}
+		}
+		
+		private function isBlankCell(point:Point):Boolean
+		{
+			return _data[point.x + point.y * _width] == BLANK_CELL;
+		}
+		
+		private function isEqual(point1:Point, point2:Point):Boolean
+		{
+			return _data[point1.x + point1.y * _width] == _data[point2.x + point2.y * _width];
+		}
+		
 		public function getPath(start:Point, target:Point):Vector.<Point>
 		{
 			var path:Vector.<Point> = new Vector.<Point>();
@@ -68,7 +103,7 @@ package com.firedragon.game.lianliankan
 						var directConnectPoints:Vector.<Point> = getDirectConnectPoints(startLine, targetLine);
 						if(directConnectPoints.length == 2)
 						{
-							path.push(directConnectPoints[0], directConnectPoints[1]);
+							path.push(directConnectPoints[0], directConnectPoints[1], target);
 							find = true;
 						}
 					}
@@ -172,8 +207,9 @@ package com.firedragon.game.lianliankan
 			
 			var lineLeft:Vector.<Point> = new Vector.<Point>();
 			var x:int = point.x;
-			while(x > 0 && _data[--x + point.y * _width] == BLANK_CELL)
+			while(x > 0 && _data[x - 1 + point.y * _width] == BLANK_CELL)
 			{
+				x--;
 				lineLeft.push(new Point(x, point.y));
 			}
 			if(x == 0)
@@ -187,8 +223,9 @@ package com.firedragon.game.lianliankan
 			
 			var lineRight:Vector.<Point> = new Vector.<Point>();
 			x = point.x;
-			while(x < _width - 1 && _data[++x + point.y * _width] == BLANK_CELL)
+			while(x < _width - 1 && _data[x + 1 + point.y * _width] == BLANK_CELL)
 			{
+				x++;
 				lineRight.push(new Point(x, point.y));
 			}
 			if(x == _width - 1)
@@ -202,8 +239,9 @@ package com.firedragon.game.lianliankan
 			
 			var lineUp:Vector.<Point> = new Vector.<Point>();
 			var y:int = point.y;
-			while(y > 0 && _data[point.x + (--y) * _width] == BLANK_CELL)
+			while(y > 0 && _data[point.x + (y - 1) * _width] == BLANK_CELL)
 			{
+				y--
 				lineUp.push(new Point(point.x, y));
 			}
 			if(y == 0)
@@ -217,8 +255,9 @@ package com.firedragon.game.lianliankan
 			
 			var lineDown:Vector.<Point> = new Vector.<Point>();
 			y = point.y;
-			while(y < _height - 1 && _data[point.x + (++y) * _width] == BLANK_CELL)
+			while(y < _height - 1 && _data[point.x + (y + 1) * _width] == BLANK_CELL)
 			{
+				y++
 				lineDown.push(new Point(point.x, y));
 			}
 			if(y == _height - 1)
@@ -232,5 +271,11 @@ package com.firedragon.game.lianliankan
 			
 			return lines;
 		}
+
+		public function get data():Vector.<int>
+		{
+			return _data;
+		}
+
 	}
 }
