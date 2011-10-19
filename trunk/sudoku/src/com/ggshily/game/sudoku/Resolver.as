@@ -104,7 +104,39 @@ package com.ggshily.game.sudoku
 			return true;
 		}
 		
-		private static function getPossibleNumbers(data:Vector.<int>, i:int):Vector.<int>
+		public static function getGroup(index:int):Vector.<int>
+		{
+			var group:Vector.<int> = new Vector.<int>();
+			
+			var x : int = index % 9;
+			var y : int = index / 9;
+			for(var i : int = 0; i < 9; ++i)
+			{
+				group.push(i + y * 9);
+			}
+			group.splice(group.indexOf(index), 1);
+			for(i = 0; i < 9; ++i)
+			{
+				if(group.indexOf(i * 9 + x) == -1)
+				{
+					group.push(i * 9 + x);
+				}
+			}
+			group.splice(group.indexOf(index), 1);
+			for(i = 0; i < 9; ++i)
+			{
+				var idx:int = int(x / 3) * 3 + int(y / 3) * 3 * 9 + int(i / 3) * 9 + i % 3;
+				if(group.indexOf(idx) == -1)
+				{
+					group.push(idx);
+				}
+			}
+			group.splice(group.indexOf(index), 1);
+			
+			return group;
+		}
+		
+		public static function getPossibleNumbers(data:Vector.<int>, i:int):Vector.<int>
 		{
 			var numbers : Vector.<int> = new Vector.<int>();
 			
