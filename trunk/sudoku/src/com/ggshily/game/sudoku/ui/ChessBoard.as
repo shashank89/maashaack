@@ -121,16 +121,21 @@ package com.ggshily.game.sudoku.ui
 		public function selectNumberHandler(e:MouseEvent):void
 		{
 			var cell:Cell = e.target as Cell;
-			_selectedCell.number = cell.number;
-			if(!checkDuplicateCell(_selectedCell))
-			{
-				removePossibleNumbers(_selectedCell);
-			}
+			selectNumberForCell(_selectedCell, cell.number);
 			
 			_selectedCell.selected = false;
 			_selectedCell = null;
 			updateSelectedCellPossibles();
 			updateNumbersCell();
+		}
+		
+		public function selectNumberForCell(cell:Cell, number:int):void
+		{
+			cell.number = number;
+			if(!checkDuplicateCell(cell))
+			{
+				removePossibleNumbers(cell);
+			}
 		}
 		
 		public function clearCellNumber(targetCell:Cell):void
