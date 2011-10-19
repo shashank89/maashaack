@@ -1,0 +1,3 @@
+split model & view
+
+add functionalty:(undo/redo, clear cell);
