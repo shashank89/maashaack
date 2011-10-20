@@ -1,22 +1,23 @@
 package com.ggshily.game.sudoku.ui
 {
+	import com.ggshily.game.sudoku.CellData;
+	import com.ggshily.game.sudoku.ChessBoardData;
 	import com.ggshily.game.ui.UIUtil;
 	
 	import flash.display.Sprite;
 	import flash.text.TextField;
 	
-	public class Cell extends Sprite
+	public class CellUI extends Sprite
 	{
-		private var _number:int;
 		private var _textPossible:TextField;
 		private var _textNumber:TextField;
 		
 		private var _cellSize:int;
 		private var _selected:Boolean;
 		
-		private var _possibles:Vector.<int>;
+		private var _cellData:CellData;
 		
-		public function Cell(x:int, y:int, number:int, size:int)
+		public function CellUI(x:int, y:int, size:int, cellData:CellData)
 		{
 			this.x = x;
 			this.y = y;
@@ -27,14 +28,10 @@ package com.ggshily.game.sudoku.ui
 			_textPossible = UIUtil.getTextField(12, true, size);
 			_textNumber = UIUtil.getTextField(36, false, size);
 			
-			if(number > 0)
+			_cellData = cellData;
+			if(cellData.number > 0)
 			{
-				_number = number;
-				_textNumber.text = number.toString();
-			}
-			else
-			{
-				_number = 0;
+				_textNumber.text = cellData.number.toString();
 			}
 			
 			addChild(_textPossible);
@@ -44,19 +41,21 @@ package com.ggshily.game.sudoku.ui
 			mouseChildren = false;
 		}
 		
+		public function addPossible(number:int):void
+		{
+			_cellData.addPossible(number);
+			updatePossbileNumbersText();
+		}
+		
 		public function removePossible(number:int):void
 		{
-			if(_possibles.indexOf(number) >= 0)
-			{
-				_possibles.splice(_possibles.indexOf(number), 1);
-				
-				updatePossbileNumbersText();
-			}
+			_cellData.removePossible(number);
+			updatePossbileNumbersText();
 		}
 		
 		public function set possibles(value:Vector.<int>):void
 		{
-			_possibles = value;
+			_cellData.possibles = value;
 			
 			updatePossbileNumbersText();
 			
@@ -64,12 +63,12 @@ package com.ggshily.game.sudoku.ui
 			_textNumber.visible = false;
 		}
 		
-		private function updatePossbileNumbersText():void
+		internal function updatePossbileNumbersText():void
 		{
 			var text:String = "";
-			for(var i:int = 0; i < sodoku.MAX_NUMBER; ++i)
+			for(var i:int = 0; i < ChessBoardData.MAX_NUMBER; ++i)
 			{
-				if(_possibles.indexOf(i + 1) == -1)
+				if(_cellData.possibles.indexOf(i + 1) == -1)
 				{
 					text += " ";
 				}
@@ -94,9 +93,9 @@ package com.ggshily.game.sudoku.ui
 		
 		public function set number(value:int):void
 		{
-			_number = value;
+			_cellData.number = value;
 			
-			if(_number > 0)
+			if(_cellData.number > 0)
 			{
 				_textNumber.text = value.toString();
 				
@@ -114,12 +113,12 @@ package com.ggshily.game.sudoku.ui
 
 		public function get number():int
 		{
-			return _number;
+			return _cellData.number;
 		}
 
 		public function get possibles():Vector.<int>
 		{
-			return _possibles;
+			return _cellData.possibles;
 		}
 
 		public function get selected():Boolean
@@ -137,6 +136,11 @@ package com.ggshily.game.sudoku.ui
 			graphics.beginFill(0xFFFFFF);
 			graphics.drawRect(0, 0, _cellSize, _cellSize);
 			graphics.endFill();
+		}
+
+		public function get cellData():CellData
+		{
+			return _cellData;
 		}
 
 
