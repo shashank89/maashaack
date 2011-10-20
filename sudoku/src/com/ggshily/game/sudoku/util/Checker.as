@@ -1,4 +1,4 @@
-package com.ggshily.game.sudoku
+package com.ggshily.game.sudoku.util
 {
 	public class Checker
 	{

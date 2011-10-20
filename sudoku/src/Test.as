@@ -1,8 +1,8 @@
 package
 {
-	import com.ggshily.game.sudoku.Checker;
-	import com.ggshily.game.sudoku.Generator;
-	import com.ggshily.game.sudoku.Resolver;
+	import com.ggshily.game.sudoku.util.Checker;
+	import com.ggshily.game.sudoku.util.Generator;
+	import com.ggshily.game.sudoku.util.Resolver;
 	
 	import flash.display.Sprite;
 	import flash.events.Event;

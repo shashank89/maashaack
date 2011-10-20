@@ -1,7 +1,8 @@
-package com.ggshily.game.sudoku
+package com.ggshily.game.sudoku.util
 {
 	public class Resolver
 	{
+		private static const TOTAL_COUNT:int = 81;
 		private static const NUMBERS : Vector.<int> = Vector.<int>([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 		
 		public function Resolver()
@@ -25,7 +26,7 @@ package com.ggshily.game.sudoku
 		
 		private static function getSolution(data:Vector.<int>, possibleNumbers:Vector.<Vector.<int>>, results:Vector.<Vector.<int>>, index:int):void
 		{
-			if(index == 81)
+			if(index == TOTAL_COUNT)
 			{
 				if(Checker.check(data))
 				{
