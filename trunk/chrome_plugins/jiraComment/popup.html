@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>qrcode</title>
+<title>auto jira commet</title>
 
 </head>
 <body>
@@ -16,8 +16,9 @@
 	var versionNumber = window.localStorage.getItem('versionNumber');
 	if(!versionNumber)
 	{
-		window.localStorage.setItem('versionNumber', "0.0.1");
+		window.localStorage.setItem('versionNumber', versionNumber = "0.0.1");
 	}
+	
 	$txtVersionNumber.value = versionNumber;
 
 	var sendVersionNumber = function(){
