@@ -1,0 +1,22 @@
+﻿{ 
+  "name": "timer mail", 
+  "version": "0.0.2", 
+  "description": "Notify when there is new messge in spm", 
+  "browser_action": {
+    "default_icon": "images/48.png" ,
+    "default_title": "Timer mail",
+    "default_popup": "popup.html"
+  },
+  "icons": {"16": "images/16.png", "48": "images/48.png", "128": "images/128.png"},
+  "background_page":"background.html",
+  //"options_page": "options.html",
+  "permissions": ["tabs"],
+   "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*", "http://mail.google.com/*"],
+      //"css": ["mystyles.css"],
+	  "all_frames": true,
+      "js": [/*"jquery.js",*/ "contentscript.js"]
+    }
+  ]
+}
