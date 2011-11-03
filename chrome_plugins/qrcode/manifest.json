@@ -1,0 +1,14 @@
+﻿{ 
+  "name": "qrcode", 
+  "version": "0.0.1", 
+  "description": "generate the qrcode of url", 
+  "browser_action": {
+    "default_icon": "images/48.png" ,
+    "default_title": "Qrcode",
+    "default_popup": "popup.html"
+  },
+  "background_page":"background.html",
+  "icons": {"16": "images/16.png", "48": "images/48.png", "128": "images/128.png"},
+  //"options_page": "options.html",
+  "permissions": ["tabs"]
+}
