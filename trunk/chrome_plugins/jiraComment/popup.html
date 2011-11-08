@@ -6,6 +6,7 @@
 
 </head>
 <body>
+Press enter to confirm the version number
 <div id="addItemInput"><input type="text" id="txtVersionNumber" /></div>
 <script>
 
@@ -24,10 +25,10 @@
 	var sendVersionNumber = function(){
 			var vb = $txtVersionNumber.value;
 			window.localStorage.setItem('versionNumber', vb);
-			console.log("send version number " + vb);
+			/*console.log("send version number " + vb);
 			chrome.tabs.getSelected(null, function(tab) {
 				chrome.tabs.sendRequest(tab.id, {versionNumber:vb}, function(response) {});
-			});
+			});*/
 	};
 	
 	sendVersionNumber();
@@ -36,6 +37,8 @@
 		var ev=ev || window.event;
 		if(ev.keyCode==13){
 			sendVersionNumber();
+			
+			window.close();
 		}
 		ev.preventDefault();
 	});
