@@ -1,1 +1,9 @@
-chrome.tabs.create({url:"https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=changelog&body=file:///D:/chg/chromePlugin/timer_mail/mail.html+-+%5B%5D+&shva=1&ov=0&to=gg.shily@gmail.com"});
+
+chrome.extension.onRequest.addListener(
+  function(request, sender, sendResponse) {
+	console.log(sender.tab ?
+				"from a content script:" + sender.tab.url :
+				"from the extension");
+	var vb = window.localStorage.getItem('versionNumber')
+	sendResponse({versionNumber: vb});
+  });
