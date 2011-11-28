@@ -1,0 +1,18 @@
+{ 
+  "name": "example", 
+  "version": "0.0.1", 
+  "description": "example description", 
+  "background_page":"background.html",
+  "icons": {"48": "48.png"},
+  //"options_page": "options.html",
+  "permissions": ["tabs", "notifications"],
+   "content_scripts": [
+    {
+      "matches": ["http://dev-simcity-qa00.fishonomics.com/*"],
+      //"css": ["mystyles.css"],
+	  "all_frames": true,
+      "js": [/*"jquery.js",*/ "contentscript.js"]
+    }
+  ],
+  "content_security_policy": "script-src 'self'; img-src 'self'"
+}
