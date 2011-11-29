@@ -1,7 +1,7 @@
 { 
-  "name": "example", 
+  "name": "auto backup notifier", 
   "version": "0.0.1", 
-  "description": "example description", 
+  "description": "auto backup notifier", 
   "background_page":"background.html",
   "icons": {"48": "48.png"},
   //"options_page": "options.html",
