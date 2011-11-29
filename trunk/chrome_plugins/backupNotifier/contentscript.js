@@ -15,9 +15,15 @@ console.log('savedId ' + savedId);
 var currentId = $('#f').children[0].rows [1].cells[1].children[0].innerHTML;
 console.log('currentId ' + currentId);
 
-if(Number(currentId ) > Number(savedId))
+var newAmount = Number(currentId) - Number(savedId);
+
+if(newAmount > 0)
 {
-	var message = (Number(currentId) - Number(savedId)).toString();
+	var message = "have new backup(s):" + newAmount + '<br>';
+	for(var i = 0; i < newAmount; ++i)
+	{
+		message += (i + 1) + "." + $('#f').children[0].rows [1].cells[3].innerHTML + "," + $('#f').children[0].rows [1].cells[4].innerHTML + "<br>";
+	}
 	console.log(message);
 	chrome.extension.sendRequest({msg: message}, function(response) { // optional callback - gets response
 		console.log(response.returnMsg);
