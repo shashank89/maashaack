@@ -9,36 +9,45 @@ function xpath(query, context){
 	return document.evaluate(context?(query.indexOf('.')==0?query:'.' + query):query, context || document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
 };
 
-var savedId = window.localStorage.getItem('savedId');
-console.log('savedId ' + savedId);
-
-var currentId = $('#f').children[0].rows [1].cells[1].children[0].innerHTML;
-console.log('currentId ' + currentId);
-
-var newAmount = Number(currentId) - Number(savedId);
-
-if(newAmount > 0)
-{
-	var message = "have new backup(s):" + newAmount + '<br>';
-	for(var i = 0; i < newAmount; ++i)
-	{
-		message += (i + 1) + "." + $('#f').children[0].rows [1].cells[3].innerHTML + "," + $('#f').children[0].rows [1].cells[4].innerHTML + "<br>";
-	}
-	console.log(message);
-	chrome.extension.sendRequest({msg: message}, function(response) { // optional callback - gets response
-		console.log(response.returnMsg);
-	});
-	
-	window.localStorage.setItem('savedId', currentId);
-}
-
 var queryString = window.top.location.search.substring(1);
 
 //console.log(getParameter(queryString, 'subAction'));
 
-if($('#f') != null && getParameter(queryString, 'subAction') == 'null')
+if(false && $('#f') != null && getParameter(queryString, 'subAction') == 'null')
 {
+	var savedId = window.localStorage.getItem('savedId');
+	console.log('savedId ' + savedId);
+
+	var currentId = savedId;
+	if($('#f').children[0].rows.length > 1)
+	{
+		currentId = $('#f').children[0].rows [1].cells[1].children[0].innerHTML;
+	}
+	console.log('currentId ' + currentId);
+
+	var newAmount = Math.min($('#f').children[0].rows.length - 1, Number(currentId) - Number(savedId));
+
+	if(newAmount > 0)
+	{
+		var message = "have new backup(s):" + newAmount + '<br>';
+		for(var i = 0; i < newAmount; ++i)
+		{
+			message += (i + 1) + "." + $('#f').children[0].rows [i + 1].cells[3].innerHTML + "," + $('#f').children[0].rows [i + 1].cells[4].innerHTML + "<br>";
+		}
+		console.log(message);
+		chrome.extension.sendRequest({msg: message}, function(response) { // optional callback - gets response
+			console.log(response.returnMsg);
+		});
+		
+		window.localStorage.setItem('savedId', currentId);
+	}
 	setInterval("window.location.reload()", 5000);
+	
+	document.title = 'qa auto backups';
+}
+else if(getParameter(queryString, 'backupId') != "null")
+{
+	document.title = getParameter(queryString, 'backupId') + ' backup';
 }
 
 

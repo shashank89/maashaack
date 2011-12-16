@@ -5,10 +5,10 @@
   "background_page":"background.html",
   "icons": {"48": "48.png"},
   //"options_page": "options.html",
-  "permissions": ["tabs", "notifications"],
+  "permissions": ["tabs", "notifications", "http://dev-simcity-qa00.fishonomics.com/"],
    "content_scripts": [
     {
-      "matches": ["http://dev-simcity-qa00.fishonomics.com/*"],
+      "matches": ["http://dev-simcity-qa00.fishonomics.com/"],
       //"css": ["mystyles.css"],
 	  "all_frames": true,
       "js": [/*"jquery.js",*/ "contentscript.js"]
