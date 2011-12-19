@@ -512,6 +512,10 @@ package abc2java
 							stackType.push("int");
 							break;
                         case OP_getsuper: 
+							stackValue.push("super." + abc.names[readU32()]);
+							stackType.push("String");
+                            //s += abc.names[readU32()]
+                            break;
                         case OP_setsuper: 
                         case OP_getproperty: 
                         case OP_initproperty: 
@@ -530,7 +534,7 @@ package abc2java
                         case OP_constructprop:
                         case OP_callproperty:
                         case OP_callproplex:
-                        case OP_callsuper:
+                        //case OP_callsuper:
                         case OP_callsupervoid:
                         case OP_callpropvoid:
                             //s += abc.names[readU32()]
@@ -538,6 +542,9 @@ package abc2java
                             s += abc.names[readU32()]
                             s += "(" + readU32() + ");"
                             break;
+                        case OP_callsuper:
+							s += "super." + abc.names[readU32()] + "(" + reasU32() + ")";
+							break;
                         case OP_newfunction: {
                             var method_id = readU32()
                             s += abc.methods[method_id]
@@ -648,6 +655,19 @@ package abc2java
 							stackType.pop();
 							stackType.push("boolean");
 							break;
+// const OP_bitnot:int = 0x97
+// const OP_add_d:int = 0x9B
+// const OP_add:int = 0xA0
+// const OP_subtract:int = 0xA1
+// const OP_multiply:int = 0xA2
+// const OP_divide:int = 0xA3
+// const OP_modulo:int = 0xA4
+// const OP_lshift:int = 0xA5
+// const OP_rshift:int = 0xA6
+// const OP_urshift:int = 0xA7
+// const OP_bitand:int = 0xA8
+// const OP_bitor:int = 0xA9
+// const OP_bitxor:int = 0xAA
 						case OP_equals:
 							var second = stackValue.pop();
 							stackValue.push(stackValue.pop() + " == " + second);
@@ -681,6 +701,18 @@ package abc2java
                         case OP_hasnext2:
                             s += readU32() + " " + readU32()
 							break;
+// const OP_instanceof:int = 0xB1
+// const OP_istype:int = 0xB2
+// const OP_istypelate:int = 0xB3
+// const OP_in:int = 0xB4
+// const OP_increment_i:int = 0xC0
+// const OP_decrement_i:int = 0xC1
+// const OP_inclocal_i:int = 0xC2
+// const OP_declocal_i:int = 0xC3
+// const OP_negate_i:int = 0xC4
+// const OP_add_i:int = 0xC5
+// const OP_subtract_i:int = 0xC6
+// const OP_multiply_i:int = 0xC7
                         case OP_getlocal1:
                         case OP_getlocal2:
                         case OP_getlocal3:
