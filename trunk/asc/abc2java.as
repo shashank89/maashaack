@@ -429,6 +429,7 @@ package abc2java
 				var initializedLocalIndex = 0;
 				var stackValue = [];
 				var stackType = [];
+				var stackScope = [];
 				
                 code.position = 0
                 var labels:LabelInfo = new LabelInfo()
@@ -436,13 +437,22 @@ package abc2java
                 {
                     var start:int = code.position
                     var s = indent //+ start
-                    while (s.length < 12) s += ' ';
+                    //while (s.length < 12) s += ' ';
                     var opcode = code.readUnsignedByte()
 
                     if (opcode == OP_label || ((code.position-1) in labels)) {
                         dumpPrint(indent)
                         dumpPrint(indent + labels.labelFor(code.position-1) + ": ")
                     }
+					
+					if(stackScope.length > 0 && start == stackScope[stackScope.length - 1])
+					{
+						stackScope.pop();
+						s += "}\n";
+						
+						indent = indent.substring(0, indent.length - TAB.length);
+						s += indent;
+					}
 
                     //s += opNames[opcode]
                     //s += opNames[opcode].length < 8 ? "\t\t" : "\t"
@@ -457,6 +467,11 @@ package abc2java
 							stackValue.push(abc.strings[readU32()]);
 							stackType.push("String");
                             break
+                        case OP_pushbyte:
+                            //s += code.readByte()
+							stackValue.push(code.readByte());
+							stackType.push("int");
+							break;
                         case OP_pushnamespace:
                             s += abc.namespaces[readU32()]
                             break
@@ -477,6 +492,21 @@ package abc2java
 							stackValue.push(abc.doubles[readU32()]);
 							stackType.push("double");
                             break;
+                        case OP_pushtrue:
+                            //s += abc.doubles[readU32()]
+							stackValue.push("true");
+							stackType.push("boolean");
+                            break;
+                        case OP_pushfalse:
+                            //s += abc.doubles[readU32()]
+							stackValue.push("false");
+							stackType.push("boolean");
+                            break;
+                        case OP_pushnan:
+                            //s += abc.doubles[readU32()]
+							stackValue.push("Nan");
+							stackType.push("Number");
+                            break;
                         case OP_getsuper: 
                         case OP_setsuper: 
                         case OP_getproperty: 
@@ -491,7 +521,7 @@ package abc2java
                         case OP_coerce: 
                         case OP_astype: 
                         case OP_getdescendants:
-                            s += abc.names[readU32()]
+                            //s += abc.names[readU32()]
                             break;
                         case OP_constructprop:
                         case OP_callproperty:
@@ -499,8 +529,10 @@ package abc2java
                         case OP_callsuper:
                         case OP_callsupervoid:
                         case OP_callpropvoid:
+                            //s += abc.names[readU32()]
+                            //s += " (" + readU32() + ")"
                             s += abc.names[readU32()]
-                            s += " (" + readU32() + ")"
+                            s += "(" + readU32() + ");"
                             break;
                         case OP_newfunction: {
                             var method_id = readU32()
@@ -525,7 +557,7 @@ package abc2java
                                 s += " " + labels.labelFor(target) // target + "("+(target-pos)+")"
                             }
                             break;
-                        case OP_jump:
+                        /*case OP_jump:
                         case OP_iftrue:     case OP_iffalse:
                         case OP_ifeq:       case OP_ifne:
                         case OP_ifge:       case OP_ifnge:
@@ -539,7 +571,19 @@ package abc2java
                             s += labels.labelFor(target)
                             if (!((code.position) in labels))
                                 s += "\n"
-                            break;
+                            break;*/
+						case OP_iftrue:
+							var offset = readS24();
+							stackScope.push(code.position+offset);
+							break;
+						case OP_iffalse:
+							s += "if(" + stackValue.pop() + ")\n" + indent + "{";
+							stackType.pop();
+							indent += TAB;
+							
+							var offset = readS24();
+							stackScope.push(code.position+offset);
+							break;
                         case OP_inclocal:
                         case OP_declocal:
                         case OP_inclocal_i:
@@ -574,11 +618,6 @@ package abc2java
                         case OP_applytype:
                             s += "(" + readU32() + ")"
                             break;
-                        case OP_pushbyte:
-                            //s += code.readByte()
-							stackValue.push(code.readByte());
-							stackType.push("int");
-							break;
                         case OP_getscopeobject:
                             //s += code.readByte()
                             break;
@@ -588,6 +627,9 @@ package abc2java
                         case OP_getlocal1:
                         case OP_getlocal2:
                         case OP_getlocal3:
+							var index = opcode - OP_getlocal1 + 1;
+							stackValue.push("loc_" + index);
+							stackType.push("");
 							break;
                         case OP_setlocal1:
                         case OP_setlocal2:
