@@ -66,7 +66,7 @@ package abc2java
     " -abs Print the bytecode, but no information about the ABC",
     ].join("\n");
 
-    const TAB = "  "
+    const TAB = "    "
     
     var totalSize:int
     var opSizes:Array = new Array(256)
@@ -448,13 +448,13 @@ package abc2java
 					if(stackScope.length > 0 && start == stackScope[stackScope.length - 1])
 					{
 						stackScope.pop();
-						s += "}\n";
+						s = s.substring(0, s.length - TAB.length) + "}\n";
 						
 						indent = indent.substring(0, indent.length - TAB.length);
 						s += indent;
 					}
 
-                    //s += opNames[opcode]
+                    s += opNames[opcode]
                     //s += opNames[opcode].length < 8 ? "\t\t" : "\t"
                         
                     switch(opcode)
@@ -507,6 +507,10 @@ package abc2java
 							stackValue.push("Nan");
 							stackType.push("Number");
                             break;
+                        case OP_pushshort:
+							stackValue.push(readU32());
+							stackType.push("int");
+							break;
                         case OP_getsuper: 
                         case OP_setsuper: 
                         case OP_getproperty: 
@@ -573,11 +577,29 @@ package abc2java
                                 s += "\n"
                             break;*/
 						case OP_iftrue:
+							s += "if(!" + stackValue.pop() + ")\n" + indent + "{";
+							stackType.pop();
+							indent += TAB;
+							
 							var offset = readS24();
 							stackScope.push(code.position+offset);
 							break;
 						case OP_iffalse:
 							s += "if(" + stackValue.pop() + ")\n" + indent + "{";
+							stackType.pop();
+							indent += TAB;
+							
+							var offset = readS24();
+							stackScope.push(code.position+offset);
+							break;
+                        case OP_ifeq:       case OP_ifne:
+                        case OP_ifge:       case OP_ifnge:
+                        case OP_ifgt:       case OP_ifngt:
+                        case OP_ifle:       case OP_ifnle:
+                        case OP_iflt:       case OP_ifnlt:
+							var second = stackValue.pop();
+							s += getLogicString(opcode, stackValue.pop(), second, indent);
+							stackType.pop();
 							stackType.pop();
 							indent += TAB;
 							
@@ -596,7 +618,7 @@ package abc2java
                         case OP_getslot:
                         case OP_setglobalslot:
                         case OP_setslot:
-                        case OP_pushshort:
+                        //case OP_pushshort:
                         case OP_newcatch:
                             s += readU32()
                             break
@@ -621,6 +643,41 @@ package abc2java
                         case OP_getscopeobject:
                             //s += code.readByte()
                             break;
+						case OP_not:
+							stackValue.push("!" + "(" + stackValue.pop() + ")");
+							stackType.pop();
+							stackType.push("boolean");
+							break;
+						case OP_equals:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " == " + second);
+							stackType.push("String");
+							break;
+						case OP_strictequals:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " === " + second);
+							stackType.push("String");
+							break;
+						case OP_lessthan:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " < " + second);
+							stackType.push("String");
+							break;
+						case OP_lessequals:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " == " + second);
+							stackType.push("String");
+							break;
+						case OP_greaterthan:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " > " + second);
+							stackType.push("String");
+							break;
+						case OP_greaterequals:
+							var second = stackValue.pop();
+							stackValue.push(stackValue.pop() + " >= " + second);
+							stackType.push("String");
+							break;
                         case OP_hasnext2:
                             s += readU32() + " " + readU32()
 							break;
@@ -659,6 +716,46 @@ package abc2java
                 }
                 dumpPrint(oldindent+"}\n")
             }
+			
+			function getLogicString(opcode, first, second, indent="")
+			{
+				var s = "";
+				switch(opcode)
+				{
+					case OP_ifeq:
+						s = "if(" + first + " != " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifne:
+						s = "if(" + first + " == " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifge:
+						s = "if(" + first + " >= " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifnge:
+						s = "if(!" + first + " >= " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifgt:
+						s = "if(" + first + " > " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifngt:
+						s = "if(!" + first + " > " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifle:
+						s = "if(" + first + " <= " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifnle:
+						s = "if(!" + first + " <= " + second + ")\n" + indent + "{";
+						break;
+					case OP_iflt:
+						s = "if(" + first + " < " + second + ")\n" + indent + "{";
+						break;
+					case OP_ifnlt:
+						s = "if(!" + first + " < " + second + ")\n" + indent + "{";
+						break;
+				}
+				
+				return s;
+			}
         }
     }
     
