@@ -163,7 +163,7 @@ package com.ggshily.fractal
 		public function getColor4(iter : Number, maxIter : Number) : int
 		{
 			if(iter == maxIter)
-				return 0xFF0000;
+				return 0x000000;
 			else
 				return ((int(sinColor(iter * 20))) << 16) | ((int(sinColor(iter * 15 + 85))) << 8) | int(sinColor(iter * 30 + 171));
 		}
@@ -197,5 +197,6 @@ import com.adobe.images.PNGEncoder;
 
 import com.ggshily.fractal.Fractal;
 
-PNGEncoder.encode(new Fractal(1920 * 2, 1280 * 2)).writeFile("output.png");
-print("Done, check the output.pgn!");
+	//PNGEncoder.encode(new Fractal(1920, 1280, -0.75, -0.3, 0.5)).writeFile("output1.png");
+	PNGEncoder.encode(new Fractal(1920, 1280, -0.7, -0.3, 0.05, 5000)).writeFile("output2.png");
+	print("Done, check the output.pgn!");

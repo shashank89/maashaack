@@ -37,7 +37,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-package abcdump
+package abc2java
 {
     import flash.utils.ByteArray
     import avmplus.System
@@ -49,7 +49,7 @@ package abcdump
     "",
     "Usage:",
     "",
-    "    abcdump [options] file ...",
+    "    abc2java [options] file ...",
     "",
     "Each file can be an ABC or SWF/SWC format file",
     "",
@@ -177,6 +177,13 @@ package abcdump
             var name = this.name ? this.name : "function"
 
             return name + "(" + paramTypes + "):" + returnType + "\t/* disp_id=" + id + " method_id=" + method_id + " */"
+        }
+        
+        public function formatJava():String
+        {
+            var name = this.name ? this.name : ""
+
+            return returnType +" " + name + "(" + paramTypes + ")\t/* disp_id=" + id + " method_id=" + method_id + " */"
         }
 
         function dump(abc:Abc, indent:String, attr:String="")
@@ -387,6 +394,230 @@ package abcdump
             b |= code.readByte()<<16
             return b
         }
+
+        function toJavaClass(abc:Abc, indent:String, attr:String="")
+        {
+            dumped = true
+            dumpPrint("")
+
+            if (metadata) {
+                for each (var md in metadata)
+                    dumpPrint(indent+md)
+            }
+
+            var s:String = ""
+            if (flags & NATIVE)
+                s = "native "
+            //s += traitKinds[kind] + " " 
+
+            dumpPrint(indent+attr+s+formatJava())
+            if (code)
+            {
+                dumpPrint(indent+"{")
+                var oldindent = indent
+                indent += TAB
+                if (flags & NEED_ACTIVATION) {
+                    dumpPrint(indent+"activation {")
+                    activation.dump(abc, indent+TAB, "")
+                    dumpPrint(indent+"}")
+                }
+                dumpPrint(indent+"// local_count="+local_count+
+                          " max_scope=" + max_scope +
+                          " max_stack=" + max_stack +
+                          " code_len=" + code.length) 
+				
+				var initializedLocalIndex = 0;
+				var stackValue = [];
+				var stackType = [];
+				
+                code.position = 0
+                var labels:LabelInfo = new LabelInfo()
+                while (code.bytesAvailable > 0)
+                {
+                    var start:int = code.position
+                    var s = indent //+ start
+                    while (s.length < 12) s += ' ';
+                    var opcode = code.readUnsignedByte()
+
+                    if (opcode == OP_label || ((code.position-1) in labels)) {
+                        dumpPrint(indent)
+                        dumpPrint(indent + labels.labelFor(code.position-1) + ": ")
+                    }
+
+                    //s += opNames[opcode]
+                    //s += opNames[opcode].length < 8 ? "\t\t" : "\t"
+                        
+                    switch(opcode)
+                    {
+                        case OP_debugfile:
+                            //s += '"' + abc.strings[readU32()].replace(/\n/g,"\\n").replace(/\t/g,"\\t") + '"'
+							break;
+                        case OP_pushstring:
+                            //s += '"' + abc.strings[readU32()].replace(/\n/g,"\\n").replace(/\t/g,"\\t") + '"'
+							stackValue.push(abc.strings[readU32()]);
+							stackType.push("String");
+                            break
+                        case OP_pushnamespace:
+                            s += abc.namespaces[readU32()]
+                            break
+                        case OP_pushint:
+                            //var i:int = abc.ints[readU32()]
+                            //s += i + "\t// 0x" + i.toString(16)
+							stackValue.push(abc.ints[readU32()]);
+							stackType.push("int");
+                            break
+                        case OP_pushuint:
+                            //var u:uint = abc.uints[readU32()]
+                            //s += u + "\t// 0x" + u.toString(16)
+							stackValue.push(abc.uints[readU32()]);
+							stackType.push("uint");
+                            break;
+                        case OP_pushdouble:
+                            //s += abc.doubles[readU32()]
+							stackValue.push(abc.doubles[readU32()]);
+							stackType.push("double");
+                            break;
+                        case OP_getsuper: 
+                        case OP_setsuper: 
+                        case OP_getproperty: 
+                        case OP_initproperty: 
+                        case OP_setproperty: 
+                        case OP_getlex: 
+                        case OP_findpropstrict: 
+                        case OP_findproperty:
+                        case OP_finddef:
+                        case OP_deleteproperty: 
+                        case OP_istype: 
+                        case OP_coerce: 
+                        case OP_astype: 
+                        case OP_getdescendants:
+                            s += abc.names[readU32()]
+                            break;
+                        case OP_constructprop:
+                        case OP_callproperty:
+                        case OP_callproplex:
+                        case OP_callsuper:
+                        case OP_callsupervoid:
+                        case OP_callpropvoid:
+                            s += abc.names[readU32()]
+                            s += " (" + readU32() + ")"
+                            break;
+                        case OP_newfunction: {
+                            var method_id = readU32()
+                            s += abc.methods[method_id]
+                            break;
+                        }
+                        case OP_callstatic:
+                            s += abc.methods[readU32()]
+                            s += " (" + readU32() + ")"
+                            break;
+                        case OP_newclass: 
+                            s += abc.instances[readU32()]
+                            break;
+                        case OP_lookupswitch:
+                            var pos = code.position-1;
+                            var target = pos + readS24()
+                            var maxindex = readU32()
+                            s += "default:" + labels.labelFor(target) // target + "("+(target-pos)+")"
+                            s += " maxcase:" + maxindex
+                            for (var i:int=0; i <= maxindex; i++) {
+                                target = pos + readS24();
+                                s += " " + labels.labelFor(target) // target + "("+(target-pos)+")"
+                            }
+                            break;
+                        case OP_jump:
+                        case OP_iftrue:     case OP_iffalse:
+                        case OP_ifeq:       case OP_ifne:
+                        case OP_ifge:       case OP_ifnge:
+                        case OP_ifgt:       case OP_ifngt:
+                        case OP_ifle:       case OP_ifnle:
+                        case OP_iflt:       case OP_ifnlt:
+                        case OP_ifstricteq: case OP_ifstrictne:
+                            var offset = readS24()
+                            var target = code.position+offset
+                            //s += target + " ("+offset+")"
+                            s += labels.labelFor(target)
+                            if (!((code.position) in labels))
+                                s += "\n"
+                            break;
+                        case OP_inclocal:
+                        case OP_declocal:
+                        case OP_inclocal_i:
+                        case OP_declocal_i:
+                        case OP_getlocal:
+                        case OP_kill:
+                        case OP_setlocal:
+                        case OP_debugline:
+                        case OP_getglobalslot:
+                        case OP_getslot:
+                        case OP_setglobalslot:
+                        case OP_setslot:
+                        case OP_pushshort:
+                        case OP_newcatch:
+                            s += readU32()
+                            break
+                        case OP_debug:
+                            s += code.readUnsignedByte() 
+                            s += " " + readU32()
+                            s += " " + code.readUnsignedByte()
+                            s += " " + readU32()
+                            break;
+                        case OP_newobject:
+                            s += "{" + readU32() + "}"
+                            break;
+                        case OP_newarray:
+                            s += "[" + readU32() + "]"
+                            break;
+                        case OP_call:
+                        case OP_construct:
+                        case OP_constructsuper:
+                        case OP_applytype:
+                            s += "(" + readU32() + ")"
+                            break;
+                        case OP_pushbyte:
+                            //s += code.readByte()
+							stackValue.push(code.readByte());
+							stackType.push("int");
+							break;
+                        case OP_getscopeobject:
+                            //s += code.readByte()
+                            break;
+                        case OP_hasnext2:
+                            s += readU32() + " " + readU32()
+							break;
+                        case OP_getlocal1:
+                        case OP_getlocal2:
+                        case OP_getlocal3:
+							break;
+                        case OP_setlocal1:
+                        case OP_setlocal2:
+                        case OP_setlocal3:
+							var index = opcode - OP_setlocal1 + 1;
+							var type = stackType.pop();
+							if(initializedLocalIndex < index)
+							{
+								s += type + " loc_" + index + " = " + stackValue.pop() + ";";
+								initializedLocalIndex = index;
+							}
+							else
+							{
+								s += "loc_" + index + " = " + stackValue.pop() + ";";
+							}
+							break;
+                        default:
+                            if (opNames[opcode] == ("0x"+opcode.toString(16).toUpperCase()))
+                                s += " UNKNOWN OPCODE"
+                            break
+                    }
+                    var size:int = code.position - start
+                    totalSize += size
+                    opSizes[opcode] = int(opSizes[opcode]) + size
+					if(s.length != 12)
+						dumpPrint(s)
+                }
+                dumpPrint(oldindent+"}\n")
+            }
+        }
     }
     
     class SlotInfo extends MemberInfo
@@ -396,6 +627,12 @@ package abcdump
         public function format():String
         {
             return traitKinds[kind] + " " + name + ":" + type + 
+                (value !== undefined ? (" = " + (value is String ? ('"'+value+'"') : value)) : "") + 
+                "\t/* slot_id " + id + " */"
+        }
+        public function formatJava():String
+        {
+            return traitKinds[kind] + " " + type + " " + name +
                 (value !== undefined ? (" = " + (value is String ? ('"'+value+'"') : value)) : "") + 
                 "\t/* slot_id " + id + " */"
         }
@@ -443,6 +680,51 @@ package abcdump
             ct.init.dump(abc,indent,"static ")
             dumpPrint(oldindent+"}\n")
         }
+		
+        function toJavaClass(abc:Abc, indent:String, attr:String="")
+        {
+            if (kind == TRAIT_Const || kind == TRAIT_Slot)
+            {
+                if (metadata) {
+                    for each (var md in metadata)
+                        dumpPrint(indent+md)
+                }
+                dumpPrint(indent+attr+formatJava())
+			}
+			else // class
+			{
+				var ct:Traits = value
+				var it:Traits = ct.itraits
+				dumpPrint('')
+				if (metadata) {
+					for each (var md in metadata)
+						dumpPrint(indent+md)
+				}
+				var def:String;
+				if (it.flags & CLASS_FLAG_interface)
+					def = "interface"
+				else {
+					def = "class";
+					if (!(it.flags & CLASS_FLAG_sealed))
+						def = "dynamic " + def;
+					if (it.flags & CLASS_FLAG_final)
+						def = "final " + def;
+						
+				}
+				dumpPrint(indent+attr+def+" "+name+" extends "+it.base)
+				var oldindent = indent
+				indent += TAB
+				if (it.interfaces.length > 0)
+					dumpPrint(indent+"implements "+it.interfaces)
+				dumpPrint(oldindent+"{")
+				it.init.toJavaClass(abc,indent)
+				it.toJavaClass(abc,indent)
+				ct.toJavaClass(abc,indent,"static ")
+				ct.init.toJavaClass(abc,indent,"static ")
+				dumpPrint(oldindent+"}\n")
+				
+			}
+		}
     }
     
     class Traits
@@ -469,6 +751,12 @@ package abcdump
             for each (var m in members)
                 m.dump(abc, indent, attr)
         }
+		
+		public function toJavaClass(abc:Abc, indent:String, attr:String="")
+		{
+            for each (var m in members)
+                m.toJavaClass(abc, indent, attr)
+		}
     }
 
     class Abc
@@ -857,7 +1145,7 @@ package abcdump
                 t.init.name = t.itraits.name + "$cinit"
                 t.init.kind = TRAIT_Method
                 parseTraits(t)
-            }           
+            }
             infoPrint("ClassInfo count " + count + " size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+"%")
         }
 
@@ -950,6 +1238,16 @@ package abcdump
                 infoPrint(opNames[max]+"\t"+int(opSizes[max])+"\t"+int(100*opSizes[max]/totalSize)+"%")
             }
         }
+		
+		function toJavaClass(indent:String="")
+		{
+            for each (var t in scripts)
+            {
+                dumpPrint("// " + indent+t.name)
+                t.toJavaClass(this,indent)
+                t.init.toJavaClass(this,indent)
+            }
+		}
     }
     
     class Rect
@@ -1274,7 +1572,7 @@ package abcdump
         case 46<<16|15:
         case 46<<16|16:
             var abc:Abc = new Abc(data)
-            abc.dump()
+            abc.toJavaClass()
             break
         case 67|87<<8|83<<16|10<<24: // SWC10
         case 67|87<<8|83<<16|9<<24: // SWC9
