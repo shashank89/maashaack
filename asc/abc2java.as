@@ -516,11 +516,25 @@ package abc2java
 							stackType.push("String");
                             //s += abc.names[readU32()]
                             break;
+                        case OP_pop: 
+                            s += stackValue.pop() + ";";
+							stackType.pop();
+                            break;
                         case OP_setsuper: 
+							s += "super." + abc.names[readU32()] + " = " + stackValue.pop();
+							stackType.pop();
+							break;
                         case OP_getproperty: 
+							stackValue.push(stackValue.pop() + "." + abc.names[readU32()]);
+							stackType.pop();
+							stackType.push("Object");
+							break;
                         case OP_initproperty: 
                         case OP_setproperty: 
                         case OP_getlex: 
+							s += abc.names[readU32()] + " = " + stackValue.pop();
+							stackType.pop();
+							break;
                         case OP_findpropstrict: 
                         case OP_findproperty:
                         case OP_finddef:
@@ -530,20 +544,28 @@ package abc2java
                         case OP_astype: 
                         case OP_getdescendants:
                             //s += abc.names[readU32()]
+							abc.names[readU32()]
                             break;
                         case OP_constructprop:
                         case OP_callproperty:
                         case OP_callproplex:
-                        //case OP_callsuper:
                         case OP_callsupervoid:
                         case OP_callpropvoid:
                             //s += abc.names[readU32()]
                             //s += " (" + readU32() + ")"
-                            s += abc.names[readU32()]
-                            s += "(" + readU32() + ");"
+							var nameIndex = readU32();
+							var argn = readU32();
+							var args = "";
+							for(var i = 0; i < argn; ++i)
+							{
+								args = stackValue.pop() + (i != 0 ? ", " : "") + args;
+								stackType.pop();
+							}
+                            s += stackValue.pop() + "." + getNameInQName(abc.names[nameIndex].toString()) + "(" + args + ");"
+							stackType.pop();
                             break;
                         case OP_callsuper:
-							s += "super." + abc.names[readU32()] + "(" + reasU32() + ")";
+							s += "super." + abc.names[readU32()] + "(" + readU32() + ")";
 							break;
                         case OP_newfunction: {
                             var method_id = readU32()
@@ -613,10 +635,15 @@ package abc2java
 							var offset = readS24();
 							stackScope.push(code.position+offset);
 							break;
-                        case OP_inclocal:
-                        case OP_declocal:
-                        case OP_inclocal_i:
-                        case OP_declocal_i:
+						case OP_pushnull:
+							stackValue.push("null");
+							stackType.push("Object");
+							break;
+						case OP_pushundefined:
+							stackValue.push("undefined");
+							stackType.push("Object");
+							break;
+//const OP_pushconstant:int = 0x22
                         case OP_getlocal:
                         case OP_kill:
                         case OP_setlocal:
@@ -625,7 +652,6 @@ package abc2java
                         case OP_getslot:
                         case OP_setglobalslot:
                         case OP_setslot:
-                        //case OP_pushshort:
                         case OP_newcatch:
                             s += readU32()
                             break
@@ -649,70 +675,67 @@ package abc2java
                             break;
                         case OP_getscopeobject:
                             //s += code.readByte()
+							code.readByte();
                             break;
 						case OP_not:
 							stackValue.push("!" + "(" + stackValue.pop() + ")");
 							stackType.pop();
 							stackType.push("boolean");
 							break;
-// const OP_bitnot:int = 0x97
-// const OP_add_d:int = 0x9B
-// const OP_add:int = 0xA0
-// const OP_subtract:int = 0xA1
-// const OP_multiply:int = 0xA2
-// const OP_divide:int = 0xA3
-// const OP_modulo:int = 0xA4
-// const OP_lshift:int = 0xA5
-// const OP_rshift:int = 0xA6
-// const OP_urshift:int = 0xA7
-// const OP_bitand:int = 0xA8
-// const OP_bitor:int = 0xA9
-// const OP_bitxor:int = 0xAA
-						case OP_equals:
-							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " == " + second);
-							stackType.push("String");
+						case OP_bitnot:
+							stackValue.push("~" + "(" + stackValue.pop() + ")");
+							stackType.pop();
+							stackType.push("int");
 							break;
-						case OP_strictequals:
+						case OP_add_d:			case OP_add:
+						case OP_subtract:		case OP_multiply:
+						case OP_divide:			case OP_modulo:
+						case OP_lshift:			case OP_rshift:
+						case OP_urshift:		case OP_bitand:
+						case OP_bitor:			case OP_bitxor:
+						case OP_equals:			case OP_strictequals:
+						case OP_lessthan:		case OP_lessequals:
+						case OP_greaterthan:	case OP_greaterequals:
+						case OP_instanceof:		case OP_istype:
+						case OP_istypelate:
 							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " === " + second);
-							stackType.push("String");
-							break;
-						case OP_lessthan:
-							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " < " + second);
-							stackType.push("String");
-							break;
-						case OP_lessequals:
-							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " == " + second);
-							stackType.push("String");
-							break;
-						case OP_greaterthan:
-							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " > " + second);
-							stackType.push("String");
-							break;
-						case OP_greaterequals:
-							var second = stackValue.pop();
-							stackValue.push(stackValue.pop() + " >= " + second);
+							stackValue.push(stackValue.pop() + " " + getNumericalString(opcode) + " " + second);
+							stackType.pop();
+							stackType.pop();
 							stackType.push("String");
 							break;
                         case OP_hasnext2:
                             s += readU32() + " " + readU32()
 							break;
-// const OP_instanceof:int = 0xB1
-// const OP_istype:int = 0xB2
-// const OP_istypelate:int = 0xB3
 // const OP_in:int = 0xB4
-// const OP_increment_i:int = 0xC0
-// const OP_decrement_i:int = 0xC1
-// const OP_inclocal_i:int = 0xC2
-// const OP_declocal_i:int = 0xC3
-// const OP_negate_i:int = 0xC4
-// const OP_add_i:int = 0xC5
-// const OP_subtract_i:int = 0xC6
-// const OP_multiply_i:int = 0xC7
+                        case OP_increment_i:
+							stackValue.push(stackValue.pop() + "++");
+							stackType.pop();
+							stackType.push("String");
+							break;
+                        case OP_decrement_i:
+							stackValue.push(stackValue.pop() + "--");
+							stackType.pop();
+							stackType.push("String");
+							break;
+                        case OP_inclocal:
+                        case OP_inclocal_i:
+							stackValue.push("local_" + readU32() + "++");
+							stackType.push("String");
+							break;
+                        case OP_declocal:
+                        case OP_declocal_i:
+							stackValue.push("local_" + readU32() + "--");
+							stackType.push("String");
+							break;
+						case OP_negate_i:
+							stackValue.push("-" + stackValue.pop());
+							stackType.push("String");
+							break;
+                        case OP_getlocal0:
+							stackValue.push("this");
+							stackType.push("Object");
+							break;
                         case OP_getlocal1:
                         case OP_getlocal2:
                         case OP_getlocal3:
@@ -749,46 +772,92 @@ package abc2java
                 dumpPrint(oldindent+"}\n")
             }
 			
-			function getLogicString(opcode, first, second, indent="")
-			{
-				var s = "";
-				switch(opcode)
-				{
-					case OP_ifeq:
-						s = "if(" + first + " != " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifne:
-						s = "if(" + first + " == " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifge:
-						s = "if(" + first + " >= " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifnge:
-						s = "if(!" + first + " >= " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifgt:
-						s = "if(" + first + " > " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifngt:
-						s = "if(!" + first + " > " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifle:
-						s = "if(" + first + " <= " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifnle:
-						s = "if(!" + first + " <= " + second + ")\n" + indent + "{";
-						break;
-					case OP_iflt:
-						s = "if(" + first + " < " + second + ")\n" + indent + "{";
-						break;
-					case OP_ifnlt:
-						s = "if(!" + first + " < " + second + ")\n" + indent + "{";
-						break;
-				}
-				
-				return s;
-			}
         }
+		function getLogicString(opcode, first, second, indent="")
+		{
+			var s = "";
+			switch(opcode)
+			{
+				case OP_ifeq:
+					s = "if(" + first + " != " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifne:
+					s = "if(" + first + " == " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifge:
+					s = "if(!" + first + " >= " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifnge:
+					s = "if(" + first + " >= " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifgt:
+					s = "if(!" + first + " > " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifngt:
+					s = "if(" + first + " > " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifle:
+					s = "if(!" + first + " <= " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifnle:
+					s = "if(" + first + " <= " + second + ")\n" + indent + "{";
+					break;
+				case OP_iflt:
+					s = "if(!" + first + " < " + second + ")\n" + indent + "{";
+					break;
+				case OP_ifnlt:
+					s = "if(" + first + " < " + second + ")\n" + indent + "{";
+					break;
+			}
+			
+			return s;
+		}
+		
+		function getNumericalString(opcode)
+		{
+			var s = "";
+			switch(opcode)
+			{
+				case OP_add_i:
+				case OP_add_d:
+				case OP_add: 		s = "+"; break;
+				case OP_subtract_i:
+				case OP_subtract: 	s = "-"; break;
+				case OP_multiply_i:
+				case OP_multiply:	s = "*"; break;
+				case OP_divide:		s = "/"; break;
+				case OP_modulo: 	s = "%"; break;
+				case OP_lshift:		s = "<<"; break;
+				case OP_rshift: 	s = ">>"; break;
+				case OP_urshift: 	s = ">>>"; break;
+				case OP_bitand: 	s = "&"; break;
+				case OP_bitor:  	s = "|"; break;
+				case OP_bitxor: 	s = "^"; break;
+				case OP_equals: 	s = "=="; break;
+				case OP_strictequals:s = "==="; break;
+				case OP_lessthan: 	s = "<"; break;
+				case OP_lessequals: s = "<="; break;
+				case OP_greaterthan: s = ">"; break;
+				case OP_greaterequals: s = ">="; break;
+				case OP_instanceof: s = "instanceof"; break;
+				case OP_istype:
+				case OP_istypelate: s = "is"; break;
+			}
+			return s;
+		}
+		
+		static function getNameInQName(qname)
+		{
+			var index = qname.indexOf("::");
+			if(index != -1)
+			{
+				return qname.substring(index + 2, qname.length);
+			}
+			else
+			{
+				return qname;
+			}
+		}
     }
     
     class SlotInfo extends MemberInfo
