@@ -96,6 +96,20 @@ package abc2java
             return /*'{' + nsset + '}::' + */name
         }
     }
+
+    class RTQnameL
+    {
+        function RTQnameL()
+        {
+        }
+    }
+
+    class RTQnameLA
+    {
+        function RTQnameLA()
+        {
+        }
+    }
 	
     class TypeName
     {
@@ -525,9 +539,27 @@ package abc2java
 							stackType.pop();
 							break;
                         case OP_getproperty: 
-							stackValue.push(stackValue.pop() + "." + abc.names[readU32()]);
-							stackType.pop();
-							stackType.push("Object");
+							var index = readU32();
+							s += " index " + index;
+							var name = abc.names[index];
+							if(false && name is RTQnameL)
+							{
+							}
+							else if(name is Multiname && name.name == null)
+							{
+								var attribute = stackValue.pop();
+								stackValue.push(stackValue.pop() + "[" + attribute + "]");
+								stackType.pop();
+								stackType.pop();
+								stackType.push("Object");
+								
+							}
+							else
+							{
+								s += name.toString();
+								stackValue.push(name.toString());
+								stackType.push("Object");
+							}
 							break;
                         case OP_initproperty: 
                         case OP_setproperty: 
@@ -561,8 +593,9 @@ package abc2java
 								args = stackValue.pop() + (i != 0 ? ", " : "") + args;
 								stackType.pop();
 							}
-                            s += stackValue.pop() + "." + getNameInQName(abc.names[nameIndex].toString()) + "(" + args + ");"
+                            stackValue.push(stackValue.pop() + "." + getNameInQName(abc.names[nameIndex].toString()) + "(" + args + ");");
 							stackType.pop();
+							stackType.push("Object");
                             break;
                         case OP_callsuper:
 							s += "super." + abc.names[readU32()] + "(" + readU32() + ")";
@@ -672,6 +705,11 @@ package abc2java
                         case OP_constructsuper:
                         case OP_applytype:
                             s += "(" + readU32() + ")"
+                            break;
+//const OP_returnvoid:int = 0x47
+                        case OP_returnvalue:
+                            s += "return " + stackValue.pop();
+							stackType.pop();
                             break;
                         case OP_getscopeobject:
                             //s += code.readByte()
@@ -1013,6 +1051,7 @@ package abc2java
         var namespaces:Array
         var nssets:Array
         var names:Array
+		var namesType:Array
         
         var defaults:Array = new Array(constantKinds.length)
         
@@ -1167,10 +1206,15 @@ package abc2java
             // multinames
             n = readU32()
             names = [null]
+			namesType = [null]
             namespaces[0] = anyNs
             strings[0] = "*" // any name
             for (i=1; i < n; i++)
-                switch (data.readByte())
+			{
+				var type = data.readByte();
+				namesType[i] = type;
+				infoPrint("names[" + i + "] type:"  + type);
+                switch (type)
                 {
                 case CONSTANT_Qname:
                 case CONSTANT_QnameA:
@@ -1183,8 +1227,10 @@ package abc2java
                     break;
                 
                 case CONSTANT_RTQnameL:
+					names[i] = new RTQnameL();
+					break;
                 case CONSTANT_RTQnameLA:
-                    names[i] = null
+                    names[i] = new RTQnameLA();
                     break;
                 
                 case CONSTANT_NameL:
@@ -1215,6 +1261,7 @@ package abc2java
                 default:
                     throw new Error("invalid kind " + data[data.position-1])
                 }
+			}
 
             infoPrint("Cpool names count "+ n +" size "+(data.position-start)+" "+int(100*(data.position-start)/data.length)+" %")
             start = data.position
