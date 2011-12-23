@@ -50,7 +50,10 @@ return "null";
 document.onclick = function(e){
 	console.log(e);
 	var URL = e.target.href;
-	chrome.tabs.create({url:URL});
+	if(URL != null)
+	{
+		chrome.tabs.create({url:URL});
+	}
 };
 
 populate();

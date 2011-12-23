@@ -8,11 +8,11 @@
   "permissions": ["tabs", "notifications", "http://dev-simcity-qa00.fishonomics.com/"],
    "content_scripts": [
     {
-      "matches": ["http://dev-simcity-qa00.fishonomics.com/"],
+      "matches": ["http://dev-simcity-qa00.fishonomics.com/*","http://dev-simcity-qa00.development.playfish.com/*"],
       //"css": ["mystyles.css"],
 	  "all_frames": true,
       "js": [/*"jquery.js",*/ "contentscript.js"]
     }
-  ],
+  ],  
   "content_security_policy": "script-src 'self'; img-src 'self'"
 }
