@@ -47,7 +47,7 @@ if(false && $('#f') != null && getParameter(queryString, 'subAction') == 'null')
 }
 else if(getParameter(queryString, 'backupId') != "null")
 {
-	document.title = getParameter(queryString, 'backupId') + ' backup';
+	document.title = getParameter(queryString, 'backupId') + '备份';
 }
 
 

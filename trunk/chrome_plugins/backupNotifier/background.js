@@ -4,7 +4,7 @@ function $(w){
 };
 
 
-chrome.extension.onRequest.addListener(
+/*chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
 
         // Create a simple text notification:
@@ -18,7 +18,7 @@ chrome.extension.onRequest.addListener(
 
     //setTimeout(function(){ notify.cancel(); },5000);
     sendResponse({returnMsg: "All good!"}); // optional response
-  });
+  });*/
   
 setInterval(function(){
 		var xhr = new XMLHttpRequest();
