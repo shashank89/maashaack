@@ -3,13 +3,14 @@
 // @namespace         shily
 // @description       automaticly set jira comments when resolved bug with next version number
 // @include           *.fishonomics.com/*
-// @version           0.1
+// @include           *.playfish.com/*
+// @version           0.2
 /* @reason
 @end*/
 
 (function() {
 
-	var versionUrl = "http://dev-static.fishonomics.com/game/simcity/c/LIVE_VERSION";
+	var versionUrl = "http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/c/LIVE_VERSION?" + (new Date()).toString();
 	var versionNumber;
 
 	function $(w){
