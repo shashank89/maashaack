@@ -540,25 +540,57 @@ package abc2java
 							break;
                         case OP_getproperty: 
 							var index = readU32();
-							s += " index " + index;
+							s += " type " + abc.namesType[index];
 							var name = abc.names[index];
-							if(false && name is RTQnameL)
+							switch (abc.namesType[index])
 							{
-							}
-							else if(name is Multiname && name.name == null)
-							{
+							case CONSTANT_Qname:
+							case CONSTANT_QnameA:
+								break;
+							
+							case CONSTANT_RTQname:
+							case CONSTANT_RTQnameA:
 								var attribute = stackValue.pop();
 								stackValue.push(stackValue.pop() + "[" + attribute + "]");
 								stackType.pop();
 								stackType.pop();
 								stackType.push("Object");
+								break;
+							
+							case CONSTANT_RTQnameL:
+								break;
+							case CONSTANT_RTQnameLA:
+								break;
+							
+							case CONSTANT_NameL:
+							case CONSTANT_NameLA:
+								break;
+							
+							case CONSTANT_Multiname:
+							case CONSTANT_MultinameA:
+								var attribute = stackValue.pop();
+								stackValue.push(attribute+ "." + name);
+								stackType.pop();
+								stackType.push("Object");
+								break;
+
+							case CONSTANT_MultinameL:
+							case CONSTANT_MultinameLA:
+								var attribute = stackValue.pop();
+								stackValue.push(stackValue.pop() + "[" + attribute + "]");
+								stackType.pop();
+								stackType.pop();
+								stackType.push("Object");
+								break;
 								
-							}
-							else
-							{
+							case CONSTANT_TypeName:
 								s += name.toString();
 								stackValue.push(name.toString());
 								stackType.push("Object");
+								break;
+								
+							default:
+								throw new Error("invalid kind " + data[data.position-1])
 							}
 							break;
                         case OP_initproperty: 
