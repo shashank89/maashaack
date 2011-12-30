@@ -1,6 +1,6 @@
 { 
   "name": "auto backup notifier", 
-  "version": "0.0.1", 
+  "version": "0.0.2", 
   "description": "auto backup notifier", 
   "background_page":"background.html",
   "icons": {"48": "48.png"},
