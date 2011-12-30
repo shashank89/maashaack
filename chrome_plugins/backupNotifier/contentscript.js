@@ -48,6 +48,28 @@ if(false && $('#f') != null && getParameter(queryString, 'subAction') == 'null')
 else if(getParameter(queryString, 'backupId') != "null")
 {
 	document.title = getParameter(queryString, 'backupId') + '备份';
+	
+	//console.log($('#f').children[0].rows [1].cells[1].innerHTML);
+	if($('#f').children[0].rows[1].cells[1].children[0].href != "")
+	{
+		var fbId = $('#f').children[0].rows[1].cells[1].children[0].innerHTML;
+		console.log(fbId);
+		
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "http://graph.facebook.com/" + fbId, true);
+		xhr.onreadystatechange = function() {
+		  if (xhr.readyState == 4) {
+			//console.log(xhr.responseText);
+			if(xhr.responseText != "false")
+			{
+				var result = JSON.parse( xhr.responseText );
+				$('#f').children[0].rows[1].cells[1].innerHTML += "(" + result.username + ")";
+				//console.log(result);
+			}
+		  }
+		};
+		xhr.send();
+	}
 }
 
 
