@@ -1,7 +1,8 @@
 { 
   "name": "auto backup notifier", 
-  "version": "0.0.2", 
+  "version": "0.0.3", 
   "description": "auto backup notifier", 
+  "update_url": "http://static-int00.fishonomics.com/game/simcity-int/chrome-plugin/updates.xml",
   "background_page":"background.html",
   "icons": {"48": "48.png"},
   //"options_page": "options.html",
