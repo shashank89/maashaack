@@ -63,7 +63,7 @@ else if(getParameter(queryString, 'backupId') != "null")
 			if(xhr.responseText != "false")
 			{
 				var result = JSON.parse( xhr.responseText );
-				$('#f').children[0].rows[1].cells[1].innerHTML += "(" + result.username + ")";
+				$('#f').children[0].rows[1].cells[1].innerHTML += "(" + (result.username ? result.username : result.name) + ")";
 				//console.log(result);
 			}
 		  }
