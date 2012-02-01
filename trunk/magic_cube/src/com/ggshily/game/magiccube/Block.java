@@ -5,17 +5,11 @@ public class Block
 	public static final int SURFACE_NUMBER = 6;
 	
 	private BlockSurface[] surfaces;
+	private int id;
 
-	public Block(int x, int y, int z)
+	public Block(BlockSurface[] surfaces)
 	{
-		
-		surfaces = new BlockSurface[SURFACE_NUMBER];
-		surfaces[0] = BlockSurfaceFactory.createSurfaceVerticalX(x, y, z);
-		surfaces[1] = BlockSurfaceFactory.createSurfaceVerticalX(x + 1, y, z);
-		surfaces[2] = BlockSurfaceFactory.createSurfaceVerticalY(x, y, z);
-		surfaces[3] = BlockSurfaceFactory.createSurfaceVerticalY(x, y + 1, z);
-		surfaces[4] = BlockSurfaceFactory.createSurfaceVerticalZ(x, y, z);
-		surfaces[5] = BlockSurfaceFactory.createSurfaceVerticalZ(x, y, z + 1);
+		this.surfaces = surfaces;
 	}
 
 	/**
@@ -36,13 +30,14 @@ public class Block
 	
 	public void getBasePoint(Vertex base)
 	{
-		float x = 3.0f;
-		float y = 3.0f;
-		float z = 3.0f;
+		Vertex surfaceBase = surfaces[0].getBase();
+		float x = surfaceBase.get_x();
+		float y = surfaceBase.get_y();
+		float z = surfaceBase.get_z();
 		
-		for(int i = 0; i < SURFACE_NUMBER; ++i)
+		for(int i = 1; i < SURFACE_NUMBER; ++i)
 		{
-			Vertex surfaceBase = surfaces[i].getBase();
+			surfaceBase = surfaces[i].getBase();
 			x = Math.min(x, surfaceBase.get_x());
 			y = Math.min(y, surfaceBase.get_y());
 			z = Math.min(z, surfaceBase.get_z());
@@ -162,5 +157,21 @@ public class Block
 			surfaces[i].transform(transform);
 		}
 		
+	}
+
+	@Override
+	public String toString()
+	{
+		Vertex base = new Vertex(0, 0, 0);
+		getBasePoint(base);
+		return "id(" + id + ") base(" + base.get_x() + ", " + base.get_y() + ", " + base.get_z() + ")" +
+				" F" + getFrontSurface().get_colorIndex() + " L" + getLeftSurface().get_colorIndex() +
+				" R" + getRightSurface().get_colorIndex() + " U" + getUpperSurface().get_colorIndex() + 
+				" D" + getDownSurface().get_colorIndex() + " B" + getBackSurface().get_colorIndex();
+	}
+
+	public void setId(int id)
+	{
+		this.id = id;
 	}
 }

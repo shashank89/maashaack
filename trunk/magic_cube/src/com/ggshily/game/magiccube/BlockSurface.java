@@ -78,4 +78,10 @@ public class BlockSurface
 			vertexs[i].transform(transform);
 		}
 	}
+	@Override
+	public String toString()
+	{
+		Vertex base = getBase();
+		return "base(" + base.get_x() + ", " + base.get_y() + ", " + base.get_z() + "),colorIndex(" + _colorIndex + ")";
+	}
 }
