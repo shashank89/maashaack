@@ -66,4 +66,11 @@ public class Vertex
 		_y = temp._y;
 		_z = temp._z;
 	}
+	
+	public void minus(Vertex other)
+	{
+		_x -= other._x;
+		_y -= other._y;
+		_z -= other._z;
+	}
 }

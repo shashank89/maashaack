@@ -16,9 +16,36 @@ public class Main
 		
 		Cube cube = CubeFactory.createCube(data);
 		System.out.println(cube.toString());
+		System.out.println();
 		
-		cube.R();
-		
-		System.out.println(cube.toString());
+//		cube.R();
+//		System.out.println(cube.toString());
+//		
+//		cube.R_CC();
+//		System.out.println(cube.toString());
+//		
+//		cube.U();
+//		System.out.println(cube.toString());
+//		
+//		cube.U_CC();
+//		System.out.println(cube.toString());
+//		
+//		cube.L();
+//		System.out.println(cube.toString());
+//		
+//		cube.L_CC();
+//		System.out.println(cube.toString());
+//		
+//		cube.F();
+//		System.out.println(cube.toString());
+//		
+//		cube.F_CC();
+//		System.out.println(cube.toString());
+//		
+//		cube.D();
+//		System.out.println(cube.toString());
+//		
+//		cube.D_CC();
+//		System.out.println(cube.toString());
 	}
 }

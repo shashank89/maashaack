@@ -49,7 +49,9 @@ public class CubeFactory
 			{
 				for(int z = 0; z < 3; ++z)
 				{
-					blocks[x * 3 * 3 + y * 3 + z] = new Block(x, y, z);
+					int index = x * 3 * 3 + y * 3 + z;
+					blocks[index] = new Block(BlockSurfaceFactory.createSurfaces(x - 1.5f, y - 1.5f, z - 1.5f));
+					blocks[index].setId(index);
 				}
 			}
 		}

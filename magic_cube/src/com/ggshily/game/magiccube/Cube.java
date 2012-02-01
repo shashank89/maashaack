@@ -13,6 +13,13 @@ public class Cube
 	private Block[] upperBlocks;
 	private Block[] downBlocks;
 	
+	private float leftX;
+	private float rightX;
+	private float upZ;
+	private float downZ;
+	private float frontY;
+	private float backY;
+	
 	private M4 transform = new M4();
 	
 	public Cube(Block[] blocks)
@@ -20,8 +27,34 @@ public class Cube
 		assert(blocks.length == BLOCK_NUMBER);
 		
 		this.blocks = blocks;
+		init();
 	}
 	
+
+	private void init()
+	{
+		Vertex base = new Vertex(0, 0, 0);
+		blocks[0].getBasePoint(base);
+		leftX = base.get_x();
+		rightX = base.get_x();
+		upZ = base.get_z();
+		downZ = base.get_z();
+		frontY = base.get_y();
+		backY = base.get_y();
+		
+		for(int i = 1; i < BLOCK_NUMBER; ++i)
+		{
+			blocks[i].getBasePoint(base);
+			
+			leftX = Math.min(leftX, base.get_x());
+			rightX = Math.max(rightX, base.get_x());
+			upZ = Math.min(upZ, base.get_z());
+			downZ = Math.max(downZ, base.get_z());
+			frontY = Math.min(frontY, base.get_y());
+			backY = Math.max(backY, base.get_y());
+		}
+	}
+
 
 	/**
 	 * @return the blocks
@@ -52,8 +85,9 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_x() == 0.0f)
+				if(base.get_x() == leftX)
 				{
+					base.minus(new Vertex(leftX, frontY, upZ));
 					leftBlocks[(int) ((2 - base.get_y()) + base.get_z() * 3)] = blocks[i];
 				}
 			}
@@ -74,8 +108,9 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_x() == 2.0f)
+				if(base.get_x() == rightX)
 				{
+					base.minus(new Vertex(leftX, frontY, upZ));
 					rightBlocks[(int) (base.get_y() + base.get_z() * 3)] = blocks[i];
 				}
 			}
@@ -96,9 +131,10 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_z() == 0.0f)
+				if(base.get_y() == frontY)
 				{
-					frontBlocks[(int) (base.get_x() + base.get_y() * 3)] = blocks[i];
+					base.minus(new Vertex(leftX, frontY, upZ));
+					frontBlocks[(int) (base.get_x() + base.get_z() * 3)] = blocks[i];
 				}
 			}
 		}
@@ -118,9 +154,10 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_z() == 2.0f)
+				if(base.get_y() == backY)
 				{
-					backBlocks[(int) (base.get_x() + (2 - base.get_y()) * 3)] = blocks[i];
+					base.minus(new Vertex(leftX, frontY, upZ));
+					backBlocks[(int) ((2 - base.get_x()) + base.get_z() * 3)] = blocks[i];
 				}
 			}
 		}
@@ -140,9 +177,10 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_y() == 0.0f)
+				if(base.get_z() == upZ)
 				{
-					upperBlocks[(int) (base.get_x() + (2 - base.get_z()) * 3)] = blocks[i];
+					base.minus(new Vertex(leftX, frontY, upZ));
+					upperBlocks[(int) (base.get_x() + (2 - base.get_y()) * 3)] = blocks[i];
 				}
 			}
 		}
@@ -162,9 +200,10 @@ public class Cube
 			for(int i = 0; i < BLOCK_NUMBER; ++i)
 			{
 				blocks[i].getBasePoint(base);
-				if(base.get_y() == 2.0f)
+				if(base.get_z() == downZ)
 				{
-					downBlocks[(int) (base.get_x() + base.get_z() * 3)] = blocks[i];
+					base.minus(new Vertex(leftX, frontY, upZ));
+					downBlocks[(int) (base.get_x() + base.get_y() * 3)] = blocks[i];
 				}
 			}
 		}
@@ -203,6 +242,313 @@ public class Cube
 	 */
 	public void R_CC()
 	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[1][1] = cos;
+		m[1][2] = sin;
+		m[2][1] = -sin;
+		m[2][2] = cos;
+		m[0][0] = 1f;
+		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
+		
+		for(int i = 0; i < getRightBlocks().length; ++i)
+		{
+			getRightBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void L()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[1][1] = cos;
+		m[1][2] = sin;
+		m[2][1] = -sin;
+		m[2][2] = cos;
+		m[0][0] = 1f;
+		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
+		
+		for(int i = 0; i < getLeftBlocks().length; ++i)
+		{
+			getLeftBlocks()[i].transform(transform);
+		}
+		
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+	}
+	
+	/**
+	 * L'
+	 * 
+	 */
+	public void L_CC()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[1][1] = cos;
+		m[1][2] = sin;
+		m[2][1] = -sin;
+		m[2][2] = cos;
+		m[0][0] = 1f;
+		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
+		
+		for(int i = 0; i < getLeftBlocks().length; ++i)
+		{
+			getLeftBlocks()[i].transform(transform);
+		}
+		
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void U()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+		for(int i = 0; i < getUpperBlocks().length; ++i)
+		{
+			getUpperBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		leftBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+	}
+	
+	/**
+	 * U'
+	 * 
+	 */
+	public void U_CC()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+		for(int i = 0; i < getUpperBlocks().length; ++i)
+		{
+			getUpperBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		leftBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void D()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+		for(int i = 0; i < getDownBlocks().length; ++i)
+		{
+			getDownBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		leftBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+	}
+	
+	/**
+	 * D'
+	 * 
+	 */
+	public void D_CC()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+		for(int i = 0; i < getDownBlocks().length; ++i)
+		{
+			getDownBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		leftBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void F()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+		for(int i = 0; i < getFrontBlocks().length; ++i)
+		{
+			getFrontBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		leftBlocks = null;
+	}
+	
+	/**
+	 * F'
+	 * 
+	 */
+	public void F_CC()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+		for(int i = 0; i < getFrontBlocks().length; ++i)
+		{
+			getFrontBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		leftBlocks = null;
+		
+	}
+	
+	public void B()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+		for(int i = 0; i < getBackBlocks().length; ++i)
+		{
+			getBackBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		leftBlocks = null;
+		backBlocks = null;
+	}
+	
+	/**
+	 * B'
+	 * 
+	 */
+	public void B_CC()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+		for(int i = 0; i < getBackBlocks().length; ++i)
+		{
+			getBackBlocks()[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		leftBlocks = null;
+		backBlocks = null;
 		
 	}
 	
