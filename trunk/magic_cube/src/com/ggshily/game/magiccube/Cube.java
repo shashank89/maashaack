@@ -3,6 +3,9 @@ package com.ggshily.game.magiccube;
 public class Cube
 {
 	public static final int BLOCK_NUMBER = 27;
+	public static final int CENTER_BLOCK_OUT_SURFACE_NUMBER = 1;
+	public static final int EDGE_BLOCK_OUT_SURFACE_NUMBER = 2;
+	public static final int CORNER_BLOCK_OUT_SURFACE_NUMBER = 3;
 	
 	private Block[] blocks;
 	
@@ -55,6 +58,10 @@ public class Cube
 		}
 	}
 
+	public void transformBasePoint(Vertex vertex)
+	{
+		vertex.minus(new Vertex(leftX, frontY, upZ));
+	}
 
 	/**
 	 * @return the blocks
@@ -271,8 +278,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(Math.PI / 2);
-		float cos = (float)Math.cos(Math.PI / 2);
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
 
 		m[1][1] = cos;
 		m[1][2] = sin;
@@ -301,8 +308,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(-Math.PI / 2);
-		float cos = (float)Math.cos(-Math.PI / 2);
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
 
 		m[1][1] = cos;
 		m[1][2] = sin;
@@ -328,8 +335,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(Math.PI / 2);
-		float cos = (float)Math.cos(Math.PI / 2);
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
 
 		m[0][0] = cos;
 		m[0][1] = sin;
@@ -358,8 +365,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(-Math.PI / 2);
-		float cos = (float)Math.cos(-Math.PI / 2);
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
 
 		m[0][0] = cos;
 		m[0][1] = sin;
@@ -499,8 +506,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(Math.PI / 2);
-		float cos = (float)Math.cos(Math.PI / 2);
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
 
 		m[0][0] = cos;
 		m[0][2] = sin;
@@ -529,8 +536,8 @@ public class Cube
 	{
 		float[][] m = transform.m;
 
-		float sin = (float)Math.sin(-Math.PI / 2);
-		float cos = (float)Math.cos(-Math.PI / 2);
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
 
 		m[0][0] = cos;
 		m[0][2] = sin;
@@ -606,5 +613,21 @@ public class Cube
 		}
 		
 		return result;
+	}
+
+
+	public Block getEdgeBlock(int color1, int color2)
+	{
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			if(blocks[i].getOutSurfaceNumber() == EDGE_BLOCK_OUT_SURFACE_NUMBER &&
+					blocks[i].hasColor(color1) && blocks[i].hasColor(color2))
+			{
+				return blocks[i];
+			}
+		}
+		
+		assert(false);
+		return null;
 	}
 }
