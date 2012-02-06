@@ -5,7 +5,7 @@ public class BlockSurface
 {
 	public static final int VERTEX_NUMBER = 4;
 	
-	private int _colorIndex;
+	private int _colorIndex = -1;
 	private Vertex[] vertexs;
 	public BlockSurface(Vertex[] vertexs)
 	{

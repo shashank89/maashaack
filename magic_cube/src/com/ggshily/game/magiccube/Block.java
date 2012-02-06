@@ -174,4 +174,29 @@ public class Block
 	{
 		this.id = id;
 	}
+
+	public int getOutSurfaceNumber()
+	{
+		int outSurfaceNumber = 0;
+		for(int i = 0; i < surfaces.length; ++i)
+		{
+			if(surfaces[i].get_colorIndex() >= 0)
+			{
+				outSurfaceNumber++;
+			}
+		}
+		return outSurfaceNumber;
+	}
+
+	public boolean hasColor(int color)
+	{
+		for(int i = 0; i < surfaces.length; ++i)
+		{
+			if(surfaces[i].get_colorIndex() == color)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
