@@ -56,15 +56,36 @@ public class CubeResolver
 	
 	private static final String[] FRONT_TOP_LEFT_CORNER_METHOD = {
 		"",
+		"LBL'B'UBU'",
+		"R'BRB2UBU",
+		"U'BUBUBU",
+		
+		"UBU'",
+		"B'UBU'",
+		"B2UBU'",
+		"BUBU'"
+	};
+	
+	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE1 = "UBU'B'UBU";
+	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2 = "UB'U'BUB'U";
+	
+	private static final String[] MIDDLE_TOP_LEFT_EDGE_METHOD = {
+		"",
 		"",
 		"",
 		"",
 		
 		"",
-		"",
-		"",
-		""
+		"L'B'L'B'L'BLBLBU'B'U'B'U'BUBU",
+		"RBRBRB'R'B'R'B'U'B'U'B'U'BUBU",
+		"R'B'R'B'R'BRBRB'U'B'U'B'U'BUBU",
+		
+		"U'B'U'B'U'BUBU",
+		"B'U'B'U'B'U'BUBU",
+		"B2U'B'U'B'U'BUBU",
+		"BU'B'U'B'U'BUBU",
 	};
+	private static final String MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE = "U'B'U'B'U'BUBUB'LBLBLB'L'B'L'";
 	
 	public static String resolve(Cube cube)
 	{
@@ -77,6 +98,21 @@ public class CubeResolver
 		result += correctFrontRightEdgeBlock(cube) + "\n";
 		
 		// second step: correct front four corner blocks
+		result += correctFrontTopLeftBlock(cube) + "\n";
+		result += correctFrontLeftDownBlock(cube) + "\n";
+		result += correctFrontRightDownBlock(cube) + "\n";
+		result += correctFrontRightTopBlock(cube) + "\n";
+		
+		// fourth step: correct middle four edge blocks
+		result += correctMiddleTopLeftBlock(cube) + "\n";
+		result += correctMiddleLeftDownBlock(cube) + "\n";
+		result += correctMiddleRightDownBlock(cube) + "\n";
+		result += correctMiddleRightTopBlock(cube) + "\n";
+		
+		// fifth step: correct back four edge blocks
+		
+		
+		// sixth step: correct back four corner blocks
 		
 		
 		return result;
@@ -171,35 +207,134 @@ public class CubeResolver
 			}
 		}
 		
-		if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == frontColor)
+		if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == leftColor &&
+				frontTopLeftBlock.getLeftSurface().get_colorIndex() == upperColor)
 		{
-			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() != leftColor)
-			{
-				// TO-DO
-			}
+			result += FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE1;
+			execute(cube, FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE1);
 		}
-		else if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == leftColor)
+		else if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == upperColor &&
+				frontTopLeftBlock.getLeftSurface().get_colorIndex() == frontColor)
 		{
-			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() == upperColor)
-			{
-				// TO-DO
-			}
-			else
-			{
-				// TO-DO
-			}
+			result += FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2;
+			execute(cube, FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2);
 		}
 		else
 		{
-			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() == leftColor)
+			assert(false);
+		}
+		
+		return result;
+	}
+	
+	public static String correctFrontLeftDownBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
+		result = rotateCommandY90(correctFrontTopLeftBlock(cube));
+		cube.rotateY90();
+		
+		return result;
+	}
+	
+	public static String correctFrontRightDownBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		cube.rotateY90();
+		result = rotateCommandY90(rotateCommandY90(correctFrontTopLeftBlock(cube)));
+		cube.rotateY90();
+		cube.rotateY90();
+		
+		return result;
+	}
+	
+	public static String correctFrontRightTopBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctFrontTopLeftBlock(cube))));
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
+		
+		return result;
+	}
+	
+	public static String correctMiddleTopLeftBlock(Cube cube)
+	{
+		String result = "";
+
+		Block leftCenter = cube.getLeftBlocks()[4];
+		Block upperCenter = cube.getUpperBlocks()[4];
+		
+		int leftColor = leftCenter.getLeftSurface().get_colorIndex();
+		int upperColor = upperCenter.getUpperSurface().get_colorIndex();
+		
+		Block middleTopLeftBlock = cube.getEdgeBlock(leftColor, upperColor);
+		
+		Vertex base = new Vertex(0, 0, 0);
+		middleTopLeftBlock.getBasePoint(base);
+		cube.transformBasePoint(base);
+		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
+		{
+			if(base.equals(EDGE_BLOCK_POSITION[i]))
 			{
-				// TO-DO
-			}
-			else
-			{
-				// TO-DO
+				result += MIDDLE_TOP_LEFT_EDGE_METHOD[i];
+				
+				execute(cube, MIDDLE_TOP_LEFT_EDGE_METHOD[i]);
 			}
 		}
+		if(middleTopLeftBlock.getUpperSurface().get_colorIndex() != upperColor)
+		{
+			result += MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE;
+			
+			execute(cube, MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE);
+		}
+
+		return result;
+	}
+	
+	public static String correctMiddleLeftDownBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
+		result = rotateCommandY90(correctMiddleTopLeftBlock(cube));
+		cube.rotateY90();
+		
+		return result;
+	}
+	
+	public static String correctMiddleRightDownBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		cube.rotateY90();
+		result = rotateCommandY90(rotateCommandY90(correctMiddleTopLeftBlock(cube)));
+		cube.rotateY90();
+		cube.rotateY90();
+		
+		return result;
+	}
+	
+	public static String correctMiddleRightTopBlock(Cube cube)
+	{
+		String result = "";
+		
+		cube.rotateY90();
+		result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctMiddleTopLeftBlock(cube))));
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
 		
 		return result;
 	}
