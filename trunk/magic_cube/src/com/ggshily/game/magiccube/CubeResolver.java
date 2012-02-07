@@ -117,73 +117,19 @@ public class CubeResolver
 
 	public static String correctFrontLeftEdgeBlock(Cube cube)
 	{
-		String result = "";
-		
-		Block frontCenter = cube.getFrontBlocks()[4];
-		Block leftCenter = cube.getLeftBlocks()[4];
-		
-		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
-		int leftColor = leftCenter.getLeftSurface().get_colorIndex();
-		
 		cube.rotateY90();
 		cube.rotateY90();
 		cube.rotateY90();
-		Block frontLeftCenterBlock = cube.getEdgeBlock(frontColor, leftColor);
-		
-		Vertex base = new Vertex(0, 0, 0);
-		frontLeftCenterBlock.getBasePoint(base);
-		cube.transformBasePoint(base);
-		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
-		{
-			if(base.equals(EDGE_BLOCK_POSITION[i]))
-			{
-				result += rotateCommandY90(FRONT_TOP_EDGE_METHOD[i]);
-				
-				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
-			}
-		}
-		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
-		{
-			result += rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE);
-			
-			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
-		}
+		String result = rotateCommandY90(correctFrontTopEdgeBlock(cube));
 		cube.rotateY90();
 		return result;
 	}
 
 	public static String correctFrontDownEdgeBlock(Cube cube)
 	{
-		String result = "";
-		
-		Block frontCenter = cube.getFrontBlocks()[4];
-		Block downCenter = cube.getDownBlocks()[4];
-		
-		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
-		int downColor = downCenter.getDownSurface().get_colorIndex();
-		
 		cube.rotateY90();
 		cube.rotateY90();
-		Block frontDownCenterBlock = cube.getEdgeBlock(frontColor, downColor);
-		
-		Vertex base = new Vertex(0, 0, 0);
-		frontDownCenterBlock.getBasePoint(base);
-		cube.transformBasePoint(base);
-		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
-		{
-			if(base.equals(EDGE_BLOCK_POSITION[i]))
-			{
-				result += rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_METHOD[i]));
-				
-				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
-			}
-		}
-		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
-		{
-			result += rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE));
-			
-			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
-		}
+		String result = rotateCommandY90(correctFrontTopEdgeBlock(cube));
 		cube.rotateY90();
 		cube.rotateY90();
 		return result;
@@ -191,35 +137,8 @@ public class CubeResolver
 
 	public static String correctFrontRightEdgeBlock(Cube cube)
 	{
-		String result = "";
-		
-		Block frontCenter = cube.getFrontBlocks()[4];
-		Block rightCenter = cube.getRightBlocks()[4];
-		
-		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
-		int rightColor = rightCenter.getRightSurface().get_colorIndex();
-		
 		cube.rotateY90();
-		Block frontRightCenterBlock = cube.getEdgeBlock(frontColor, rightColor);
-		
-		Vertex base = new Vertex(0, 0, 0);
-		frontRightCenterBlock.getBasePoint(base);
-		cube.transformBasePoint(base);
-		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
-		{
-			if(base.equals(EDGE_BLOCK_POSITION[i]))
-			{
-				result += rotateCommandY90(rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_METHOD[i])));
-				
-				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
-			}
-		}
-		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
-		{
-			result += rotateCommandY90(rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE)));
-			
-			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
-		}
+		String result = rotateCommandY90(correctFrontTopEdgeBlock(cube));
 		cube.rotateY90();
 		cube.rotateY90();
 		cube.rotateY90();
