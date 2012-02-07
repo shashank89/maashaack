@@ -11,6 +11,20 @@ import org.junit.Test;
 public class CubeTest
 {
 	private Cube _cube;
+	/**
+	 * 
+	 * <p>&nbsp; &nbsp;111<br>
+		&nbsp; &nbsp;111<br>
+		&nbsp; &nbsp;111<br>
+		222000333444<br>
+		222000333444<br>
+		222000333444<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555</p>
+	 * 
+	 * 
+	 */
 	private int[] data = {0, 0, 0, 0, 0, 0, 0, 0, 0,
 			  1, 1, 1, 1, 1, 1, 1, 1, 1,
 			  2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -32,6 +46,16 @@ public class CubeTest
 	@Before
 	public void setUp() throws Exception
 	{
+//		String result = 
+//			"   111\n" +
+//			"   111\n" +
+//			"   111\n" +
+//			"222000333444\n" +
+//			"222000333444\n" +
+//			"222000333444\n" +
+//			"   555\n" +
+//			"   555\n" +
+//			"   555";
 		_cube = CubeFactory.createCube(data);
 	}
 
@@ -689,5 +713,56 @@ public class CubeTest
 			"   555";
 		
 		assertEquals(_cube.toString(), result);
+	}
+	
+	@Test
+	public void test_rotateX90()
+	{
+		_cube.rotateX90();
+		String result = 
+			"   000\n" +
+			"   000\n" +
+			"   000\n" +
+			"222555333111\n" +
+			"222555333111\n" +
+			"222555333111\n" +
+			"   444\n" +
+			"   444\n" +
+			"   444";
+		assertEquals(result, _cube.toString());
+	}
+	
+	@Test
+	public void test_rotateY90()
+	{
+		_cube.rotateY90();
+		String result = 
+		"   333\n" +
+		"   333\n" +
+		"   333\n" +
+		"111000555444\n" +
+		"111000555444\n" +
+		"111000555444\n" +
+		"   222\n" +
+		"   222\n" +
+		"   222";
+		assertEquals(result, _cube.toString());
+	}
+	
+	@Test
+	public void test_rotateZ90()
+	{
+		_cube.rotateZ90();
+		String result = 
+		"   111\n" +
+		"   111\n" +
+		"   111\n" +
+		"444222000333\n" +
+		"444222000333\n" +
+		"444222000333\n" +
+		"   555\n" +
+		"   555\n" +
+		"   555";
+		assertEquals(result, _cube.toString());
 	}
 }

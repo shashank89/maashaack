@@ -231,6 +231,8 @@ public class Cube
 		m[0][0] = 1f;
 		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
 		
+//		System.out.println(transform.toString());
+		
 		for(int i = 0; i < getRightBlocks().length; ++i)
 		{
 			getRightBlocks()[i].transform(transform);
@@ -559,6 +561,96 @@ public class Cube
 		
 	}
 	
+	public void rotateX90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[1][1] = cos;
+		m[1][2] = sin;
+		m[2][1] = -sin;
+		m[2][2] = cos;
+		m[0][0] = 1f;
+		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void rotateY90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void rotateZ90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
 	public String toString()
 	{
 		String result = "   ";
@@ -627,6 +719,22 @@ public class Cube
 			}
 		}
 		
+		assert(false);
+		return null;
+	}
+	
+	public Block getCornerBlock(int color1, int color2, int color3)
+	{
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			if(blocks[i].getOutSurfaceNumber() == CORNER_BLOCK_OUT_SURFACE_NUMBER &&
+					blocks[i].hasColor(color1) &&
+					blocks[i].hasColor(color2) &&
+					blocks[i].hasColor(color3))
+			{
+				return blocks[i];
+			}
+		}
 		assert(false);
 		return null;
 	}
