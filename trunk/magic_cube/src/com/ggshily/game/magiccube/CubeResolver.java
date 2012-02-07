@@ -138,7 +138,7 @@ public class CubeResolver
 	public static String correctFrontRightEdgeBlock(Cube cube)
 	{
 		cube.rotateY90();
-		String result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctFrontTopEdgeBlock(cube)));
+		String result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctFrontTopEdgeBlock(cube))));
 		cube.rotateY90();
 		cube.rotateY90();
 		cube.rotateY90();
