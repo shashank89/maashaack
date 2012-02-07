@@ -44,7 +44,7 @@ public class CubeResolverTest extends CubeResolver
 	@Test
 	public void testCorrectFrontTopEdgeBlock()
 	{
-		String result =
+		final String result =
 				"   111\n" +
 				"   111\n" +
 				"   111\n" +
@@ -71,7 +71,23 @@ public class CubeResolverTest extends CubeResolver
 	@Test
 	public void testCorrectFrontLeftEdgeBlock()
 	{
-		fail("Not yet implemented");
+		final String result =
+			"   111\n" +
+			"   111\n" +
+			"   111\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   555";
+
+		assertEquals("", CubeResolver.correctFrontLeftEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
+		
+		_cube.L();
+		assertEquals("L'", CubeResolver.correctFrontLeftEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
 	}
 
 	@Test

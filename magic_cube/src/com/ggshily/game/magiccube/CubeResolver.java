@@ -40,205 +40,7 @@ public class CubeResolver
 		"BU2"
 	};
 	
-	private static final String[] FRONT_LEFT_EDGE_METHOD = {
-		"UL",
-		"",
-		"D'L'",
-		"R2B2L2",
-		
-		"L",
-		"L'",
-		"D2L'D2",
-		"U2LU2",
-		
-		"BL",
-		"L2",
-		"B'L2",
-		"B2L2"
-	};
-	
-	private static final String[] FRONT_BOTTOM_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] FRONT_RIGHT_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] LEFT_TOP_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] LEFT_BOTTOM_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] RIGHT_TOP_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] RIGHT_BOTTOM_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] BACK_TOP_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] BACK_LEFT_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] BACK_BOTTOM_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
-	private static final String[] BACK_RIGHT_EDGE_METHOD = {
-		"",
-		"R'U'",
-		"D2B2U2",
-		"LU",
-		
-		"U'",
-		"L2U'L2",
-		"R2UR2",
-		"U",
-		
-		"U2",
-		"B'U2",
-		"B2U2",
-		"BU2"
-	};
-	
 	private static final String FRONT_TOP_EDGE_COLOR_EXCHANGE = "UL'B'LU2";
-	private static final String FRONT_LEFT_EDGE_COLOR_EXCHANGE = "";
-	private static final String FRONT_BOTTOM_EDGE_COLOR_EXCHANGE = "";
-	private static final String FRONT_RIGHT_EDGE_COLOR_EXCHANGE = "";
-	private static final String LEFT_TOP_EDGE_COLOR_EXCHANGE = "";
-	private static final String LEFT_BOTTOM_EDGE_COLOR_EXCHANGE = "";
-	private static final String RIGHT_TOP_EDGE_COLOR_EXCHANGE = "";
-	private static final String RIGHT_BOTTOM_EDGE_COLOR_EXCHANGE = "";
-	private static final String BACK_TOP_EDGE_COLOR_EXCHANGE = "";
-	private static final String BACK_RIGHT_EDGE_COLOR_EXCHANGE = "";
-	private static final String BACK_BOTTOM_EDGE_COLOR_EXCHANGE = "";
-	private static final String BACK_LEFT_EDGE_COLOR_EXCHANGE = "";
 	
 	private static final Vertex[] CORNER_BLOCK_POSITION = {
 		new Vertex(0, 0, 0),
@@ -252,13 +54,30 @@ public class CubeResolver
 		new Vertex(2, 2, 0),
 	};
 	
+	private static final String[] FRONT_TOP_LEFT_CORNER_METHOD = {
+		"",
+		"",
+		"",
+		"",
+		
+		"",
+		"",
+		"",
+		""
+	};
+	
 	public static String resolve(Cube cube)
 	{
 		String result = "";
 		
 		// first step: correct front four edge blocks
+		result += correctFrontTopEdgeBlock(cube) + "\n";
+		result += correctFrontLeftEdgeBlock(cube) + "\n";
+		result += correctFrontDownEdgeBlock(cube) + "\n";
+		result += correctFrontRightEdgeBlock(cube) + "\n";
 		
-		result += correctFrontTopEdgeBlock(cube);
+		// second step: correct front four corner blocks
+		
 		
 		return result;
 	}
@@ -269,20 +88,11 @@ public class CubeResolver
 		
 		Block frontCenter = cube.getFrontBlocks()[4];
 		Block upperCenter = cube.getUpperBlocks()[4];
-		Block leftCenter = cube.getLeftBlocks()[4];
-		Block rightCenter = cube.getRightBlocks()[4];
-		Block downCenter = cube.getDownBlocks()[4];
 		
 		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
 		int upperColor = upperCenter.getUpperSurface().get_colorIndex();
-		int leftColor = leftCenter.getLeftSurface().get_colorIndex();
-		int rightColor = rightCenter.getRightSurface().get_colorIndex();
-		int downColor = downCenter.getDownSurface().get_colorIndex();
 		
 		Block frontTopCenterBlock = cube.getEdgeBlock(frontColor, upperColor);
-		Block frontLeftCenterBlock = cube.getEdgeBlock(frontColor, leftColor);
-		Block frontDownCenterBlock = cube.getEdgeBlock(frontColor, downColor);
-		Block frontRightCenterBlock = cube.getEdgeBlock(frontColor, rightColor);
 		
 		Vertex base = new Vertex(0, 0, 0);
 		frontTopCenterBlock.getBasePoint(base);
@@ -310,39 +120,168 @@ public class CubeResolver
 		String result = "";
 		
 		Block frontCenter = cube.getFrontBlocks()[4];
-		Block upperCenter = cube.getUpperBlocks()[4];
 		Block leftCenter = cube.getLeftBlocks()[4];
-		Block rightCenter = cube.getRightBlocks()[4];
-		Block downCenter = cube.getDownBlocks()[4];
 		
 		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
-		int upperColor = upperCenter.getUpperSurface().get_colorIndex();
 		int leftColor = leftCenter.getLeftSurface().get_colorIndex();
-		int rightColor = rightCenter.getRightSurface().get_colorIndex();
-		int downColor = downCenter.getDownSurface().get_colorIndex();
 		
-		Block frontTopCenterBlock = cube.getEdgeBlock(frontColor, upperColor);
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
 		Block frontLeftCenterBlock = cube.getEdgeBlock(frontColor, leftColor);
-		Block frontDownCenterBlock = cube.getEdgeBlock(frontColor, downColor);
-		Block frontRightCenterBlock = cube.getEdgeBlock(frontColor, rightColor);
 		
 		Vertex base = new Vertex(0, 0, 0);
 		frontLeftCenterBlock.getBasePoint(base);
+		cube.transformBasePoint(base);
 		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
 		{
 			if(base.equals(EDGE_BLOCK_POSITION[i]))
 			{
-				result += FRONT_LEFT_EDGE_METHOD[i];
+				result += rotateCommandY90(FRONT_TOP_EDGE_METHOD[i]);
 				
-				execute(cube, FRONT_LEFT_EDGE_METHOD[i]);
+				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
 			}
 		}
 		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
 		{
-			result += FRONT_LEFT_EDGE_COLOR_EXCHANGE;
+			result += rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE);
 			
-			execute(cube, FRONT_LEFT_EDGE_COLOR_EXCHANGE);
+			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
 		}
+		cube.rotateY90();
+		return result;
+	}
+
+	public static String correctFrontDownEdgeBlock(Cube cube)
+	{
+		String result = "";
+		
+		Block frontCenter = cube.getFrontBlocks()[4];
+		Block downCenter = cube.getDownBlocks()[4];
+		
+		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
+		int downColor = downCenter.getDownSurface().get_colorIndex();
+		
+		cube.rotateY90();
+		cube.rotateY90();
+		Block frontDownCenterBlock = cube.getEdgeBlock(frontColor, downColor);
+		
+		Vertex base = new Vertex(0, 0, 0);
+		frontDownCenterBlock.getBasePoint(base);
+		cube.transformBasePoint(base);
+		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
+		{
+			if(base.equals(EDGE_BLOCK_POSITION[i]))
+			{
+				result += rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_METHOD[i]));
+				
+				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
+			}
+		}
+		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
+		{
+			result += rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE));
+			
+			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
+		}
+		cube.rotateY90();
+		cube.rotateY90();
+		return result;
+	}
+
+	public static String correctFrontRightEdgeBlock(Cube cube)
+	{
+		String result = "";
+		
+		Block frontCenter = cube.getFrontBlocks()[4];
+		Block rightCenter = cube.getRightBlocks()[4];
+		
+		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
+		int rightColor = rightCenter.getRightSurface().get_colorIndex();
+		
+		cube.rotateY90();
+		Block frontRightCenterBlock = cube.getEdgeBlock(frontColor, rightColor);
+		
+		Vertex base = new Vertex(0, 0, 0);
+		frontRightCenterBlock.getBasePoint(base);
+		cube.transformBasePoint(base);
+		for(int i = 0; i < EDGE_BLOCK_POSITION.length; i++)
+		{
+			if(base.equals(EDGE_BLOCK_POSITION[i]))
+			{
+				result += rotateCommandY90(rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_METHOD[i])));
+				
+				execute(cube, FRONT_TOP_EDGE_METHOD[i]);
+			}
+		}
+		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
+		{
+			result += rotateCommandY90(rotateCommandY90(rotateCommandY90(FRONT_TOP_EDGE_COLOR_EXCHANGE)));
+			
+			execute(cube, FRONT_TOP_EDGE_COLOR_EXCHANGE);
+		}
+		cube.rotateY90();
+		cube.rotateY90();
+		cube.rotateY90();
+		return result;
+	}
+	
+	public static String correctFrontTopLeftBlock(Cube cube)
+	{
+		String result = "";
+		
+		Block frontCenter = cube.getFrontBlocks()[4];
+		Block leftCenter = cube.getLeftBlocks()[4];
+		Block upperCenter = cube.getUpperBlocks()[4];
+		
+		int frontColor = frontCenter.getFrontSurface().get_colorIndex();
+		int leftColor = leftCenter.getLeftSurface().get_colorIndex();
+		int upperColor = upperCenter.getUpperSurface().get_colorIndex();
+		
+		Block frontTopLeftBlock = cube.getCornerBlock(frontColor, leftColor, upperColor);
+		
+		Vertex base = new Vertex(0, 0, 0);
+		frontTopLeftBlock.getBasePoint(base);
+		cube.transformBasePoint(base);
+		for(int i = 0; i < CORNER_BLOCK_POSITION.length; i++)
+		{
+			if(base.equals(CORNER_BLOCK_POSITION[i]))
+			{
+				result += FRONT_TOP_LEFT_CORNER_METHOD[i];
+				execute(cube, FRONT_TOP_LEFT_CORNER_METHOD[i]);
+			}
+		}
+		
+		if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == frontColor)
+		{
+			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() != leftColor)
+			{
+				// TO-DO
+			}
+		}
+		else if(frontTopLeftBlock.getFrontSurface().get_colorIndex() == leftColor)
+		{
+			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() == upperColor)
+			{
+				// TO-DO
+			}
+			else
+			{
+				// TO-DO
+			}
+		}
+		else
+		{
+			if(frontTopLeftBlock.getLeftSurface().get_colorIndex() == leftColor)
+			{
+				// TO-DO
+			}
+			else
+			{
+				// TO-DO
+			}
+		}
+		
 		return result;
 	}
 	
@@ -414,5 +353,80 @@ public class CubeResolver
 		default:
 			throw new Error("unknow command:" + command);
 		}
+	}
+	
+	public static String rotateCommandX90(String commands)
+	{
+		char[] commandChars = commands.toCharArray();
+		
+		for(int i = 0; i < commandChars.length; i++)
+		{
+			switch(commandChars[i])
+			{
+			case 'F':
+				commandChars[i] = 'U';
+				break;
+			case 'U':
+				commandChars[i] = 'B';
+				break;
+			case 'B':
+				commandChars[i] = 'D';
+				break;
+			case 'D':
+				commandChars[i] = 'F';
+				break;
+			}
+		}
+		return String.valueOf(commandChars);
+	}
+	
+	public static String rotateCommandY90(String commands)
+	{
+		char[] commandChars = commands.toCharArray();
+		
+		for(int i = 0; i < commandChars.length; i++)
+		{
+			switch(commandChars[i])
+			{
+			case 'R':
+				commandChars[i] = 'U';
+				break;
+			case 'U':
+				commandChars[i] = 'L';
+				break;
+			case 'L':
+				commandChars[i] = 'D';
+				break;
+			case 'D':
+				commandChars[i] = 'R';
+				break;
+			}
+		}
+		return String.valueOf(commandChars);
+	}
+	
+	public static String rotateCommandZ90(String commands)
+	{
+		char[] commandChars = commands.toCharArray();
+		
+		for(int i = 0; i < commandChars.length; i++)
+		{
+			switch(commandChars[i])
+			{
+			case 'F':
+				commandChars[i] = 'L';
+				break;
+			case 'L':
+				commandChars[i] = 'B';
+				break;
+			case 'B':
+				commandChars[i] = 'R';
+				break;
+			case 'R':
+				commandChars[i] = 'F';
+				break;
+			}
+		}
+		return String.valueOf(commandChars);
 	}
 }
