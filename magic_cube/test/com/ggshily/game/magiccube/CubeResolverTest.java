@@ -91,6 +91,50 @@ public class CubeResolverTest extends CubeResolver
 	}
 
 	@Test
+	public void testCorrectFrontDownEdgeBlock()
+	{
+		final String result =
+			"   111\n" +
+			"   111\n" +
+			"   111\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   555";
+
+		assertEquals("", CubeResolver.correctFrontDownEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
+		
+		_cube.D();
+		assertEquals("D'", CubeResolver.correctFrontDownEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
+	}
+
+	@Test
+	public void testCorrectFrontRightEdgeBlock()
+	{
+		final String result =
+			"   111\n" +
+			"   111\n" +
+			"   111\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   555";
+
+		assertEquals("", CubeResolver.correctFrontRightEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
+		
+		_cube.R();
+		assertEquals("R'", CubeResolver.correctFrontRightEdgeBlock(_cube));
+		assertEquals(result, _cube.toString());
+	}
+
+	@Test
 	public void testExecute()
 	{
 		fail("Not yet implemented");
