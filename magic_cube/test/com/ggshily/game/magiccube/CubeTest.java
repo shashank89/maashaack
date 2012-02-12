@@ -10,6 +10,20 @@ import org.junit.Test;
 
 public class CubeTest
 {
+	/**
+	 * 
+	 * <p>&nbsp; &nbsp;111<br>
+		&nbsp; &nbsp;111<br>
+		&nbsp; &nbsp;111<br>
+		222000333444<br>
+		222000333444<br>
+		222000333444<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555</p>
+	 * 
+	 * 
+	 */
 	private Cube _cube;
 	/**
 	 * 
@@ -760,6 +774,57 @@ public class CubeTest
 		"444222000333\n" +
 		"444222000333\n" +
 		"444222000333\n" +
+		"   555\n" +
+		"   555\n" +
+		"   555";
+		assertEquals(result, _cube.toString());
+	}
+	
+	@Test
+	public void test_rotateXNegative90()
+	{
+		_cube.rotateXNegative90();
+		String result = 
+			"   444\n" +
+			"   444\n" +
+			"   444\n" +
+			"222111333555\n" +
+			"222111333555\n" +
+			"222111333555\n" +
+			"   000\n" +
+			"   000\n" +
+			"   000";
+		assertEquals(result, _cube.toString());
+	}
+	
+	@Test
+	public void test_rotateYNegative90()
+	{
+		_cube.rotateYNegative90();
+		String result = 
+		"   222\n" +
+		"   222\n" +
+		"   222\n" +
+		"555000111444\n" +
+		"555000111444\n" +
+		"555000111444\n" +
+		"   333\n" +
+		"   333\n" +
+		"   333";
+		assertEquals(result, _cube.toString());
+	}
+	
+	@Test
+	public void test_rotateZNegetive90()
+	{
+		_cube.rotateZNegative90();
+		String result = 
+		"   111\n" +
+		"   111\n" +
+		"   111\n" +
+		"000333444222\n" +
+		"000333444222\n" +
+		"000333444222\n" +
 		"   555\n" +
 		"   555\n" +
 		"   555";
