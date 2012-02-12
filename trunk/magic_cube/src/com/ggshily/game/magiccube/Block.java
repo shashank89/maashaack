@@ -199,4 +199,9 @@ public class Block
 		}
 		return false;
 	}
+
+	public int getBackColor()
+	{
+		return getBackSurface().get_colorIndex();
+	}
 }

@@ -1,5 +1,17 @@
 package com.ggshily.game.magiccube;
 
+/**
+ *    _  y
+ *    /|
+ *   /
+ *  /_________\  x
+ *  |         /
+ *  |
+ *  |
+ * \|/ z
+ *  
+ *  
+ */
 public class Cube
 {
 	public static final int BLOCK_NUMBER = 27;
@@ -627,6 +639,96 @@ public class Cube
 
 		float sin = (float)Math.sin(Math.PI / 2);
 		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][1] = sin;
+		m[1][0] = -sin;
+		m[1][1] = cos;
+		m[2][2] = 1f;
+		m[2][0] = m[2][1] = m[0][2] = m[1][2] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void rotateXNegative90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
+
+		m[1][1] = cos;
+		m[1][2] = sin;
+		m[2][1] = -sin;
+		m[2][2] = cos;
+		m[0][0] = 1f;
+		m[0][1] = m[0][2] = m[1][0] = m[2][0] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void rotateYNegative90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(Math.PI / 2);
+		float cos = (float)Math.cos(Math.PI / 2);
+
+		m[0][0] = cos;
+		m[0][2] = sin;
+		m[2][0] = -sin;
+		m[2][2] = cos;
+		m[1][1] = 1f;
+		m[0][1] = m[1][0] = m[1][2] = m[2][1] = 0f;
+		
+//		System.out.println(transform.toString());
+		
+		for(int i = 0; i < blocks.length; ++i)
+		{
+			blocks[i].transform(transform);
+		}
+		
+		rightBlocks = null;
+		leftBlocks = null;
+		upperBlocks = null;
+		downBlocks = null;
+		frontBlocks = null;
+		backBlocks = null;
+		
+	}
+	
+	public void rotateZNegative90()
+	{
+		float[][] m = transform.m;
+
+		float sin = (float)Math.sin(-Math.PI / 2);
+		float cos = (float)Math.cos(-Math.PI / 2);
 
 		m[0][0] = cos;
 		m[0][1] = sin;
