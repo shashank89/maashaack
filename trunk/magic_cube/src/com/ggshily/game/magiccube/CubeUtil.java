@@ -67,6 +67,41 @@ public class CubeUtil
 		}
 		return true;
 	}
+	
+	/**
+	 * 
+	 * check if two cube is match after rotate Y
+	 * 
+	 * @param cube1
+	 * @param cube2
+	 * @return -1, not match<br>
+	 * 0 or 1 or 2 or 3, match after rotate Y 0/1/2/3 times
+	 */
+	public static int isMathAfterRotateY(Cube cube1, Cube cube2)
+	{
+		if(isMatch(cube1, cube2))
+		{
+			return 0;
+		}
+		cube1.rotateY90();
+		if(isMatch(cube1, cube2))
+		{
+			return 1;
+		}
+		cube1.rotateY90();
+		if(isMatch(cube1, cube2))
+		{
+			return 2;
+		}
+		cube1.rotateY90();
+		if(isMatch(cube1, cube2))
+		{
+			return 3;
+		}
+		
+		return -1;
+	}
+	
 	/**
 	 * 
 	 * &nbsp;&nbsp;&nbsp;111<br>
@@ -151,7 +186,26 @@ public class CubeUtil
 		data[5 * 9 + 8] = Integer.valueOf(String.valueOf(value.charAt(74 + 5)));
 		return data;
 	}
-	
+
+	/**
+	 * 
+	 * [0, 0, 0, 0, 0, 0, 0, 0, 0,<br>
+	 *  &nbsp;1, 1, 1, 1, 1, 1, 1, 1, 1,<br>
+	 *  &nbsp;2, 2, 2, 2, 2, 2, 2, 2, 2,<br>
+	 *  &nbsp;3, 3, 3, 3, 3, 3, 3, 3, 3,<br>
+	 *  &nbsp;4, 4, 4, 4, 4, 4, 4, 4, 4,<br>
+	 *  &nbsp;5, 5, 5, 5, 5, 5, 5, 5, 5]<br>
+	 * to<br>
+	 * &nbsp;&nbsp;&nbsp;111<br>
+	 * &nbsp;&nbsp;&nbsp;111<br>
+	 * &nbsp;&nbsp;&nbsp;111<br>
+	 * 222000333444<br>
+		222000333444<br>
+		222000333444<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555<br>
+		&nbsp; &nbsp;555
+	 */
 	public static String array2String(int[] value)
 	{
 		String data = "   ";

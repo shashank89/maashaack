@@ -96,9 +96,66 @@ public class CubeResolver
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		  4,  4, 4 ,  4,  4,  4,  4,  4,  4,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
-		 
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_1 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1,  4, -1,  4,  4,  4, -1,  4,  4,
+		  4, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_2 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1,  4, -1, -1, -1, -1, -1, -1,
+		 -1, -1,  4, -1, -1, -1, -1, -1, -1,
+		 -1, -1,  4, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final String BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 = "R'U'RU'R'U'2R";
+	private static final String BACK_CORNER_BLOCKS_COLOR_EXCHANGE2 = "FUF'UFU2F'";
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_3 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_4 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_5 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_6 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		};
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_7 = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4,  4,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		};
 	
 	public static String resolve(Cube cube)
@@ -487,6 +544,67 @@ public class CubeResolver
 		{
 			// done
 		}
+		else
+		{
+			int count = 0;
+			if(backBlocks[0].getBackColor() == backColor)
+				count++;
+			if(backBlocks[2].getBackColor() == backColor)
+				count++;
+			if(backBlocks[6].getBackColor() == backColor)
+				count++;
+			if(backBlocks[8].getBackColor() == backColor)
+				count++;
+			
+			if(count == 1)
+			{
+				data = BACK_CORNER_BLOCKS_COLOR_TEMPLATE_1;
+				ArrayUtil.replace(data, 4, backColor);
+				int rotateCount1 = CubeUtil.isMathAfterRotateY(CubeFactory.createCube(data), cube);
+
+				data = BACK_CORNER_BLOCKS_COLOR_TEMPLATE_2;
+				ArrayUtil.replace(data, 4, backColor);
+				int rotateCount2 = CubeUtil.isMathAfterRotateY(CubeFactory.createCube(data), cube);
+				if(rotateCount1 != -1)
+				{
+					for(int i = 0; i < rotateCount1; ++i)
+					{
+						cube.rotateY90();
+					}
+					
+					cube.rotateXNegative90();
+					executeCommands(cube, BACK_CORNER_BLOCKS_COLOR_EXCHANGE1);
+					result = rotateCommandX90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE1);
+					
+					for(int i = rotateCount1; i < 4; ++i)
+					{
+						cube.rotateY90();
+						result = rotateCommandYNegative90(result);
+					}
+				}
+				else if(rotateCount2 != -1)
+				{
+					for(int i = 0; i < rotateCount2; ++i)
+					{
+						cube.rotateY90();
+					}
+					
+					cube.rotateXNegative90();
+					executeCommands(cube, BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+					result = rotateCommandX90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+					
+					for(int i = rotateCount2; i < 4; ++i)
+					{
+						cube.rotateY90();
+						result = rotateCommandYNegative90(result);
+					}
+				}
+				else
+				{
+					assert(false);
+				}
+			}
+		}
 		
 		return result;
 	}
@@ -630,6 +748,31 @@ public class CubeResolver
 				break;
 			case 'R':
 				commandChars[i] = 'F';
+				break;
+			}
+		}
+		return String.valueOf(commandChars);
+	}
+	
+	public static String rotateCommandYNegative90(String commands)
+	{
+		char[] commandChars = commands.toCharArray();
+		
+		for(int i = 0; i < commandChars.length; i++)
+		{
+			switch(commandChars[i])
+			{
+			case 'R':
+				commandChars[i] = 'D';
+				break;
+			case 'U':
+				commandChars[i] = 'R';
+				break;
+			case 'L':
+				commandChars[i] = 'U';
+				break;
+			case 'D':
+				commandChars[i] = 'L';
 				break;
 			}
 		}
