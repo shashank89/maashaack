@@ -204,4 +204,29 @@ public class Block
 	{
 		return getBackSurface().get_colorIndex();
 	}
+
+	public int getFrontColor()
+	{
+		return getFrontSurface().get_colorIndex();
+	}
+	
+	public int getRightColor()
+	{
+		return getRightSurface().get_colorIndex();
+	}
+	
+	public int getLeftColor()
+	{
+		return getLeftSurface().get_colorIndex();
+	}
+	
+	public int getUpperColor()
+	{
+		return getUpperSurface().get_colorIndex();
+	}
+	
+	public int getDownColor()
+	{
+		return getDownSurface().get_colorIndex();
+	}
 }
