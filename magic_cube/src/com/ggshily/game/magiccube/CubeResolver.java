@@ -1,5 +1,7 @@
 package com.ggshily.game.magiccube;
 
+import com.ggshily.game.util.ArrayUtil;
+
 
 public class CubeResolver
 {
@@ -88,6 +90,16 @@ public class CubeResolver
 	private static final String MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE = "U'B'U'B'U'BUBUB'LBLBLB'L'B'L'";
 	
 	private static final String BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE = "FRUR'U'F'";
+	
+	private static final int[] BACK_CORNER_BLOCKS_COLOR_TEMPLATE_DONE = 
+		{-1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		  4,  4, 4 ,  4,  4,  4,  4,  4,  4,
+		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		 
+		};
 	
 	public static String resolve(Cube cube)
 	{
@@ -468,11 +480,10 @@ public class CubeResolver
 		Block[] backBlocks = cube.getBackBlocks();
 		int backColor = backBlocks[4].getBackColor();
 		
+		int[] data = BACK_CORNER_BLOCKS_COLOR_TEMPLATE_DONE.clone();
+		ArrayUtil.replace(data, 4, backColor);
 
-		if(backBlocks[0].getBackColor() == backColor &&
-				backBlocks[2].getBackColor() == backColor &&
-				backBlocks[6].getBackColor() == backColor &&
-				backBlocks[8].getBackColor() == backColor)
+		if(CubeUtil.isMatch(CubeFactory.createCube(data), cube))
 		{
 			// done
 		}

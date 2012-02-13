@@ -19,6 +19,8 @@ public class CubeFactory
 	 */
 	public static Cube createCube(String data)
 	{
+		assert(false);
+		
 		Cube cube = null;
 		
 		return cube;
@@ -36,7 +38,12 @@ public class CubeFactory
 		&nbsp; &nbsp;555<br>
 		&nbsp; &nbsp;555</p>
 	 * 
-	 * @param data
+	 * @param data [0, 0, 0, 0, 0, 0, 0, 0, 0,
+	 *              1, 1, 1, 1, 1, 1, 1, 1, 1,
+	 *              2, 2, 2, 2, 2, 2, 2, 2, 2,
+	 *              3, 3, 3, 3, 3, 3, 3, 3, 3,
+	 *              4, 4, 4, 4, 4, 4, 4, 4, 4,
+	 *              5, 5, 5, 5, 5, 5, 5, 5, 5]
 	 * @return
 	 */
 	public static Cube createCube(int[] data)
