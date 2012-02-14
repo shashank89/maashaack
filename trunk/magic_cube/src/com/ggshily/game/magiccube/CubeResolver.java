@@ -158,7 +158,7 @@ public class CubeResolver
 		 -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		};
 
-	private static final String BACK_CORNER_BLOCKS_POSITION_EXCHANGE1 = "R2D2R'U'RD2R'UR'";
+	private static final String BACK_CORNER_BLOCKS_POSITION_EXCHANGE = "R2D2R'U'RD2R'UR'";
 	
 	public static String resolve(Cube cube)
 	{
@@ -192,6 +192,7 @@ public class CubeResolver
 		result += correctBackCornerBlocksPosition(cube) + "\n";
 		
 		// 7th step: correct back edge blocks' position
+		result += correctBackEdgeBlocksPosition(cube) + "\n";
 		
 		return result;
 	}
@@ -670,34 +671,123 @@ public class CubeResolver
 
 	public static String correctBackCornerBlocksPosition(Cube cube)
 	{
+		String result = "";
+		
+		String method = getMethod2FinishBackCornerBlocks(cube);
+		if(method != null)
+		{
+			result = method;
+		}
+		else
+		{
+			method = getMethod2GetSameCornerColorInOneFace(cube);
+			if(method != null)
+			{
+				result = method;
+				
+				cube.rotateXNegative90();
+				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result += rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				cube.rotateX90();
+			}
+			else
+			{
+				cube.rotateXNegative90();
+				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result = rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				cube.rotateX90();
+				
+				method = getMethod2GetSameCornerColorInOneFace(cube);
+				assert(method != null);
+				result += method;
+				
+				cube.rotateXNegative90();
+				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result += rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				cube.rotateX90();
+			}
+		}
+		return result;
+	}
+	
+	private static String getMethod2GetSameCornerColorInOneFace(Cube cube)
+	{
+		Block[] rightBlocks = cube.getRightBlocks();
+		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
+		{
+			return "";
+		}
+		executeSingleCommand(cube, 'B');
+		rightBlocks = cube.getRightBlocks();
+		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
+		{
+			return "B";
+		}
+		executeSingleCommand(cube, 'B');
+		rightBlocks = cube.getRightBlocks();
+		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
+		{
+			return "B2";
+		}
+		executeSingleCommand(cube, 'B');
+		rightBlocks = cube.getRightBlocks();
+		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
+		{
+			return "B'";
+		}
+		executeSingleCommand(cube, 'B');
+		return null;
+	}
+
+	private static String getMethod2FinishBackCornerBlocks(Cube cube)
+	{
+		if(checkIfBackCornerBlocksFinished(cube))
+		{
+			return "";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackCornerBlocksFinished(cube))
+		{
+			return "B";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackCornerBlocksFinished(cube))
+		{
+			return "B2";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackCornerBlocksFinished(cube))
+		{
+			return "B'";
+		}
+		executeSingleCommand(cube, 'B');
+		
+		return null;
+	}
+
+	private static boolean checkIfBackCornerBlocksFinished(Cube cube)
+	{
 		Block[] upperBlocks = cube.getUpperBlocks();
 		Block[] leftBlocks = cube.getLeftBlocks();
 		Block[] downBlocks = cube.getDownBlocks();
 		Block[] rightBlocks = cube.getRightBlocks();
 		
-		if(upperBlocks[0].getUpperColor() == upperBlocks[2].getUpperColor())
-		{
-			
-		}
-		else if(leftBlocks[0].getLeftColor() == leftBlocks[2].getLeftColor())
-		{
-			
-		}
-		else if(downBlocks[6].getDownColor() == downBlocks[8].getDownColor())
-		{
-			
-		}
-		else if(rightBlocks[3].getRightColor() == rightBlocks[8].getRightColor())
-		{
-			
-		}
-		else
-		{
-			
-		}
+		return (upperBlocks[0].getUpperColor() == upperBlocks[2].getUpperColor() && 
+				upperBlocks[0].getUpperColor() == upperBlocks[4].getUpperColor() &&
+				leftBlocks[0].getLeftColor() == leftBlocks[2].getLeftColor() && 
+				leftBlocks[0].getLeftColor() == leftBlocks[4].getLeftColor() && 
+				downBlocks[6].getDownColor() == downBlocks[8].getDownColor() && 
+				downBlocks[6].getDownColor() == downBlocks[4].getDownColor() && 
+				rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor() && 
+				rightBlocks[2].getRightColor() == rightBlocks[4].getRightColor());
+	}
+
+	public static String correctBackEdgeBlocksPosition(Cube cube)
+	{
+		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	public static void executeCommands(Cube cube, String commands)
 	{
 		int i = 0;
