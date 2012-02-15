@@ -422,7 +422,7 @@ public class Cube
 		}
 		
 		rightBlocks = null;
-		upperBlocks = null;
+		downBlocks = null;
 		leftBlocks = null;
 		frontBlocks = null;
 		backBlocks = null;
@@ -452,7 +452,7 @@ public class Cube
 		}
 		
 		rightBlocks = null;
-		upperBlocks = null;
+		downBlocks = null;
 		leftBlocks = null;
 		frontBlocks = null;
 		backBlocks = null;

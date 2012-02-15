@@ -513,7 +513,18 @@ public class CubeTest
 		assertEquals(5, _cube.getBackBlocks()[8].getDownSurface().get_colorIndex());
 		assertEquals(2, _cube.getBackBlocks()[8].getLeftSurface().get_colorIndex());
 		assertEquals(-1, _cube.getBackBlocks()[8].getFrontSurface().get_colorIndex());
-		
+
+		final String result =
+			"   111\n" +
+			"   111\n" +
+			"   111\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   555";
+		assertEquals(_cube.toString(), result);
 	}
 	
 	@Test
