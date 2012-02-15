@@ -917,16 +917,16 @@ public class CubeResolver
 			switch(commandChars[i])
 			{
 			case 'F':
-				commandChars[i] = 'L';
-				break;
-			case 'L':
-				commandChars[i] = 'B';
-				break;
-			case 'B':
 				commandChars[i] = 'R';
 				break;
-			case 'R':
+			case 'L':
 				commandChars[i] = 'F';
+				break;
+			case 'B':
+				commandChars[i] = 'L';
+				break;
+			case 'R':
+				commandChars[i] = 'B';
 				break;
 			}
 		}
