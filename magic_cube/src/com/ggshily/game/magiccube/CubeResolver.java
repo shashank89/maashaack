@@ -784,8 +784,105 @@ public class CubeResolver
 
 	public static String correctBackEdgeBlocksPosition(Cube cube)
 	{
+		String result = "";
+		
+		String method = getMethod2FinishBackEdgeBlocks(cube);
+		if(method != null)
+		{
+			result = method;
+		}
+		else
+		{
+			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
+			String method2 = countClockWiseCanFinishBackEdgeBlocks(cube);
+			String method3 = exchange2OppsiteCanFinishBackEdgeBlocks(cube);
+			String method4 = exchange2NeighborCanFinishBackEdgeBlocks(cube);
+			
+			if(method1 != null)
+			{
+				
+			}
+			else if(method2 != null)
+			{
+				
+			}
+			else if(method3 != null)
+			{
+				
+			}
+			else if(method4 != null)
+			{
+				
+			}
+			else
+			{
+				assert(false);
+			}
+		}
+		return result;
+	}
+
+	private static String clockWiseCanFinishBackEdgeBlocks(Cube cube)
+	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	private static String countClockWiseCanFinishBackEdgeBlocks(Cube cube)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String exchange2OppsiteCanFinishBackEdgeBlocks(Cube cube)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String exchange2NeighborCanFinishBackEdgeBlocks(Cube cube)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static String getMethod2FinishBackEdgeBlocks(Cube cube)
+	{
+		if(checkIfBackEdgeBlocksFinished(cube))
+		{
+			return "";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackEdgeBlocksFinished(cube))
+		{
+			return "B";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackEdgeBlocksFinished(cube))
+		{
+			return "B2";
+		}
+		executeSingleCommand(cube, 'B');
+		if(checkIfBackEdgeBlocksFinished(cube))
+		{
+			return "B'";
+		}
+		executeSingleCommand(cube, 'B');
+		
+		return null;
+	}
+	
+	private static boolean checkIfBackEdgeBlocksFinished(Cube cube)
+	{
+		Block[] upperBlocks = cube.getUpperBlocks();
+		Block[] leftBlocks = cube.getLeftBlocks();
+		Block[] downBlocks = cube.getDownBlocks();
+		Block[] rightBlocks = cube.getRightBlocks();
+		
+		return (upperBlocks[1].getUpperColor() == upperBlocks[4].getUpperColor() &&
+				leftBlocks[3].getLeftColor() == leftBlocks[4].getLeftColor() && 
+				downBlocks[7].getDownColor() == downBlocks[4].getDownColor() && 
+				rightBlocks[5].getRightColor() == rightBlocks[4].getRightColor());
 	}
 
 	public static void executeCommands(Cube cube, String commands)
