@@ -300,7 +300,6 @@ public class CubeResolverTest extends CubeResolver
 		CubeResolver.executeCommands(_cube, CubeResolver.rotateCommandZ90("U"));
 		_cube.rotateZNegative90();
 		assertEquals(cube.toString(), _cube.toString());
-		System.out.println(_cube.toString());
 		
 		cube.F();
 		_cube.rotateZ90();
