@@ -135,6 +135,36 @@ public class CubeResolverTest extends CubeResolver
 	}
 	
 	@Test
+	public void testCorrectBackEdgeBlocksPosition()
+	{
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+		final String init = 
+				"   121\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"522000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   515";
+		
+		Cube cube = CubeFactory.createCube(init);
+		CubeResolver.correctBackEdgeBlocksPosition(cube);
+		
+		assertEquals(result, cube.toString());
+	}
+	
+	@Test
 	public void testRotateCommandX90()
 	{
 		Cube cube = CubeFactory.createCube(data);

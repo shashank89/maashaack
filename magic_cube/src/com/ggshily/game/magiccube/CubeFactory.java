@@ -19,11 +19,7 @@ public class CubeFactory
 	 */
 	public static Cube createCube(String data)
 	{
-		assert(false);
-		
-		Cube cube = null;
-		
-		return cube;
+		return createCube(CubeUtil.string2Array(data));
 	}
 
 	/**
