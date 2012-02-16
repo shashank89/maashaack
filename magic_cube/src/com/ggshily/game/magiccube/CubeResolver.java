@@ -774,7 +774,7 @@ public class CubeResolver
 		
 		return (upperBlocks[0].getUpperColor() == upperBlocks[2].getUpperColor() && 
 				upperBlocks[0].getUpperColor() == upperBlocks[4].getUpperColor() &&
-				leftBlocks[0].getLeftColor() == leftBlocks[2].getLeftColor() && 
+				leftBlocks[0].getLeftColor() == leftBlocks[6].getLeftColor() && 
 				leftBlocks[0].getLeftColor() == leftBlocks[4].getLeftColor() && 
 				downBlocks[6].getDownColor() == downBlocks[8].getDownColor() && 
 				downBlocks[6].getDownColor() == downBlocks[4].getDownColor() && 
@@ -794,29 +794,38 @@ public class CubeResolver
 		else
 		{
 			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
-			String method2 = countClockWiseCanFinishBackEdgeBlocks(cube);
-			String method3 = exchange2OppsiteCanFinishBackEdgeBlocks(cube);
-			String method4 = exchange2NeighborCanFinishBackEdgeBlocks(cube);
 			
 			if(method1 != null)
 			{
-				
-			}
-			else if(method2 != null)
-			{
-				
-			}
-			else if(method3 != null)
-			{
-				
-			}
-			else if(method4 != null)
-			{
-				
+				result = method1;
 			}
 			else
 			{
-				assert(false);
+				String method2 = countClockWiseCanFinishBackEdgeBlocks(cube);
+				if(method2 != null)
+				{
+					result = method2;
+				}
+				else
+				{
+					String method3 = exchange2OppositeCanFinishBackEdgeBlocks(cube);
+					if(method3 != null)
+					{
+						result = method3;
+					}
+					else
+					{
+						String method4 = exchange2NeighborCanFinishBackEdgeBlocks(cube);
+						if(method4 != null)
+						{
+							result = method4;
+						}
+						else
+						{
+							assert(false);
+						}
+					}
+				}
 			}
 		}
 		return result;
@@ -824,26 +833,250 @@ public class CubeResolver
 
 	private static String clockWiseCanFinishBackEdgeBlocks(Cube cube)
 	{
-		// TODO Auto-generated method stub
+		final String[] rotates = {"", "B", "B2", "B'"};
+		
+		int i = 0;
+		for(i = 0; i < 4; ++i)
+		{
+			if(getRotateCountForClockWise(cube) >= 0)
+			{
+				break;
+			}
+			cube.B();
+		}
+		
+		if(i < 4)
+		{
+
+			String result = rotates[i];
+			int count = getRotateCountForClockWise(cube);
+			for(int j = 0; j < count; ++j)
+			{
+				cube.rotateX90();
+			}
+			
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE2 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE1);
+			executeCommands(cube, step);
+			for(int j = 0; j < count; ++j)
+			{
+				step = rotateCommandXNegative90(step);
+			}
+			result += step;
+			
+			for(int j = count; j < 4; ++j)
+			{
+				cube.rotateX90();
+			}
+			return result;
+		}
 		return null;
+	}
+
+	private static int getRotateCountForClockWise(Cube cube)
+	{
+		Block[] upperBlocks = cube.getUpperBlocks();
+		Block[] leftBlocks = cube.getLeftBlocks();
+		Block[] downBlocks = cube.getDownBlocks();
+		Block[] rightBlocks = cube.getRightBlocks();
+		
+		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		
+		for(int i = 0; i < centerColors.length; ++i)
+		{
+			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 2) % 4]
+					&& edgeColors[(i + 2) % 4] == centerColors[(i + 3) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 1) % 4])
+			{
+				return centerColors[i];
+			}
+		}
+		return -1;
 	}
 
 	private static String countClockWiseCanFinishBackEdgeBlocks(Cube cube)
 	{
-		// TODO Auto-generated method stub
+		final String[] rotates = {"", "B", "B2", "B'"};
+		
+		int i = 0;
+		for(i = 0; i < 4; ++i)
+		{
+			if(getRotateCountForCountClockWise(cube) >= 0)
+			{
+				break;
+			}
+			cube.B();
+		}
+
+		if(i < 4)
+		{
+
+			String result = rotates[i];
+			int count = getRotateCountForCountClockWise(cube);
+			for(int j = 0; j < count; ++j)
+			{
+				cube.rotateX90();
+			}
+			
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+			executeCommands(cube, step);
+			for(int j = 0; j < count; ++j)
+			{
+				step = rotateCommandXNegative90(step);
+			}
+			result += step;
+			
+			for(int j = count; j < 4; ++j)
+			{
+				cube.rotateX90();
+			}
+			return result;
+		}
+		
 		return null;
 	}
 
-	private static String exchange2OppsiteCanFinishBackEdgeBlocks(Cube cube)
+	private static int getRotateCountForCountClockWise(Cube cube)
 	{
-		// TODO Auto-generated method stub
+		Block[] upperBlocks = cube.getUpperBlocks();
+		Block[] leftBlocks = cube.getLeftBlocks();
+		Block[] downBlocks = cube.getDownBlocks();
+		Block[] rightBlocks = cube.getRightBlocks();
+		
+		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		
+		for(int i = 0; i < centerColors.length; ++i)
+		{
+			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 3) % 4]
+					&& edgeColors[(i + 2) % 4] == centerColors[(i + 1) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 2) % 4])
+			{
+				return centerColors[i];
+			}
+		}
+		return -1;
+	}
+
+	private static String exchange2OppositeCanFinishBackEdgeBlocks(Cube cube)
+	{
+		final String[] rotates = {"", "B", "B2", "B'"};
+		
+		int i = 0;
+		for(i = 0; i < 4; ++i)
+		{
+			if(is2Opposite(cube))
+			{
+				break;
+			}
+			cube.B();
+		}
+
+		if(i < 4)
+		{
+			String result = rotates[i];
+
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+			executeCommands(cube, step);
+			
+			result += step;
+			
+			
+			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
+			
+			if(method1 != null)
+			{
+				result += method1;
+			}
+			else
+			{
+				String method2 = countClockWiseCanFinishBackEdgeBlocks(cube);
+				if(method2 != null)
+				{
+					result += method2;
+				}
+				else
+				{
+					assert(false);
+				}
+			}
+			
+			return result;
+		}
 		return null;
+	}
+
+	private static boolean is2Opposite(Cube cube)
+	{
+		Block[] upperBlocks = cube.getUpperBlocks();
+		Block[] leftBlocks = cube.getLeftBlocks();
+		Block[] downBlocks = cube.getDownBlocks();
+		Block[] rightBlocks = cube.getRightBlocks();
+		
+		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		
+		return centerColors[0] == edgeColors[2] && centerColors[1] == edgeColors[3] && centerColors[2] == edgeColors[0] && centerColors[3] == edgeColors[1]; 
 	}
 
 	private static String exchange2NeighborCanFinishBackEdgeBlocks(Cube cube)
 	{
-		// TODO Auto-generated method stub
+		final String[] rotates = {"", "B", "B2", "B'"};
+		
+		int i = 0;
+		for(i = 0; i < 4; ++i)
+		{
+			if(is2Neighbor(cube))
+			{
+				break;
+			}
+			cube.B();
+		}
+
+		if(i < 4)
+		{
+			String result = rotates[i];
+
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+			executeCommands(cube, step);
+			
+			result += step;
+			
+			
+			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
+			
+			if(method1 != null)
+			{
+				result += method1;
+			}
+			else
+			{
+				String method2 = countClockWiseCanFinishBackEdgeBlocks(cube);
+				if(method2 != null)
+				{
+					result += method2;
+				}
+				else
+				{
+					assert(false);
+				}
+			}
+			
+			return result;
+		}
 		return null;
+	}
+
+	private static boolean is2Neighbor(Cube cube)
+	{
+		Block[] upperBlocks = cube.getUpperBlocks();
+		Block[] leftBlocks = cube.getLeftBlocks();
+		Block[] downBlocks = cube.getDownBlocks();
+		Block[] rightBlocks = cube.getRightBlocks();
+		
+		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		
+		return (centerColors[0] == edgeColors[3] && centerColors[3] == edgeColors[0] && centerColors[1] == edgeColors[2] && centerColors[2] == edgeColors[1]) ||
+				(centerColors[0] == edgeColors[1] && centerColors[1] == edgeColors[0] && centerColors[2] == edgeColors[3] && centerColors[3] == edgeColors[2]); 
 	}
 
 	private static String getMethod2FinishBackEdgeBlocks(Cube cube)
@@ -974,6 +1207,31 @@ public class CubeResolver
 				break;
 			case 'D':
 				commandChars[i] = 'F';
+				break;
+			}
+		}
+		return String.valueOf(commandChars);
+	}
+	
+	public static String rotateCommandXNegative90(String commands)
+	{
+		char[] commandChars = commands.toCharArray();
+		
+		for(int i = 0; i < commandChars.length; i++)
+		{
+			switch(commandChars[i])
+			{
+			case 'F':
+				commandChars[i] = 'D';
+				break;
+			case 'U':
+				commandChars[i] = 'F';
+				break;
+			case 'B':
+				commandChars[i] = 'U';
+				break;
+			case 'D':
+				commandChars[i] = 'B';
 				break;
 			}
 		}
