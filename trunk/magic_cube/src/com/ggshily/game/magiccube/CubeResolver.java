@@ -786,12 +786,7 @@ public class CubeResolver
 	{
 		String result = "";
 		
-		String method = getMethod2FinishBackEdgeBlocks(cube);
-		if(method != null)
-		{
-			result = method;
-		}
-		else
+		if(!checkIfBackEdgeBlocksFinished(cube))
 		{
 			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
 			
@@ -833,23 +828,10 @@ public class CubeResolver
 
 	private static String clockWiseCanFinishBackEdgeBlocks(Cube cube)
 	{
-		final String[] rotates = {"", "B", "B2", "B'"};
-		
-		int i = 0;
-		for(i = 0; i < 4; ++i)
+		String result = null;
+		int count = getRotateCountForClockWise(cube);
+		if(count >= 0)
 		{
-			if(getRotateCountForClockWise(cube) >= 0)
-			{
-				break;
-			}
-			cube.B();
-		}
-		
-		if(i < 4)
-		{
-
-			String result = rotates[i];
-			int count = getRotateCountForClockWise(cube);
 			for(int j = 0; j < count; ++j)
 			{
 				cube.rotateX90();
@@ -867,9 +849,8 @@ public class CubeResolver
 			{
 				cube.rotateX90();
 			}
-			return result;
 		}
-		return null;
+		return result;
 	}
 
 	private static int getRotateCountForClockWise(Cube cube)
@@ -879,15 +860,15 @@ public class CubeResolver
 		Block[] downBlocks = cube.getDownBlocks();
 		Block[] rightBlocks = cube.getRightBlocks();
 		
-		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
-		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		int[] centerColors = {rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor(), upperBlocks[4].getUpperColor()};
+		int[] edgeColors = {rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor(), upperBlocks[1].getUpperColor()};
 		
 		for(int i = 0; i < centerColors.length; ++i)
 		{
-			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 2) % 4]
-					&& edgeColors[(i + 2) % 4] == centerColors[(i + 3) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 1) % 4])
+			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 3) % 4]
+					&& edgeColors[(i + 2) % 4] == centerColors[(i + 1) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 2) % 4])
 			{
-				return centerColors[i];
+				return i;
 			}
 		}
 		return -1;
@@ -895,23 +876,10 @@ public class CubeResolver
 
 	private static String countClockWiseCanFinishBackEdgeBlocks(Cube cube)
 	{
-		final String[] rotates = {"", "B", "B2", "B'"};
-		
-		int i = 0;
-		for(i = 0; i < 4; ++i)
+		String result = null;
+		int count = getRotateCountForCountClockWise(cube);
+		if(count >= 0)
 		{
-			if(getRotateCountForCountClockWise(cube) >= 0)
-			{
-				break;
-			}
-			cube.B();
-		}
-
-		if(i < 4)
-		{
-
-			String result = rotates[i];
-			int count = getRotateCountForCountClockWise(cube);
 			for(int j = 0; j < count; ++j)
 			{
 				cube.rotateX90();
@@ -929,10 +897,8 @@ public class CubeResolver
 			{
 				cube.rotateX90();
 			}
-			return result;
 		}
-		
-		return null;
+		return result;
 	}
 
 	private static int getRotateCountForCountClockWise(Cube cube)
@@ -942,15 +908,15 @@ public class CubeResolver
 		Block[] downBlocks = cube.getDownBlocks();
 		Block[] rightBlocks = cube.getRightBlocks();
 		
-		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
-		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
+		int[] centerColors = {upperBlocks[4].getUpperColor(), leftBlocks[4].getLeftColor(), downBlocks[4].getDownColor(), rightBlocks[4].getRightColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), leftBlocks[3].getLeftColor(), downBlocks[7].getDownColor(), rightBlocks[5].getRightColor()};
 		
 		for(int i = 0; i < centerColors.length; ++i)
 		{
 			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 3) % 4]
 					&& edgeColors[(i + 2) % 4] == centerColors[(i + 1) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 2) % 4])
 			{
-				return centerColors[i];
+				return i;
 			}
 		}
 		return -1;
@@ -958,21 +924,9 @@ public class CubeResolver
 
 	private static String exchange2OppositeCanFinishBackEdgeBlocks(Cube cube)
 	{
-		final String[] rotates = {"", "B", "B2", "B'"};
-		
-		int i = 0;
-		for(i = 0; i < 4; ++i)
+		if(is2Opposite(cube))
 		{
-			if(is2Opposite(cube))
-			{
-				break;
-			}
-			cube.B();
-		}
-
-		if(i < 4)
-		{
-			String result = rotates[i];
+			String result = "";
 
 			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
 			executeCommands(cube, step);
@@ -1019,21 +973,9 @@ public class CubeResolver
 
 	private static String exchange2NeighborCanFinishBackEdgeBlocks(Cube cube)
 	{
-		final String[] rotates = {"", "B", "B2", "B'"};
-		
-		int i = 0;
-		for(i = 0; i < 4; ++i)
+		if(is2Neighbor(cube))
 		{
-			if(is2Neighbor(cube))
-			{
-				break;
-			}
-			cube.B();
-		}
-
-		if(i < 4)
-		{
-			String result = rotates[i];
+			String result = "";
 
 			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
 			executeCommands(cube, step);
@@ -1079,32 +1021,6 @@ public class CubeResolver
 				(centerColors[0] == edgeColors[1] && centerColors[1] == edgeColors[0] && centerColors[2] == edgeColors[3] && centerColors[3] == edgeColors[2]); 
 	}
 
-	private static String getMethod2FinishBackEdgeBlocks(Cube cube)
-	{
-		if(checkIfBackEdgeBlocksFinished(cube))
-		{
-			return "";
-		}
-		executeSingleCommand(cube, 'B');
-		if(checkIfBackEdgeBlocksFinished(cube))
-		{
-			return "B";
-		}
-		executeSingleCommand(cube, 'B');
-		if(checkIfBackEdgeBlocksFinished(cube))
-		{
-			return "B2";
-		}
-		executeSingleCommand(cube, 'B');
-		if(checkIfBackEdgeBlocksFinished(cube))
-		{
-			return "B'";
-		}
-		executeSingleCommand(cube, 'B');
-		
-		return null;
-	}
-	
 	private static boolean checkIfBackEdgeBlocksFinished(Cube cube)
 	{
 		Block[] upperBlocks = cube.getUpperBlocks();
