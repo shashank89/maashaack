@@ -296,7 +296,7 @@ public class CubeResolver
 		}
 		else
 		{
-			assert(false);
+			throw new Error("The kubic is broken:\n" + cube.toString());
 		}
 		
 		return result;
@@ -528,7 +528,7 @@ public class CubeResolver
 		}
 		else
 		{
-			assert(false);
+			throw new Error("The kubic is broken:\n" + cube.toString());
 		}
 		
 		return result;
@@ -607,7 +607,7 @@ public class CubeResolver
 				}
 				else
 				{
-					assert(false);
+					throw new Error("The kubic is broken:\n" + cube.toString());
 				}
 			}
 		}
@@ -664,7 +664,7 @@ public class CubeResolver
 		}
 		else
 		{
-			assert(false);
+			throw new Error("The kubic is broken:\n" + cube.toString());
 		}
 		return result;
 	}
@@ -698,7 +698,10 @@ public class CubeResolver
 				cube.rotateX90();
 				
 				method = getMethod2GetSameCornerColorInOneFace(cube);
-				assert(method != null);
+				if(method == null)
+				{
+					throw new Error("The kubic is broken:\n" + cube.toString());
+				}
 				result += method;
 				
 				cube.rotateXNegative90();
@@ -817,7 +820,7 @@ public class CubeResolver
 						}
 						else
 						{
-							assert(false);
+							throw new Error("The kubic is broken:\n" + cube.toString());
 						}
 					}
 				}
@@ -834,20 +837,24 @@ public class CubeResolver
 		{
 			for(int j = 0; j < count; ++j)
 			{
-				cube.rotateX90();
+				cube.rotateY90();
 			}
 			
-			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE2 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE1);
+			cube.rotateXNegative90();
+			
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE2 + rotateCommandZ90(rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE1));
 			executeCommands(cube, step);
 			for(int j = 0; j < count; ++j)
 			{
-				step = rotateCommandXNegative90(step);
+				step = rotateCommandYNegative90(step);
 			}
-			result += step;
+			cube.rotateX90();
+			
+			result = rotateCommandX90(step);
 			
 			for(int j = count; j < 4; ++j)
 			{
-				cube.rotateX90();
+				cube.rotateY90();
 			}
 		}
 		return result;
@@ -882,20 +889,23 @@ public class CubeResolver
 		{
 			for(int j = 0; j < count; ++j)
 			{
-				cube.rotateX90();
+				cube.rotateY90();
 			}
-			
-			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+
+			cube.rotateXNegative90();
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2));
 			executeCommands(cube, step);
 			for(int j = 0; j < count; ++j)
 			{
-				step = rotateCommandXNegative90(step);
+				step = rotateCommandYNegative90(step);
 			}
-			result += step;
+			cube.rotateX90();
+			
+			result = rotateCommandX90(step);
 			
 			for(int j = count; j < 4; ++j)
 			{
-				cube.rotateX90();
+				cube.rotateY90();
 			}
 		}
 		return result;
@@ -908,13 +918,13 @@ public class CubeResolver
 		Block[] downBlocks = cube.getDownBlocks();
 		Block[] rightBlocks = cube.getRightBlocks();
 		
-		int[] centerColors = {upperBlocks[4].getUpperColor(), leftBlocks[4].getLeftColor(), downBlocks[4].getDownColor(), rightBlocks[4].getRightColor()};
-		int[] edgeColors = {upperBlocks[1].getUpperColor(), leftBlocks[3].getLeftColor(), downBlocks[7].getDownColor(), rightBlocks[5].getRightColor()};
+		int[] centerColors = {upperBlocks[4].getUpperColor(), rightBlocks[4].getRightColor(), downBlocks[4].getDownColor(), leftBlocks[4].getLeftColor()};
+		int[] edgeColors = {upperBlocks[1].getUpperColor(), rightBlocks[5].getRightColor(), downBlocks[7].getDownColor(), leftBlocks[3].getLeftColor()};
 		
 		for(int i = 0; i < centerColors.length; ++i)
 		{
-			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 3) % 4]
-					&& edgeColors[(i + 2) % 4] == centerColors[(i + 1) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 2) % 4])
+			if(edgeColors[i] == centerColors[i] && edgeColors[(i + 1) % 4] == centerColors[(i + 2) % 4]
+					&& edgeColors[(i + 2) % 4] == centerColors[(i + 3) % 4] && edgeColors[(i + 3) % 4] == centerColors[(i + 1) % 4])
 			{
 				return i;
 			}
@@ -928,10 +938,12 @@ public class CubeResolver
 		{
 			String result = "";
 
-			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+			cube.rotateXNegative90();
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2));
 			executeCommands(cube, step);
+			cube.rotateX90();
 			
-			result += step;
+			result += rotateCommandX90(step);
 			
 			
 			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
@@ -949,7 +961,7 @@ public class CubeResolver
 				}
 				else
 				{
-					assert(false);
+					throw new Error("The kubic is broken:\n" + cube.toString());
 				}
 			}
 			
@@ -977,10 +989,12 @@ public class CubeResolver
 		{
 			String result = "";
 
-			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2);
+			cube.rotateXNegative90();
+			String step = BACK_CORNER_BLOCKS_COLOR_EXCHANGE1 + rotateCommandZ90(rotateCommandZ90(BACK_CORNER_BLOCKS_COLOR_EXCHANGE2));
 			executeCommands(cube, step);
+			cube.rotateX90();
 			
-			result += step;
+			result += rotateCommandX90(step);
 			
 			
 			String method1 = clockWiseCanFinishBackEdgeBlocks(cube);
@@ -998,7 +1012,7 @@ public class CubeResolver
 				}
 				else
 				{
-					assert(false);
+					throw new Error("The kubic is broken:\n" + cube.toString());
 				}
 			}
 			
