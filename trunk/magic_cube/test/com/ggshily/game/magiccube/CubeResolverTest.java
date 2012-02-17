@@ -147,6 +147,7 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   555\n" +
 				"   555";
+		
 		final String init = 
 				"   121\n" + 
 				"   111\n" +
@@ -160,8 +161,82 @@ public class CubeResolverTest extends CubeResolver
 		
 		Cube cube = CubeFactory.createCube(init);
 		CubeResolver.correctBackEdgeBlocksPosition(cube);
-		
 		assertEquals(result, cube.toString());
+		
+		final String init_1 = 
+				"   121\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"322000331444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+		
+		Cube cube_1 = CubeFactory.createCube(init_1);
+		CubeResolver.correctBackEdgeBlocksPosition(cube_1);
+		assertEquals(result, cube_1.toString());
+		
+		final String init1 = 
+				"   151\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"122000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   525";
+		
+		Cube cube1 = CubeFactory.createCube(init1);
+		CubeResolver.correctBackEdgeBlocksPosition(cube1);
+		assertEquals(result, cube1.toString());
+		
+		final String init2 = 
+				"   151\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"322000332444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   515";
+		
+		Cube cube2 = CubeFactory.createCube(init2);
+		CubeResolver.correctBackEdgeBlocksPosition(cube2);
+		assertEquals(result, cube2.toString());
+		
+		final String init3 = 
+				"   131\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"522000331444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   525";
+		
+		Cube cube3 = CubeFactory.createCube(init3);
+		CubeResolver.correctBackEdgeBlocksPosition(cube3);
+		assertEquals(result, cube3.toString());
+		
+		final String init4 = 
+				"   121\n" + 
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"122000335444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   535";
+		
+		Cube cube4 = CubeFactory.createCube(init4);
+		CubeResolver.correctBackEdgeBlocksPosition(cube4);
+		assertEquals(result, cube4.toString());
 	}
 	
 	@Test
