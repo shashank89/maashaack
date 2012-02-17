@@ -135,6 +135,47 @@ public class CubeResolverTest extends CubeResolver
 	}
 	
 	@Test
+	public void testCorrectBackCornerBlocksPosition()
+	{
+		final String result =
+			"   111\n" +
+			"   111\n" +
+			"   111\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   555";
+		_cube.B();
+		CubeResolver.correctBackCornerBlocksPosition(_cube);
+		assertEquals(result, _cube.toString());
+		
+		
+		final String init = 
+				"   512\n" +
+				"   111\n" +
+				"   111\n" +
+				"322000335444\n" +
+				"222000333444\n" +
+				"322000331444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   152";
+		
+		Cube cube = CubeFactory.createCube(init);
+		CubeResolver.correctBackCornerBlocksPosition(cube);
+		assertEquals(1, cube.getUpperBlocks()[0].getUpperColor());
+		assertEquals(1, cube.getUpperBlocks()[2].getUpperColor());
+		assertEquals(2, cube.getLeftBlocks()[0].getLeftColor());
+		assertEquals(2, cube.getLeftBlocks()[6].getLeftColor());
+		assertEquals(5, cube.getDownBlocks()[6].getDownColor());
+		assertEquals(5, cube.getDownBlocks()[8].getDownColor());
+		assertEquals(3, cube.getRightBlocks()[2].getRightColor());
+		assertEquals(3, cube.getRightBlocks()[8].getRightColor());
+	}
+	
+	@Test
 	public void testCorrectBackEdgeBlocksPosition()
 	{
 		final String result =
