@@ -339,7 +339,7 @@ public class CubeResolver
 	
 	public static String correctMiddleTopLeftBlock(Cube cube)
 	{
-		String result = "";
+		String result = null;
 
 		Block leftCenter = cube.getLeftBlocks()[4];
 		Block upperCenter = cube.getUpperBlocks()[4];
@@ -356,7 +356,7 @@ public class CubeResolver
 		{
 			if(base.equals(EDGE_BLOCK_POSITION[i]))
 			{
-				result += MIDDLE_TOP_LEFT_EDGE_METHOD[i];
+				result = MIDDLE_TOP_LEFT_EDGE_METHOD[i];
 				
 				executeCommands(cube, MIDDLE_TOP_LEFT_EDGE_METHOD[i]);
 			}
@@ -366,6 +366,10 @@ public class CubeResolver
 			result += MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE;
 			
 			executeCommands(cube, MIDDLE_TOP_LEFT_EDGE_COLOR_EXCHANGE);
+		}
+		if(result == null)
+		{
+			throw new Error("the kubic is wrong:\n" + cube.toString());
 		}
 
 		return result;
@@ -451,16 +455,16 @@ public class CubeResolver
 			executeCommands(cube, BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE);
 			result = rotateCommandX90(BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE);
 
-			cube.rotateY90();
-			cube.rotateY90();
+			cube.rotateZ90();
+			cube.rotateZ90();
 			
 			executeCommands(cube, BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE);
 			executeCommands(cube, BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE);
-			result = rotateCommandY90(rotateCommandY90(rotateCommandX90(BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE)));
+			result += rotateCommandY90(rotateCommandY90(rotateCommandX90(BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE)));
 			result += rotateCommandY90(rotateCommandY90(rotateCommandX90(BACK_EDGE_BLOCKS_BACK_COLOR_EXCHANGE)));
 
-			cube.rotateY90();
-			cube.rotateY90();
+			cube.rotateZ90();
+			cube.rotateZ90();
 			
 			cube.rotateX90();
 		}
