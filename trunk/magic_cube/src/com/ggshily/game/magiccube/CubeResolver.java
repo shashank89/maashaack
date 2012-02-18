@@ -684,17 +684,31 @@ public class CubeResolver
 			if(method != null)
 			{
 				result = method;
-				
-				cube.rotateXNegative90();
-				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
-				result += rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+
 				cube.rotateX90();
+				cube.rotateX90();
+				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result += rotateCommandX90(rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE));
+				cube.rotateX90();
+				cube.rotateX90();
+				
+				method = getMethod2FinishBackCornerBlocks(cube);
+				if(method != null)
+				{
+					result += method;
+				}
+				else
+				{
+					throw new Error("The kubic is broken:\n" + cube.toString());
+				}
 			}
 			else
 			{
-				cube.rotateXNegative90();
+				cube.rotateX90();
+				cube.rotateX90();
 				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
-				result = rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result += rotateCommandX90(rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE));
+				cube.rotateX90();
 				cube.rotateX90();
 				
 				method = getMethod2GetSameCornerColorInOneFace(cube);
@@ -704,10 +718,22 @@ public class CubeResolver
 				}
 				result += method;
 				
-				cube.rotateXNegative90();
-				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
-				result += rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
 				cube.rotateX90();
+				cube.rotateX90();
+				executeCommands(cube, BACK_CORNER_BLOCKS_POSITION_EXCHANGE);
+				result += rotateCommandX90(rotateCommandX90(BACK_CORNER_BLOCKS_POSITION_EXCHANGE));
+				cube.rotateX90();
+				cube.rotateX90();
+				
+				method = getMethod2FinishBackCornerBlocks(cube);
+				if(method != null)
+				{
+					result += method;
+				}
+				else
+				{
+					throw new Error("The kubic is broken:\n" + cube.toString());
+				}
 			}
 		}
 		return result;
@@ -720,25 +746,25 @@ public class CubeResolver
 		{
 			return "";
 		}
-		executeSingleCommand(cube, 'B');
+		cube.B();
 		rightBlocks = cube.getRightBlocks();
 		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
 		{
 			return "B";
 		}
-		executeSingleCommand(cube, 'B');
+		cube.B();
 		rightBlocks = cube.getRightBlocks();
 		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
 		{
 			return "B2";
 		}
-		executeSingleCommand(cube, 'B');
+		cube.B();
 		rightBlocks = cube.getRightBlocks();
 		if(rightBlocks[2].getRightColor() == rightBlocks[8].getRightColor())
 		{
 			return "B'";
 		}
-		executeSingleCommand(cube, 'B');
+		cube.B();
 		return null;
 	}
 
