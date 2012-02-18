@@ -70,7 +70,7 @@ public class CubeUtil
 	
 	/**
 	 * 
-	 * check if two cube is match after rotate Y
+	 * check if two cube is match after rotate Y of cube1, return the rotate count
 	 * 
 	 * @param cube1
 	 * @param cube2
@@ -98,6 +98,7 @@ public class CubeUtil
 		{
 			return 3;
 		}
+		cube1.rotateY90();
 		
 		return -1;
 	}
