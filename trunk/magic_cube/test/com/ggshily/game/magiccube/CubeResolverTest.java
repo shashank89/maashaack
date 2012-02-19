@@ -135,6 +135,148 @@ public class CubeResolverTest extends CubeResolver
 	}
 	
 	@Test
+	public void testCorrectFrontEdgeBlocks()
+	{
+		_cube = CubeFactory.createCube(
+				"   104\n" +
+				"   412\n" +
+				"   002\n" +
+				"015354541332\n" +
+				"325301232041\n" +
+				"022414540142\n" +
+				"   103\n" +
+				"   553\n" +
+				"   553");
+		CubeResolver.correctFrontTopEdgeBlock(_cube);
+		CubeResolver.correctFrontLeftEdgeBlock(_cube);
+		CubeResolver.correctFrontDownEdgeBlock(_cube);
+		CubeResolver.correctFrontRightEdgeBlock(_cube);
+		
+		assertEquals(0, _cube.getFrontBlocks()[1].getFrontColor());
+		assertEquals(0, _cube.getFrontBlocks()[3].getFrontColor());
+		assertEquals(0, _cube.getFrontBlocks()[5].getFrontColor());
+		assertEquals(0, _cube.getFrontBlocks()[7].getFrontColor());
+		assertEquals(1, _cube.getUpperBlocks()[7].getUpperColor());
+		assertEquals(2, _cube.getLeftBlocks()[5].getLeftColor());
+		assertEquals(3, _cube.getRightBlocks()[3].getRightColor());
+		assertEquals(5, _cube.getDownBlocks()[1].getDownColor());
+	}
+	
+	@Test
+	public void testCorrectFrontTopLeftBlock()
+	{
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+
+		assertEquals("", CubeResolver.correctFrontTopLeftBlock(_cube));
+		assertEquals(result, _cube.toString());
+		
+		_cube = CubeFactory.createCube(
+			"   234\n" +
+			"   511\n" +
+			"   042\n" +
+			"103114501310\n" +
+			"122405334342\n" +
+			"304550552400\n" +
+			"   322\n" +
+			"   254\n" +
+			"   531");
+		CubeResolver.correctFrontTopLeftBlock(_cube);
+		assertEquals(0, _cube.getFrontBlocks()[0].getFrontColor());
+		assertEquals(1, _cube.getUpperBlocks()[6].getUpperColor());
+		assertEquals(2, _cube.getLeftBlocks()[2].getLeftColor());
+	}
+	
+	@Test
+	public void testcorrectFrontLeftDownBlock()
+	{
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+
+		assertEquals("", CubeResolver.correctFrontLeftDownBlock(_cube));
+		assertEquals(result, _cube.toString());
+		
+		_cube = CubeFactory.createCube(
+			"   345\n" + 
+			"   513\n" +
+			"   521\n" +
+			"420204243015\n" +
+			"322105430341\n" +
+			"023150202553\n" +
+			"   431\n" +
+			"   451\n" +
+			"   104");
+		CubeResolver.correctFrontLeftDownBlock(_cube);
+		assertEquals(0, _cube.getFrontBlocks()[6].getFrontColor());
+		assertEquals(2, _cube.getLeftBlocks()[8].getLeftColor());
+		assertEquals(5, _cube.getDownBlocks()[0].getDownColor());
+		
+		_cube = CubeFactory.createCube(
+			"   311\n" + 
+			"   115\n" + 
+			"   245\n" + 
+			"131414322024\n" + 
+			"324201034340\n" + 
+			"041354253502\n" + 
+			"   005\n" + 
+			"   553\n" + 
+			"   520");
+		CubeResolver.correctFrontLeftDownBlock(_cube);
+		assertEquals(0, _cube.getFrontBlocks()[6].getFrontColor());
+		assertEquals(2, _cube.getLeftBlocks()[8].getLeftColor());
+		assertEquals(5, _cube.getDownBlocks()[0].getDownColor());
+	}
+	
+	@Test
+	public void testCorrectFrontRightDownBlock()
+	{
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+
+		assertEquals("", CubeResolver.correctFrontRightDownBlock(_cube));
+		assertEquals(result, _cube.toString());
+
+		_cube = CubeFactory.createCube(
+			"   513\n" + 
+			"   513\n" + 
+			"   031\n" + 
+			"441210304122\n" + 
+			"025304331045\n" + 
+			"040524145305\n" + 
+			"   252\n" + 
+			"   152\n" + 
+			"   324");
+		CubeResolver.correctFrontRightDownBlock(_cube);
+		assertEquals(0, _cube.getFrontBlocks()[8].getFrontColor());
+		assertEquals(3, _cube.getRightBlocks()[6].getRightColor());
+		assertEquals(5, _cube.getDownBlocks()[2].getDownColor());
+	}
+	
+	@Test
 	public void testCorrectMiddleTopLeftBlock()
 	{
 		final String result =
@@ -462,28 +604,34 @@ public class CubeResolverTest extends CubeResolver
 				"   254";
 		
 		Cube cube = CubeFactory.createCube(init);
-		CubeResolver.correctBackCornerBlocksBackColor(cube);
+		String commands = CubeResolver.correctBackCornerBlocksBackColor(cube);
 		assertEquals(4, cube.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube.getBackBlocks()[8].getBackColor());
+		Cube cube_1 = CubeFactory.createCube(init);
+		executeCommands(cube_1, commands);
+		assertTrue(CubeUtil.isMatch(cube, cube_1));
 
 		final String init1 = 
 				"   111\n" +
 				"   111\n" +
 				"   111\n" +
-				"424000333449\n" +
+				"422000333449\n" +
 				"222000333444\n" +
 				"222000334949\n" +
 				"   555\n" +
 				"   555\n" +
 				"   455";
 		Cube cube1 = CubeFactory.createCube(init1);
-		CubeResolver.correctBackCornerBlocksBackColor(cube1);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube1);
 		assertEquals(4, cube1.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube1.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube1.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube1.getBackBlocks()[8].getBackColor());
+		Cube cube1_1 = CubeFactory.createCube(init1);
+		executeCommands(cube1_1, commands);
+		assertTrue(CubeUtil.isMatch(cube1, cube1_1));
 		
 		final String init2 =
 				"   114\n" +
@@ -496,11 +644,14 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   554";
 		Cube cube2 = CubeFactory.createCube(init2);
-		CubeResolver.correctBackCornerBlocksBackColor(cube2);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube2);
 		assertEquals(4, cube2.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube2.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube2.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube2.getBackBlocks()[8].getBackColor());
+		Cube cube2_1 = CubeFactory.createCube(init2);
+		executeCommands(cube2_1, commands);
+		assertTrue(CubeUtil.isMatch(cube2, cube2_1));
 
 		final String init3 =
 				"   414\n" +
@@ -513,11 +664,14 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   555";
 		Cube cube3 = CubeFactory.createCube(init3);
-		CubeResolver.correctBackCornerBlocksBackColor(cube3);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube3);
 		assertEquals(4, cube3.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube3.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube3.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube3.getBackBlocks()[8].getBackColor());
+		Cube cube3_1 = CubeFactory.createCube(init3);
+		executeCommands(cube3_1, commands);
+		assertTrue(CubeUtil.isMatch(cube3, cube3_1));
 
 		final String init4 =
 				"   114\n" +
@@ -530,11 +684,14 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   555";
 		Cube cube4 = CubeFactory.createCube(init4);
-		CubeResolver.correctBackCornerBlocksBackColor(cube4);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube4);
 		assertEquals(4, cube4.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube4.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube4.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube4.getBackBlocks()[8].getBackColor());
+		Cube cube4_1 = CubeFactory.createCube(init4);
+		executeCommands(cube4_1, commands);
+		assertTrue(CubeUtil.isMatch(cube4, cube4_1));
 
 		final String init5 =
 				"   411\n" +
@@ -547,11 +704,14 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   455";
 		Cube cube5 = CubeFactory.createCube(init5);
-		CubeResolver.correctBackCornerBlocksBackColor(cube5);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube5);
 		assertEquals(4, cube5.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube5.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube5.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube5.getBackBlocks()[8].getBackColor());
+		Cube cube5_1 = CubeFactory.createCube(init5);
+		executeCommands(cube5_1, commands);
+		assertTrue(CubeUtil.isMatch(cube5, cube5_1));
 
 		final String init6 =
 				"   111\n" +
@@ -564,11 +724,14 @@ public class CubeResolverTest extends CubeResolver
 				"   555\n" +
 				"   555";
 		Cube cube6 = CubeFactory.createCube(init6);
-		CubeResolver.correctBackCornerBlocksBackColor(cube6);
+		commands = CubeResolver.correctBackCornerBlocksBackColor(cube6);
 		assertEquals(4, cube6.getBackBlocks()[0].getBackColor());
 		assertEquals(4, cube6.getBackBlocks()[2].getBackColor());
 		assertEquals(4, cube6.getBackBlocks()[6].getBackColor());
 		assertEquals(4, cube6.getBackBlocks()[8].getBackColor());
+		Cube cube6_1 = CubeFactory.createCube(init6);
+		executeCommands(cube6_1, commands);
+		assertTrue(CubeUtil.isMatch(cube6, cube6_1));
 	}
 	
 	@Test
@@ -973,11 +1136,70 @@ public class CubeResolverTest extends CubeResolver
 		_cube.rotateZNegative90();
 		assertEquals(cube.toString(), _cube.toString());
 	}
+	
+	@Test
+	public void testResolver()
+	{
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+		CubeResolver.resolve(_cube);
+		assertEquals(result, _cube.toString());
+		
+		final String init1=
+				"   112\n" + 
+				"   014\n" + 
+				"   353\n" + 
+				"011035415032\n" + 
+				"420202431245\n" + 
+				"404141423535\n" + 
+				"   233\n" + 
+				"   555\n" + 
+				"   200";
+		_cube = CubeFactory.createCube(init1);
+		String commands = CubeResolver.resolve(_cube);
+		assertEquals(result, _cube.toString());
+		
+		commands = commands.replace("\n", "");
+		_cube = CubeFactory.createCube(init1);
+		executeCommands(_cube, commands);
+		assertEquals(result, _cube.toString());
+	}
 
 	@Test
-	public void testExecute()
+	public void testResolverRandomly()
 	{
-		fail("Not yet implemented");
+		final String result =
+				"   111\n" +
+				"   111\n" +
+				"   111\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"222000333444\n" +
+				"   555\n" +
+				"   555\n" +
+				"   555";
+		
+		final int[] commands = {'F', 'B', 'L', 'R', 'U', 'D',
+				'F' + 1, 'B' + 1, 'L' + 1, 'R' + 1, 'U' + 1, 'D' + 1};
+		int i = 0;
+		while(i++ < 200)
+		{
+			executeSingleCommand(_cube, (char) commands[(int) (Math.random() * commands.length)]);
+		}
+		
+		System.out.println(_cube);
+		
+		resolve(_cube);
+		
+		assertEquals(result, _cube.toString());
 	}
 
 }

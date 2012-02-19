@@ -5,6 +5,68 @@ import com.ggshily.game.util.ArrayUtil;
 
 public class CubeResolver
 {
+	private static final String STEP1 = 
+			"   999\n" +
+			"   919\n" +
+			"   919\n" +
+			"999909999999\n" +
+			"922000339949\n" +
+			"999909999999\n" +
+			"   959\n" +
+			"   959\n" +
+			"   999";
+	private static final String STEP2 = 
+			"   999\n" +
+			"   919\n" +
+			"   111\n" +
+			"992009399999\n" +
+			"922000339949\n" +
+			"992000399999\n" +
+			"   555\n" +
+			"   959\n" +
+			"   999";
+	private static final String STEP3 = 
+			"   999\n" +
+			"   111\n" +
+			"   111\n" +
+			"922009339999\n" +
+			"922000339949\n" +
+			"922000339999\n" +
+			"   555\n" +
+			"   555\n" +
+			"   999";
+	private static final String STEP4 = 
+			"   999\n" +
+			"   111\n" +
+			"   111\n" +
+			"922009339949\n" +
+			"922000339444\n" +
+			"922000339949\n" +
+			"   555\n" +
+			"   555\n" +
+			"   999";
+	private static final String STEP5 = 
+			"   999\n" +
+			"   111\n" +
+			"   111\n" +
+			"922000339444\n" +
+			"922000339444\n" +
+			"922000339444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   999";
+	private static final String STEP6 = 
+			"   191\n" +
+			"   111\n" +
+			"   111\n" +
+			"222009333444\n" +
+			"922000339444\n" +
+			"222000333444\n" +
+			"   555\n" +
+			"   555\n" +
+			"   595";
+	
+	
 	private static final Vertex[] EDGE_BLOCK_POSITION = {
 		// front
 		new Vertex(1, 0, 0),
@@ -58,9 +120,9 @@ public class CubeResolver
 	
 	private static final String[] FRONT_TOP_LEFT_CORNER_METHOD = {
 		"",
-		"LBL'B'UBU'",
-		"R'BRB2UBU",
-		"U'BUBUBU",
+		"LBL'B'UB'U'",
+		"R'BRB2UBU'",
+		"U'BUBUBU'",
 		
 		"UBU'",
 		"B'UBU'",
@@ -68,8 +130,8 @@ public class CubeResolver
 		"BUBU'"
 	};
 	
-	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE1 = "UBU'B'UBU";
-	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2 = "UB'U'BUB'U";
+	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE1 = "UBU'B'UBU'";
+	private static final String FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2 = "UB'U'BUB'U'";
 	
 	private static final String[] MIDDLE_TOP_LEFT_EDGE_METHOD = {
 		"",
@@ -219,9 +281,10 @@ public class CubeResolver
 				result += FRONT_TOP_EDGE_METHOD[i];
 				
 				executeCommands(cube, FRONT_TOP_EDGE_METHOD[i]);
+				break;
 			}
 		}
-		if(cube.getFrontBlocks()[2].getFrontSurface().get_colorIndex() != frontColor)
+		if(cube.getFrontBlocks()[1].getFrontSurface().get_colorIndex() != frontColor)
 		{
 			result += FRONT_TOP_EDGE_COLOR_EXCHANGE;
 			
@@ -253,6 +316,15 @@ public class CubeResolver
 		cube.rotateY90();
 		String result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctFrontTopEdgeBlock(cube))));
 		cube.rotateYNegative90();
+		
+		int[] data = CubeUtil.string2Array(STEP1);
+		ArrayUtil.replace(data, 9, -1);
+		Cube temp = CubeFactory.createCube(data);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
+		}
+		
 		return result;
 	}
 	
@@ -279,6 +351,7 @@ public class CubeResolver
 			{
 				result += FRONT_TOP_LEFT_CORNER_METHOD[i];
 				executeCommands(cube, FRONT_TOP_LEFT_CORNER_METHOD[i]);
+				break;
 			}
 		}
 		
@@ -293,6 +366,12 @@ public class CubeResolver
 		{
 			result += FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2;
 			executeCommands(cube, FRONT_TOP_LEFT_CORNER_COLOR_EXCHANGE2);
+		}
+		else if(frontTopLeftBlock.getFrontColor() == frontColor &&
+				frontTopLeftBlock.getUpperColor() == upperColor &&
+				frontTopLeftBlock.getLeftColor() == leftColor)
+		{
+			// done
 		}
 		else
 		{
@@ -334,6 +413,14 @@ public class CubeResolver
 		result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctFrontTopLeftBlock(cube))));
 		cube.rotateYNegative90();
 		
+		int[] data = CubeUtil.string2Array(STEP2);
+		ArrayUtil.replace(data, 9, -1);
+		Cube temp = CubeFactory.createCube(data);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
+		}
+		
 		return result;
 	}
 	
@@ -359,6 +446,7 @@ public class CubeResolver
 				result = MIDDLE_TOP_LEFT_EDGE_METHOD[i];
 				
 				executeCommands(cube, MIDDLE_TOP_LEFT_EDGE_METHOD[i]);
+				break;
 			}
 		}
 		if(middleTopLeftBlock.getUpperSurface().get_colorIndex() != upperColor)
@@ -406,6 +494,14 @@ public class CubeResolver
 		cube.rotateY90();
 		result = rotateCommandY90(rotateCommandY90(rotateCommandY90(correctMiddleTopLeftBlock(cube))));
 		cube.rotateYNegative90();
+		
+		int[] data = CubeUtil.string2Array(STEP3);
+		ArrayUtil.replace(data, 9, -1);
+		Cube temp = CubeFactory.createCube(data);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
+		}
 		
 		return result;
 	}
@@ -535,6 +631,14 @@ public class CubeResolver
 			throw new Error("The kubic is broken:\n" + cube.toString());
 		}
 		
+		int[] data = CubeUtil.string2Array(STEP4);
+		ArrayUtil.replace(data, 9, -1);
+		Cube temp = CubeFactory.createCube(data);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
+		}
+		
 		return result;
 	}
 
@@ -598,7 +702,7 @@ public class CubeResolver
 					for(int i = rotateCount; i < 4; ++i)
 					{
 						cube.rotateY90();
-						result = rotateCommandYNegative90(result);
+						result = rotateCommandY90(result);
 					}
 
 					result += correctBackCornerBlocksBackColor1(cube, backColor);
@@ -608,6 +712,14 @@ public class CubeResolver
 					throw new Error("The kubic is broken:\n" + cube.toString());
 				}
 			}
+		}
+		
+		int[] data1 = CubeUtil.string2Array(STEP5);
+		ArrayUtil.replace(data1, 9, -1);
+		Cube temp = CubeFactory.createCube(data1);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
 		}
 		
 		return result;
@@ -642,7 +754,7 @@ public class CubeResolver
 			for(int i = rotateCount1; i < 4; ++i)
 			{
 				cube.rotateY90();
-				result = rotateCommandYNegative90(result);
+				result = rotateCommandY90(result);
 			}
 		}
 		else
@@ -661,7 +773,7 @@ public class CubeResolver
 				for (int i = rotateCount2; i < 4; ++i)
 				{
 					cube.rotateY90();
-					result = rotateCommandYNegative90(result);
+					result = rotateCommandY90(result);
 				}
 			} else
 			{
@@ -737,6 +849,14 @@ public class CubeResolver
 					throw new Error("The kubic is broken:\n" + cube.toString());
 				}
 			}
+		}
+		
+		int[] data = CubeUtil.string2Array(STEP6);
+		ArrayUtil.replace(data, 9, -1);
+		Cube temp = CubeFactory.createCube(data);
+		if(!CubeUtil.isMatch(temp, cube))
+		{
+			throw new Error();
 		}
 		return result;
 	}
