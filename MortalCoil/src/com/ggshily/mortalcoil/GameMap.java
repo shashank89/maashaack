@@ -368,6 +368,17 @@ public class GameMap
 		
 		int count = 0;
 		int[] directions;
+		
+		// add 3 directions point first
+		for(int i = 0; i < _mapdata.length; i++)
+		{
+			if(_mapdata[i] == CELL_EMPTY && getDirections(i).length == 3)
+			{
+				points[count++] = i;
+			}
+		}
+		
+		// add 2 directions point and remove points in same path
 		for(int i = 0; i < _mapdata.length; i++)
 		{
 			if (_mapdata[i] == CELL_EMPTY)
@@ -435,8 +446,8 @@ public class GameMap
 		
 		System.out.println("width:" + gm._width);
 		System.out.println("height:" + gm._height);
-		System.out.println("map data:\n" + gm.getFormatMap());
-		
+		System.out.printf("map data:\n%s", gm.getFormatMap());
+
 //		System.out.println("point 1's directions:" + gm.getDirections(1).length);
 //		System.out.println("point 2's directions:" + gm.getDirections(2).length);
 //		System.out.println("point 3's directions:" + gm.getDirections(3).length);
