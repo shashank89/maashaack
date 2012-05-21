@@ -97,6 +97,51 @@
 						}, '//*[@id="Dg_Data"]', false, false);*/
 					})();
 					
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+				newRow.insertCell(-1);
+					(function(){
+						// 维修单追加查询
+						var url = 'http://spm1.lenovo.com.cn/SV/SV_REPAIR/SV_REPAIR_SuperadditionList.aspx?REPAIRID=' + recps[i];
+						var index = i;
+						var row = newRow;
+						var xhr = new XMLHttpRequest();
+						xhr.open("GET", url, true);
+						xhr.onreadystatechange = function() {
+						  if (xhr.readyState == 4) {
+							html2dom(xhr.responseText, function( dom, url, xhr ){
+									//console.log('fenpei shijian');
+									//console.log(dom.getElementById('Dg_Data'));
+									if(dom.getElementById('Dg_Data').tBodies[0].rows.length > 1)
+									{
+										row.cells[5].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[2].innerHTML;
+										row.cells[6].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[3].innerHTML;
+										row.cells[7].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[4].innerHTML;
+										row.cells[8].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[5].innerHTML;
+										row.cells[9].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[6].innerHTML;
+										row.cells[10].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[7].innerHTML;
+										row.cells[11].innerHTML = dom.getElementById('Dg_Data').tBodies[0].rows[1].cells[8].innerHTML;
+									}
+								},
+								url, null, false, false);
+						  }
+						};
+						xhr.send();
+						/*wget$X(url, function( DOMNode, url, dom, xhr )
+						{
+							// 设置分配时间
+							// console.log("-----------------------");
+							// console.log("url:" + url);
+							// console.log(DOMNode);
+							// console.log("i:" + index);
+							// console.log(cell);
+							cell.innerHTML = DOMNode.tBodies[0].rows[1].cells[9].innerHTML;
+						}, '//*[@id="Dg_Data"]', false, false);*/
+					})();
 					
 			}
 			var total = 0;
