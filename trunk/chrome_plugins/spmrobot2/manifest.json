@@ -1,0 +1,23 @@
+{ 
+  "name": "spm robot", 
+  "version": "0.0.1", 
+  "description": "get extra data", 
+  "background_page":"background.html",
+  "browser_action": {
+    "default_icon": "images/icon.png" ,
+    "default_title": "Î¬ÐÞµ¥×·¼Ó²éÑ¯",
+    "default_popup": "popup.html"
+  },
+  "icons": {"48": "48.png"},
+  //"options_page": "options.html",
+  "permissions": ["tabs", "notifications", "http://*.lenovo.com.cn/"],
+   //"content_scripts": [
+   // {
+   //   "matches": ["http://spm1.lenovo.com.cn/*"],
+   //   //"css": ["mystyles.css"],
+	//  "all_frames": true,
+   //   "js": [/*"jquery.js",*/ "contentscript.js"]
+   // }
+  //],
+  "content_security_policy": "script-src 'self'; img-src 'self'"
+}
