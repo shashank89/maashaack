@@ -1,0 +1,5 @@
+#Tue Apr 03 10:12:32 CST 2012
+eclipse.preferences.version=1
+jarsExcludedFromWebInfLib=D\:/projects/project_java/AutoMail/lib/blazeds-core-3.2.0.3978.jar|D\:/projects/project_java/AutoMail/lib/gson-2.1.jar
+warSrcDir=war
+warSrcDirIsOutput=true
