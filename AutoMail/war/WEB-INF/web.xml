@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+	<servlet>
+		<servlet-name>AutoMail</servlet-name>
+		<servlet-class>com.ggshily.mail.AutoMailServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>Reports</servlet-name>
+		<servlet-class>com.ggshily.mail.ReportsServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>Download</servlet-name>
+		<servlet-class>com.ggshily.mail.DownloadServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AutoMail</servlet-name>
+		<url-pattern>/automail</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Reports</servlet-name>
+		<url-pattern>/reports</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Download</servlet-name>
+		<url-pattern>/dl</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>
