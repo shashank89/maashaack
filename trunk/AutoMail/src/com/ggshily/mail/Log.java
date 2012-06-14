@@ -11,5 +11,5 @@ public class Log
 	public String message;
 	public String clientLog;
 	public String rpcActions;
-	public Date time;
+	public String time;
 }

@@ -70,7 +70,7 @@ public class ReportsServlet extends HttpServlet
 			try
 			{
 				Gson gson = new Gson();
-				Log log = gson.fromJson(LogUtil.getLog(report.getBytes()), Log.class);
+				Log log = gson.fromJson(LogUtil.getLogString(report.getBytes()), Log.class);
 				log.clientLog = "";
 				log.rpcActions = "";
 				log.key = result.getKey().toString();
