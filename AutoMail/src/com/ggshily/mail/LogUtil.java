@@ -32,12 +32,23 @@ public class LogUtil
 		return log;
 	}
 	
+	public static Log getLog(String logString)
+	{
+		Gson gson = new Gson();
+		Log log = gson.fromJson(logString, Log.class);
+		
+		return log;
+	}
+	
 	public static String getMailBody(Log log)
 	{
 		return ":<div><br>user :<a href=\"http://www.facebook.com/profile.php?id="
 		+ log.userId + "\">" + log.userId
 		+ "</a><br>Error code:" + log.code
 		+ "<br>Error message:<br>"
-		+ log.message.replaceAll("\n", "<br>") + "</div>";
+		+ (log.message != null ? log.message.replaceAll("\n", "<br>") : "null")
+		+ "<br>client version:<br>" + log.clientVersion
+		+ "<br>server:<br>" + log.server
+		+ "</div>";
 	}
 }

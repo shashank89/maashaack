@@ -75,7 +75,7 @@ public class AutoMailServlet extends HttpServlet
 	{
 		try
 		{
-			Log report = storeData(req);
+			Log report = storeData(req, session);
 			
 			if(report != null)
 			{
@@ -101,7 +101,7 @@ public class AutoMailServlet extends HttpServlet
 		}
 	}
 
-	private Log storeData(HttpServletRequest req) throws IOException
+	private Log storeData(HttpServletRequest req, Session session) throws IOException
 	{
 
 		byte[] by = null;
@@ -125,21 +125,28 @@ public class AutoMailServlet extends HttpServlet
 		errorReport.setProperty("time", new Date());
 		
 		Log report = null;
+		String logString = "";
 		try
 		{
-			report = LogUtil.getLog(by);
+			logString = LogUtil.getLogString(by);
+			report = LogUtil.getLog(logString);
 			log("userid:" + report.userId);
+			log("code:" + report.code);
 			log("message:" + report.message);
-			log("time:" + report.time.toString());
+			log("time:" + report.time);
+			log("client version:" + report.clientVersion);
+			log("server:" + report.server);
 		}
 		catch(JsonSyntaxException e)
 		{
 			log(e.getMessage());
+			sendReport(logString, session);
 			e.printStackTrace();
 		}
 		catch(DataFormatException e)
 		{
 			log(e.getMessage());
+			sendReport(logString, session);
 			e.printStackTrace();
 		}
 		
@@ -147,6 +154,30 @@ public class AutoMailServlet extends HttpServlet
 		log("key:" + errorReport.getKey().toString());
 		
 		return report;
+	}
+
+	private void sendReport(String logString, Session session)
+	{
+		Log report = new Log();
+		report.clientLog = logString;
+		report.rpcActions = "";
+
+		ArrayList<Log> logs = new ArrayList<Log>();
+		logs.add(report);
+		try
+		{
+			sendMail(session, logs, LogUtil.getMailBody(report));
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			log(e.getMessage());
+			e.printStackTrace();
+		}
+		catch(MessagingException e)
+		{
+			log(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	private boolean needSendMail() throws EntityNotFoundException
@@ -273,16 +304,16 @@ public class AutoMailServlet extends HttpServlet
 				"SimCity Error Log"));
 		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
 				"chen.haogang@playfish.com", "chen haogang"));
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				"ding.ning@playfish.com", "ding ning"));
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				"li.maomao@playfish.com", "li maomao"));
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				"qiao.jia@playfish.com", "qiao jia"));
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				"chen.liang@playfish.com", "chen liang"));
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				"li.juqiang@playfish.com", "li juqiang"));
+//		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+//				"ding.ning@playfish.com", "ding ning"));
+//		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+//				"li.maomao@playfish.com", "li maomao"));
+//		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+//				"qiao.jia@playfish.com", "qiao jia"));
+//		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+//				"chen.liang@playfish.com", "chen liang"));
+//		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+//				"li.juqiang@playfish.com", "li juqiang"));
 
 		SimpleDateFormat df = new SimpleDateFormat(
 				"MM_dd_yyyy-HH:mm:ss");

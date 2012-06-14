@@ -1,6 +1,5 @@
 package com.ggshily.mail;
 
-import java.util.Date;
 
 public class Log
 {
@@ -12,4 +11,6 @@ public class Log
 	public String clientLog;
 	public String rpcActions;
 	public String time;
+	public String clientVersion;
+	public String server;
 }
