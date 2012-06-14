@@ -42,7 +42,7 @@ public class DownloadServlet extends HttpServlet
 			Blob report = (Blob) result.getProperty("report");
 
 			Gson gson = new Gson();
-			Log log = gson.fromJson(LogUtil.getLog(report.getBytes()), Log.class);
+			Log log = gson.fromJson(LogUtil.getLogString(report.getBytes()), Log.class);
 			
 			content = log.clientLog + log.rpcActions;
 		}

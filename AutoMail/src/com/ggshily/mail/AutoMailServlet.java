@@ -35,7 +35,7 @@ import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 @SuppressWarnings("serial")
 public class AutoMailServlet extends HttpServlet
@@ -75,7 +75,15 @@ public class AutoMailServlet extends HttpServlet
 	{
 		try
 		{
-			storeData(req);
+			Log report = storeData(req);
+			
+			if(report != null)
+			{
+				ArrayList<Log> logs = new ArrayList<Log>();
+				logs.add(report);
+				sendMail(session, logs, LogUtil.getMailBody(report));
+			}
+			
 			if(needSendMail())
 			{
 				sendMail(session);
@@ -83,12 +91,17 @@ public class AutoMailServlet extends HttpServlet
 		}
 		catch(EntityNotFoundException e)
 		{
-			// TODO Auto-generated catch block
+			log(e.getMessage());
+			e.printStackTrace();
+		}
+		catch(MessagingException e)
+		{
+			log(e.getMessage());
 			e.printStackTrace();
 		}
 	}
 
-	private void storeData(HttpServletRequest req) throws IOException
+	private Log storeData(HttpServletRequest req) throws IOException
 	{
 
 		byte[] by = null;
@@ -110,7 +123,30 @@ public class AutoMailServlet extends HttpServlet
 		errorReport.setProperty("report", new Blob(by));
 		errorReport.setProperty("mailSent", false);
 		errorReport.setProperty("time", new Date());
+		
+		Log report = null;
+		try
+		{
+			report = LogUtil.getLog(by);
+			log("userid:" + report.userId);
+			log("message:" + report.message);
+			log("time:" + report.time.toString());
+		}
+		catch(JsonSyntaxException e)
+		{
+			log(e.getMessage());
+			e.printStackTrace();
+		}
+		catch(DataFormatException e)
+		{
+			log(e.getMessage());
+			e.printStackTrace();
+		}
+		
 		datastore.put(errorReport);
+		log("key:" + errorReport.getKey().toString());
+		
+		return report;
 	}
 
 	private boolean needSendMail() throws EntityNotFoundException
@@ -163,7 +199,7 @@ public class AutoMailServlet extends HttpServlet
 			lastMailTime.setProperty("time", new Date());
 
 			datastore.put(lastMailTime);
-			return true;
+			return false;
 		}
 
 		return false;
@@ -195,15 +231,9 @@ public class AutoMailServlet extends HttpServlet
 				Blob report = (Blob) result.getProperty("report");
 				result.setProperty("mailSent", true);
 
-				Gson gson = new Gson();
-				Log log = gson.fromJson(LogUtil.getLog(report.getBytes()), Log.class);
+				Log log = LogUtil.getLog(report.getBytes());
 				logs.add(log);
-				mailBody += (i++)
-						+ ":<div><br>user :<a href=\"http://www.facebook.com/profile.php?id="
-						+ log.userId + "\">" + log.userId
-						+ "</a><br>Error code:" + log.code
-						+ "<br>Error message:<br>"
-						+ log.message.replaceAll("\n", "<br>") + "</div>";
+				mailBody += (i++) + LogUtil.getMailBody(log);
 				if(i == 2)
 				{
 					break;
@@ -213,61 +243,7 @@ public class AutoMailServlet extends HttpServlet
 
 			if(logs.size() > 0)
 			{
-				Message msg = new MimeMessage(session);
-				msg.setFrom(new InternetAddress("gg.shily@gmail.com",
-						"SimCity Error Log"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"chen.haogang@playfish.com", "chen haogang"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"ding.ning@playfish.com", "ding ning"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"li.maomao@playfish.com", "li maomao"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"qiao.jia@playfish.com", "qiao jia"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"chen.liang@playfish.com", "chen liang"));
-				msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-						"li.juqiang@playfish.com", "li juqiang"));
-
-				SimpleDateFormat df = new SimpleDateFormat(
-						"MM_dd_yyyy-HH:mm:ss");
-				df.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-				msg.setSubject("Simcity error report:" + logs.size() + " "
-						+ df.format(new Date()));
-				// msg.setText(mailBody);
-
-				Multipart mp = new MimeMultipart();
-
-				MimeBodyPart htmlPart = new MimeBodyPart();
-				htmlPart.setContent(mailBody, "text/html");
-				mp.addBodyPart(htmlPart);
-
-				i = 0;
-				for(Log log : logs)
-				{
-					if(log.clientLog.length() > 0)
-					{
-						MimeBodyPart attachment = new MimeBodyPart();
-						attachment.setFileName(df.format(new Date())
-								+ "_client_" + i + ".txt");
-						attachment.setContent(log.clientLog, "application/txt");
-						mp.addBodyPart(attachment);
-					}
-					if(log.rpcActions.length() > 0)
-					{
-						MimeBodyPart attachment1 = new MimeBodyPart();
-						attachment1.setFileName(df.format(new Date())
-								+ "_rpcActions_" + i + ".txt");
-						attachment1.setContent(log.rpcActions,
-								"application/txt");
-						mp.addBodyPart(attachment1);
-					}
-					i++;
-				}
-				msg.setContent(mp);
-
-				Transport.send(msg);
-				log("mail sent");
+				sendMail(session, logs, mailBody);
 			}
 		}
 		catch(AddressException e)
@@ -286,5 +262,66 @@ public class AutoMailServlet extends HttpServlet
 		{
 			log(e.toString());
 		}
+	}
+
+	private void sendMail(Session session, ArrayList<Log> logs, String mailBody)
+			throws MessagingException, UnsupportedEncodingException
+	{
+		int i;
+		Message msg = new MimeMessage(session);
+		msg.setFrom(new InternetAddress("gg.shily@gmail.com",
+				"SimCity Error Log"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"chen.haogang@playfish.com", "chen haogang"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"ding.ning@playfish.com", "ding ning"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"li.maomao@playfish.com", "li maomao"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"qiao.jia@playfish.com", "qiao jia"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"chen.liang@playfish.com", "chen liang"));
+		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+				"li.juqiang@playfish.com", "li juqiang"));
+
+		SimpleDateFormat df = new SimpleDateFormat(
+				"MM_dd_yyyy-HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+		msg.setSubject("Simcity error report:" + logs.size() + " "
+				+ df.format(new Date()));
+		// msg.setText(mailBody);
+
+		Multipart mp = new MimeMultipart();
+
+		MimeBodyPart htmlPart = new MimeBodyPart();
+		htmlPart.setContent(mailBody, "text/html");
+		mp.addBodyPart(htmlPart);
+
+		i = 0;
+		for(Log log : logs)
+		{
+			if(log.clientLog.length() > 0)
+			{
+				MimeBodyPart attachment = new MimeBodyPart();
+				attachment.setFileName(df.format(new Date())
+						+ "_client_" + i + ".txt");
+				attachment.setContent(log.clientLog, "application/txt");
+				mp.addBodyPart(attachment);
+			}
+			if(log.rpcActions.length() > 0)
+			{
+				MimeBodyPart attachment1 = new MimeBodyPart();
+				attachment1.setFileName(df.format(new Date())
+						+ "_rpcActions_" + i + ".txt");
+				attachment1.setContent(log.rpcActions,
+						"application/txt");
+				mp.addBodyPart(attachment1);
+			}
+			i++;
+		}
+		msg.setContent(mp);
+
+		Transport.send(msg);
+		log("mail sent");
 	}
 }
