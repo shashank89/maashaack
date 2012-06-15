@@ -33,6 +33,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.JsonSyntaxException;
@@ -77,7 +78,8 @@ public class AutoMailServlet extends HttpServlet
 		{
 			Log report = storeData(req, session);
 			
-			if(report != null)
+			// 3003 is out of date
+			if(report != null && report.code != null && !report.code.equals("3003"))
 			{
 				ArrayList<Log> logs = new ArrayList<Log>();
 				logs.add(report);
@@ -151,7 +153,7 @@ public class AutoMailServlet extends HttpServlet
 		}
 		
 		datastore.put(errorReport);
-		log("key:" + errorReport.getKey().toString());
+		log("key:" + KeyFactory.keyToString(errorReport.getKey()));
 		
 		return report;
 	}
