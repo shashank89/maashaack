@@ -79,7 +79,7 @@ public class AutoMailServlet extends HttpServlet
 			Log report = storeData(req, session);
 			
 			// 3003 is out of date
-			if(report != null && report.code != null && !report.code.equals("3003"))
+			if(report != null && report.code != null && !report.code.equals("3003") && !report.code.equals("0"))
 			{
 				ArrayList<Log> logs = new ArrayList<Log>();
 				logs.add(report);
