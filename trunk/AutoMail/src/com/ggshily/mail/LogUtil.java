@@ -44,11 +44,11 @@ public class LogUtil
 	{
 		return ":<div><br>user :<a href=\"http://www.facebook.com/profile.php?id="
 		+ log.userId + "\">" + log.userId
-		+ "</a><br>Error code:" + log.code
-		+ "<br>Error message:<br>"
+		+ "</a><br><b>Error code</b>:" + log.code
+		+ "<br><b>Error message</b>:<br>"
 		+ (log.message != null ? log.message.replaceAll("\n", "<br>") : "null")
-		+ "<br>client version:<br>" + log.clientVersion
-		+ "<br>server:<br>" + log.server
+		+ "<br><b>client version</b>:<br>" + log.clientVersion
+		+ "<br><b>server</b>:<br>" + log.server
 		+ "</div>";
 	}
 }
