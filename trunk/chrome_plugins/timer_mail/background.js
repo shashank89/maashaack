@@ -1,1 +1,1 @@
-chrome.tabs.create({url:"https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&su=changelog&body=file:///D:/chg/chromePlugin/timer_mail/mail.html+-+%5B%5D+&shva=1&ov=0&to=gg.shily@gmail.com"});
+chrome.tabs.create({url:"https://mail.google.com/mail/?ui=2&view=cm&fs=1&tf=1&body=file:///D:/chg/chromePlugin/timer_mail/mail.html+-+%5B%5D+&shva=1&ov=0&to=gg.shily@gmail.com"});
