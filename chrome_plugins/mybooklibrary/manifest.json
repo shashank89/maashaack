@@ -1,0 +1,23 @@
+﻿{ 
+  "name": "my book library", 
+  "version": "0.0.1", 
+  "description": "list all books bought from online store", 
+  "background_page":"background.html",
+  "browser_action": {
+    "default_icon": "images/icon.png" ,
+    "default_title": "my book library",
+    "default_popup": "popup.html"
+  },
+  "icons": {"48": "48.png"},
+  //"options_page": "options.html",
+  "permissions": ["tabs", "notifications", "http://*.360buy.com/", "http://*.360buyimg.com/", "http://*.baidu.com/"],
+   //"content_scripts": [
+   // {
+   //   "matches": ["http://*.360buy.com/*"],
+   //   //"css": ["mystyles.css"],
+	//  "all_frames": true,
+   //   "js": [/*"jquery.js",*/ "contentscript.js"]
+   // }
+  //],
+  "content_security_policy": "script-src 'self'; img-src *"
+}
