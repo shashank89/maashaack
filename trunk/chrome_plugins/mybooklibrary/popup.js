@@ -22,7 +22,10 @@
 var ORDER_JINGDONG = "http://order.360buy.com/normal/list.action";
 var ORDER_JINGDONG_MORE = "http://jd2008.360buy.com/JdHome/OrderLists.aspx?page=";
 
-isLoginJingDong(ORDER_JINGDONG_MORE + 1, function(){ getOrders(ORDER_JINGDONG_MORE, 1);});
+isLoginJingDong(ORDER_JINGDONG_MORE + 1, function(){
+		document.getElementById('done').innerHTML = "正在查询...";
+		getOrders(ORDER_JINGDONG_MORE, 1);
+	});
 
 function isLoginJingDong(url, cb) {
 	wrequest(url, function(xhr) {
@@ -114,10 +117,10 @@ function processItems(items) {
 }
 
 function getItem(itemUrl) {
-	wrequest(itemUrl, function(xhr3) {
-		if(xhr3.readyState == 4)
+	wrequest(itemUrl, function(xhr) {
+		if(xhr.readyState == 4)
 		{
-			html2dom(xhr3.responseText, function(dom, itemUrl, xhr3) {
+			html2dom(xhr.responseText, function(dom, itemUrl, xhr) {
 				console.log(itemUrl);
 				//console.log(dom);
 				var name = $x('.//*[@id="name"]', dom);
@@ -147,8 +150,9 @@ function getItem(itemUrl) {
 						console.log(name[0].innerText);
 						console.log(isbn[0].innerText);
 
-
-						var newRow = document.getElementById('output_table').insertRow(-1);
+						var table = document.getElementById('output_table');
+						var newRow = table.insertRow(-1);
+						newRow.insertCell(-1).innerText = $x(".//*[@id='output_table']/tr", document).length;
 						newRow.insertCell(-1).innerText = name[0].innerText;
 						newRow.insertCell(-1).innerText = isbn[0].nextSibling.textContent;
 					}
