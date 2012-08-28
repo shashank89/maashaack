@@ -22,30 +22,124 @@
 var ORDER_JINGDONG = "http://order.360buy.com/normal/list.action";
 var ORDER_JINGDONG_MORE = "http://jd2008.360buy.com/JdHome/OrderLists.aspx?page=";
 
-isLoginJingDong(ORDER_JINGDONG_MORE + 1, function(){
+var ORDER_AMAZON = "https://www.amazon.cn/gp/css/order-history?opt=ab&__mk_zh_CN=%E4%BA%9A%E9%A9%AC%E9%80%8A%E7%BD%91%E7%AB%99&digitalOrders=1&unifiedOrders=1&orderFilter=year-";
+
+getOrdersAmazon(ORDER_AMAZON, (new Date()).getFullYear());
+
+function getOrdersAmazon(url, year) {
+	var ordersUrl = url + year;
+	wrequest(ordersUrl, function(xhr) {
+		html2dom(xhr.responseText, function(dom, ordersUrl, xhr) {
+			console.log(ordersUrl);
+			//console.log(dom);
+			var orders = $x('.//*[@id="cs-orders"]/div', dom);
+			console.log(orders);
+			
+			if(orders && orders.length > 4)
+			{
+				processOrderAmazon(orders);
+				
+				getOrdersAmazon(url, Number(year) - 1);
+			}
+		}, ordersUrl);
+	});
+}
+//*[@id="cs-orders"]/div[4]/div[2]/div/div[2]/ul[2]/li/a/span[1]/img
+function processOrderAmazon(orders) {
+	for(var i = 0; i < orders.length; i++)
+	{
+		//console.log(orders[i]);
+		if(orders[i].getAttribute("class") == "action-box rounded") {
+			var products = $x(".//div[2]/div/div[2]/ul[2]/li", orders[i]);
+			//console.log(products);
+			
+			for(var j = 0; j < products.length; j++)
+			{
+				var productUrl = $x(".//a", products[j])[0].href;
+				getProductAmazon(productUrl);
+			}
+		}
+	}
+}
+//*[@id="btAsinTitle"]
+function getProductAmazon(productUrl) {
+	wrequest(productUrl, function(xhr) {
+		html2dom(xhr.responseText, function(dom, productUrl, xhr) {
+			console.log(productUrl);
+			//console.log(dom);
+			var name = $x('.//*[@id="btAsinTitle"]', dom)[0].innerText;
+			//console.log(name);
+			
+			var isbn = getIsbnInAmazon(dom);
+			if(isbn != "")
+			{
+				console.log(name + "/" + isbn);
+				
+				addBook(name, isbn);
+			}
+			
+		}, productUrl);
+	});
+}
+//*[@id="divsinglecolumnminwidth"]/table/tbody/tr/td/div/ul/li[7]
+function isBookInAmazon(dom) {
+	var result = false;
+	var info = $x('.//*[@id="divsinglecolumnminwidth"]/table/tbody/tr/td/div/ul/li', dom);
+	
+	for(var i = 0; i < info.length; i++)
+	{
+		if(info[i].innerText.indexOf("isbn") == 0)
+		{
+			result = true;
+			break;
+		}
+	}
+	
+	return result;
+}
+
+function getIsbnInAmazon(dom) {
+	var isbn = "";
+	var info = $x('.//*[@id="divsinglecolumnminwidth"]/table/tbody/tr/td/div/ul/li', dom);
+	//console.log(info);
+	
+	for(var i = 0; i < info.length; i++)
+	{
+		if(info[i].innerText.indexOf("ISBN") == 0)
+		{
+			isbn = info[i].innerText.substring(5);
+			break;
+		}
+	}
+	
+	return isbn;
+}
+
+//*[@id="cs-orders"]/div[2]
+
+
+/*isLoginJingDong(ORDER_JINGDONG_MORE + 1, function(){
 		document.getElementById('done').innerHTML = "正在查询...";
 		getOrders(ORDER_JINGDONG_MORE, 1);
-	});
+	});*/
 
 function isLoginJingDong(url, cb) {
 	wrequest(url, function(xhr) {
-		if(xhr.readyState == 4) {
 			//console.log(xhr.responseText);
 
-			html2dom(xhr.responseText, function(dom, url, xhr) {
-				//console.log(dom);
+		html2dom(xhr.responseText, function(dom, url, xhr) {
+			//console.log(dom);
 
-				if(dom.title == "登录京东商城")
-				{
-					$x('.//*[@id="jingdong"]', document)[0].innerText = "未登录";
-				}
-				else
-				{
-					$x('.//*[@id="jingdong"]', document)[0].innerText = "已登录";
-					cb();
-				}
-			}, xhr.url);
-		}
+			if(dom.title == "登录京东商城")
+			{
+				$x('.//*[@id="jingdong"]', document)[0].innerText = "未登录";
+			}
+			else
+			{
+				$x('.//*[@id="jingdong"]', document)[0].innerText = "已登录";
+				cb();
+			}
+		}, url);
 	});
 }
 //*[@id="tb-olists"]/div[2]/div[2]/table/tbody
@@ -54,8 +148,6 @@ function getOrders(url, page) {
 
 	var ordersUrl = url + page;
 	wrequest(ordersUrl, function(xhr) {
-		//console.log("state:" + xhr.readyState);
-	  if (xhr.readyState == 4) {
 		//console.log(xhr.responseText);
 		
 		html2dom(xhr.responseText, function(dom, ordersUrl, xhr){
@@ -72,7 +164,6 @@ function getOrders(url, page) {
 			}
 			//document.removeChild(dom);
 		}, ordersUrl);
-	  }
 	});
 }
 
@@ -89,20 +180,17 @@ function processOrders(orders) {
 
 function getOrder(orderUrl) {
 	wrequest(orderUrl, function(xhr) {
-		if(xhr.readyState == 4)
-		{
-			html2dom(xhr.responseText, function(dom1, orderUrl, xhr) {
-				//console.log(orderUrl);
-				//console.log(dom1);
-				var items = $x('.//*[@id="orderinfo"]/div[2]/dl[4]/dd/table/tbody/tr', dom1);
-				//console.log(items);
-				
-				if(items) {
-					processItems(items);
-				}
-				//document.removeChild(dom1);
-			}, orderUrl);
-		}
+		html2dom(xhr.responseText, function(dom1, orderUrl, xhr) {
+			//console.log(orderUrl);
+			//console.log(dom1);
+			var items = $x('.//*[@id="orderinfo"]/div[2]/dl[4]/dd/table/tbody/tr', dom1);
+			//console.log(items);
+			
+			if(items) {
+				processItems(items);
+			}
+			//document.removeChild(dom1);
+		}, orderUrl);
 	});
 }
 
@@ -118,60 +206,67 @@ function processItems(items) {
 
 function getItem(itemUrl) {
 	wrequest(itemUrl, function(xhr) {
-		if(xhr.readyState == 4)
-		{
-			html2dom(xhr.responseText, function(dom, itemUrl, xhr) {
-				console.log(itemUrl);
-				//console.log(dom);
-				var name = $x('.//*[@id="name"]', dom);
-				//console.log(name);
-				
-				var summary = $x('.//*[@id="summary"]', dom);
-				
-				if(summary.length == 0)
+		html2dom(xhr.responseText, function(dom, itemUrl, xhr) {
+			console.log(itemUrl);
+			//console.log(dom);
+			var name = $x('.//*[@id="name"]', dom);
+			//console.log(name);
+			
+			if(isBookInJingDong(dom))
+			{
+				var isbn = $x('.//*[@id="summary"]/li[4]/span[1]', dom);
+				if(isbn.length == 0)
 				{
-					summary = $x('.//*[@id="summary-english"]', dom);
+					isbn = $x('.//*[@id="summary-english"]/li[4]/span[1]', dom);
 				}
 				
-				//console.log(summary[0]);
-				
-				if(summary[0] && summary[0].getAttribute("clstag") == "book|keycount|product|summary")
-				{
-					var isbn = $x('.//*[@id="summary"]/li[4]/span[1]', dom);
-					if(isbn.length == 0)
-					{
-						isbn = $x('.//*[@id="summary-english"]/li[4]/span[1]', dom);
-					}
+				//console.log(isbn);
 					
-					//console.log(isbn);
-						
-					if(isbn.length > 0)
-					{
-						console.log(name[0].innerText);
-						console.log(isbn[0].innerText);
-
-						var table = document.getElementById('output_table');
-						var newRow = table.insertRow(-1);
-						newRow.insertCell(-1).innerText = $x(".//*[@id='output_table']/tr", document).length;
-						newRow.insertCell(-1).innerText = name[0].innerText;
-						newRow.insertCell(-1).innerText = isbn[0].nextSibling.textContent;
-					}
-					else
-					{
-						console.log("can not get isbn or not a book:" + itemUrl);
-					}
+				if(isbn.length > 0)
+				{
+					console.log(name[0].innerText);
+					console.log(isbn[0].innerText);
+					
+					addBook(name[0].innerText, isbn[0].nextSibling.textContent);
 				}
-				//document.removeChild(dom);
-			}, itemUrl);
-		}
+				else
+				{
+					console.log("can not get isbn or not a book:" + itemUrl);
+				}
+			}
+			//document.removeChild(dom);
+		}, itemUrl);
 	});
 }
-		
+
+function isBookInJingDong(dom) {
+	var summary = $x('.//*[@id="summary"]', dom);
+			
+	if(summary.length == 0)
+	{
+		summary = $x('.//*[@id="summary-english"]', dom);
+	}
+	
+	//console.log(summary[0]);
+	
+	return (summary[0] && summary[0].getAttribute("clstag") == "book|keycount|product|summary")
+}
+
+function addBook(name, isbn) {
+	var table = document.getElementById('output_table');
+	var newRow = table.insertRow(-1);
+	newRow.insertCell(-1).innerText = $x(".//*[@id='output_table']/tbody/tr", document).length - 1;
+	newRow.insertCell(-1).innerText = name;
+	newRow.insertCell(-1).innerText = isbn;
+}
 		
 function wrequest(url, cb) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
-	xhr.onreadystatechange = function(){cb(xhr);};
+	xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4)
+				cb(xhr);
+		};
 	xhr.send();
 }
 			// list nodes matching this expression, optionally relative to the node `root'
