@@ -18,100 +18,150 @@
 		*/
 	
 //*[@id="myorder"]/div[2]/div[2]/table/tbody
-	
-	wrequest("http://order.360buy.com/normal/list.action", function(xhr) {
+
+var ORDER_JINGDONG = "http://order.360buy.com/normal/list.action";
+var ORDER_JINGDONG_MORE = "http://jd2008.360buy.com/JdHome/OrderLists.aspx?page=";
+
+isLoginJingDong(ORDER_JINGDONG_MORE + 1, function(){ getOrders(ORDER_JINGDONG_MORE, 1);});
+
+function isLoginJingDong(url, cb) {
+	wrequest(url, function(xhr) {
+		if(xhr.readyState == 4) {
+			//console.log(xhr.responseText);
+
+			html2dom(xhr.responseText, function(dom, url, xhr) {
+				//console.log(dom);
+
+				if(dom.title == "登录京东商城")
+				{
+					$x('.//*[@id="jingdong"]', document)[0].innerText = "未登录";
+				}
+				else
+				{
+					$x('.//*[@id="jingdong"]', document)[0].innerText = "已登录";
+					cb();
+				}
+			}, xhr.url);
+		}
+	});
+}
+//*[@id="tb-olists"]/div[2]/div[2]/table/tbody
+//*[@id="myorder"]/div[2]/div[2]/table/tbody
+function getOrders(url, page) {
+
+	var ordersUrl = url + page;
+	wrequest(ordersUrl, function(xhr) {
 		//console.log("state:" + xhr.readyState);
 	  if (xhr.readyState == 4) {
 		//console.log(xhr.responseText);
 		
-		html2dom(xhr.responseText, function(dom, url, xhr1){
+		html2dom(xhr.responseText, function(dom, ordersUrl, xhr){
+			console.log(ordersUrl);
 			//console.log(dom);
-			var orders = $x('.//*[@id="myorder"]/div[2]/div[2]/table/tbody/tr', dom)
+			var orders = $x('.//*[@id="tb-olists"]/div[2]/div[2]/table/tbody/tr', dom)
 			//console.log(orders);
 			
-			if(orders.length > 0)
+			if(orders && orders.length > 1)
 			{
-				for(var i = 0; i < orders.length; i++)
-				{
-					//console.log(i + ":" + orders[i].id);
-					
-					if(orders[i].id != "")
-					{
-						(function(){
-							var orderUrl = $x(".//td[1]/a[1]", orders[i])[0].href;
-							//console.log(orderUrl); //http://order.360buy.com/normal/item.action?orderid=284772793&PassKey=19DBAD5849B98C5AF3A1FB13868AD839
-							wrequest(orderUrl, function(xhr2) {
-								if(xhr2.readyState == 4)
-								{
-									//console.log(orderUrl);
-									html2dom(xhr2.responseText, function(dom1, orderUrl, xhr2) {
-										//console.log(dom1);
-										var items = $x('.//*[@id="orderinfo"]/div[2]/dl[4]/dd/table/tbody/tr', dom1);
-										//console.log(items);
-										
-										for(var j = 1; j < items.length; j++)
-										{
-											//console.log(items[j]);
-											(function(){
-												var itemUrl = $x(".//td[2]/div[1]/a[1]", items[j])[0].href;
-												
-												wrequest(itemUrl, function(xhr3) {
-													if(xhr3.readyState == 4)
-													{
-														html2dom(xhr3.responseText, function(dom2, itemUrl, xhr3) {
-															console.log(itemUrl);
-															//console.log(dom2);
-															var name = $x('.//*[@id="name"]', dom2);
-															//console.log(name);
-															
-															var summary = $x('.//*[@id="summary"]', dom2);
-															
-															if(summary.length == 0)
-															{
-																summary = $x('.//*[@id="summary-english"]', dom2);
-															}
-															
-															//console.log(summary[0]);
-															
-															if(summary[0] && summary[0].getAttribute("clstag") == "book|keycount|product|summary")
-															{
-																var isbn = $x('.//*[@id="summary"]/li[4]', dom2);
-																if(isbn.length == 0)
-																{
-																	isbn = $x('.//*[@id="summary-english"]/li[4]', dom2);
-																}
-																
-																console.log(isbn);
-																	
-																if(isbn.length > 0)
-																{
-																	console.log(name[0].innerText);
-																	console.log(isbn[0].innerText);
-																}
-																else
-																{
-																	console.log("can not get isbn or not a book:" + itemUrl);
-																}
-															}
-														}, itemUrl);
-													}
-												});
-											})();
-										}
-										
-									}, orderUrl);
-								}
-							});
-						})();
-						//var items = $x('.//*[@id="orderinfo"]/div[2]/dl[4]/dd/table/tbody/tr', 
-					}
-				}
+				processOrders(orders);
+
+				getOrders(url, Number(page) + 1);
 			}
-			
-			
-		}, xhr.url);
+			//document.removeChild(dom);
+		}, ordersUrl);
 	  }
 	});
+}
+
+function processOrders(orders) {
+	for(var i = 0; i < orders.length; i++)
+	{
+		//console.log(orders[i]);
+		if(orders[i].id != "") {
+			var orderUrl = $x(".//td[1]/a[1]", orders[i])[0].href;
+			getOrder(orderUrl);
+		}
+	}
+}
+
+function getOrder(orderUrl) {
+	wrequest(orderUrl, function(xhr) {
+		if(xhr.readyState == 4)
+		{
+			html2dom(xhr.responseText, function(dom1, orderUrl, xhr) {
+				//console.log(orderUrl);
+				//console.log(dom1);
+				var items = $x('.//*[@id="orderinfo"]/div[2]/dl[4]/dd/table/tbody/tr', dom1);
+				//console.log(items);
+				
+				if(items) {
+					processItems(items);
+				}
+				//document.removeChild(dom1);
+			}, orderUrl);
+		}
+	});
+}
+
+function processItems(items) {
+	for(var j = 1; j < items.length; j++)
+	{
+		//console.log(items[j]);
+		var itemUrl = $x(".//td[2]/div[1]/a[1]", items[j])[0].href;
+
+		getItem(itemUrl);
+	}
+}
+
+function getItem(itemUrl) {
+	wrequest(itemUrl, function(xhr3) {
+		if(xhr3.readyState == 4)
+		{
+			html2dom(xhr3.responseText, function(dom, itemUrl, xhr3) {
+				console.log(itemUrl);
+				//console.log(dom);
+				var name = $x('.//*[@id="name"]', dom);
+				//console.log(name);
+				
+				var summary = $x('.//*[@id="summary"]', dom);
+				
+				if(summary.length == 0)
+				{
+					summary = $x('.//*[@id="summary-english"]', dom);
+				}
+				
+				//console.log(summary[0]);
+				
+				if(summary[0] && summary[0].getAttribute("clstag") == "book|keycount|product|summary")
+				{
+					var isbn = $x('.//*[@id="summary"]/li[4]/span[1]', dom);
+					if(isbn.length == 0)
+					{
+						isbn = $x('.//*[@id="summary-english"]/li[4]/span[1]', dom);
+					}
+					
+					//console.log(isbn);
+						
+					if(isbn.length > 0)
+					{
+						console.log(name[0].innerText);
+						console.log(isbn[0].innerText);
+
+
+						var newRow = document.getElementById('output_table').insertRow(-1);
+						newRow.insertCell(-1).innerText = name[0].innerText;
+						newRow.insertCell(-1).innerText = isbn[0].nextSibling.textContent;
+					}
+					else
+					{
+						console.log("can not get isbn or not a book:" + itemUrl);
+					}
+				}
+				//document.removeChild(dom);
+			}, itemUrl);
+		}
+	});
+}
 		
 		
 function wrequest(url, cb) {
