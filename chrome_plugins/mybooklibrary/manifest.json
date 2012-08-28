@@ -10,7 +10,7 @@
   },
   "icons": {"48": "48.png"},
   //"options_page": "options.html",
-  "permissions": ["tabs", "notifications", "http://*.360buy.com/", "http://*.360buyimg.com/", "http://*.baidu.com/"],
+  "permissions": ["tabs", "notifications", "http://*.360buy.com/", "http://*.360buyimg.com/", "*://*.amazon.cn/", "http://*.baidu.com/"],
    //"content_scripts": [
    // {
    //   "matches": ["http://*.360buy.com/*"],
