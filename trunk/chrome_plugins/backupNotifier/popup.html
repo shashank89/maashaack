@@ -32,6 +32,12 @@
       text-decoration: underline;
       color: #003ea8
     }
+	
+	table{border-collapse:collapse;border-spacing:0;border-left:1px solid #888;border-top:1px solid #888;background:#efefef;}
+	
+	th,td{border-right:1px solid #888;border-bottom:1px solid #888;padding:5px 15px;}
+	
+	th{font-weight:bold;background:#ccc;}
  
     #template { display: none }
   </style>
@@ -45,9 +51,39 @@
   
   
   <label id="qa_version"></label>
-<div id="int_version"></div>
-<div id="milestone_version"></div>
-<div id="cb_version"></div><br>
+  <table width="100%" border="1">
+	<tr>
+		<td>qa00(ironfist)</td>
+		<td><div id="ironfist"></div></td>
+	</tr>
+	<tr>
+		<td>qa01(lightspeed)</td>
+		<td><div id="lightspeed"></div></td>
+	</tr>
+	<tr>
+		<td>qa02(stable)</td>
+		<td><div id="stable"></div></td>
+	</tr>
+	<tr>
+		<td>qa03(hotfix)</td>
+		<td><div id="hotfix"></div></td>
+	</tr>
+	<tr>
+		<td>live</td>
+		<td><div id="live"></div></td>
+	</tr>
+	<tr>
+		<td>int</td>
+		<td><div id="int"></div></td>
+	</tr>
+  </table>
+
+
+
+
+
+
+<br>
 
     <script type="text/javascript" src="popup.js"></script>
 
