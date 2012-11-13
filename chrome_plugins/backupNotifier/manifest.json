@@ -2,6 +2,7 @@
   "name": "auto backup notifier", 
   "version": "0.0.3", 
   "description": "auto backup notifier", 
+  "manifest_version":2,
   "update_url": "http://static-int00.fishonomics.com/game/simcity-int/chrome-plugin/updates.xml",
   //"background_page":"background.html",
   "icons": {"48": "48.png"},
@@ -11,14 +12,14 @@
     "default_popup": "popup.html"
   },
   //"options_page": "options.html",
-  "permissions": ["tabs", "notifications", "http://*.amazonaws.com/"],
-   /*"content_scripts": [
-    {
-      "matches": ["http://dev-simcity-qa00.fishonomics.com/*","http://dev-simcity-qa00.development.playfish.com/*"],
+  "permissions": ["tabs", "notifications", "http://*.amazonaws.com/", "https://*.cloudfront.net/"],
+   //"content_scripts": [
+    //{
+     // "matches": ["http://dev-simcity-qa00.fishonomics.com/*","http://dev-simcity-qa00.development.playfish.com/*"],
       //"css": ["mystyles.css"],
-	  "all_frames": true,
-      "js": [/*"jquery.js",*/ "contentscript.js"]
-    }
-  ], */ 
-  "content_security_policy": "script-src 'self'; img-src 'self'"
+	 // "all_frames": true,
+     // "js": [/*"jquery.js",*/ "contentscript.js"]
+    //}
+  //], */ 
+  "content_security_policy": "script-src 'self'; img-src 'self'; object-src 'self'"
 }

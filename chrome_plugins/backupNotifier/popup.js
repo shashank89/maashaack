@@ -2,18 +2,22 @@ const QA_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simci
 const LIVE_QA_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa02/c/LIVE_VERSION?" + (new Date()).getTime();
 const QA01_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa01/c/LIVE_VERSION?" + (new Date()).getTime();
 const QA03_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa03/c/LIVE_VERSION?" + (new Date()).getTime();
-const INT_VERSION_URL="http://dev-static.fishonomics.com/game/simcity-int/c/LIVE_VERSION?" + (new Date()).getTime();
+const INT_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-int00/c/LIVE_VERSION?" + (new Date()).getTime();
 const MILESTONE_VERSION_URL="http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-int01/c/LIVE_VERSION?" + (new Date()).getTime();
 const CB_VERSION_URL="https://d13px3umnb4fz8.cloudfront.net/game/simcity/c/LIVE_VERSION?" + (new Date()).getTime();
 
 
-setVersion(QA_VERSION_URL, document.getElementById("content"), "qa00(ironfist)");
+setVersion(QA_VERSION_URL, document.getElementById("ironfist"), "qa00(ironfist)");
 
-setVersion(QA01_VERSION_URL, document.getElementById("content"), "qa01(lightspeed)");
+setVersion(QA01_VERSION_URL, document.getElementById("lightspeed"), "qa01(lightspeed)");
 
-setVersion(LIVE_QA_VERSION_URL, document.getElementById("content"), "qa02(stable)");
+setVersion(LIVE_QA_VERSION_URL, document.getElementById("stable"), "qa02(stable)");
 
-setVersion(QA03_VERSION_URL, document.getElementById("content"), "qa03(hotfix)");
+setVersion(QA03_VERSION_URL, document.getElementById("hotfix"), "qa03(hotfix)");
+
+setVersion(CB_VERSION_URL, document.getElementById("live"), "live");
+
+setVersion(INT_VERSION_URL, document.getElementById("int"), "int");
 /*
 var xhr = new XMLHttpRequest();
 xhr.open("GET", QA_VERSION_URL, true);
@@ -75,7 +79,7 @@ function setVersion(url, element, name){
 	xhr.onreadystatechange = function() {
 	  if (xhr.readyState == 4) {
 		console.log(name + ":" + xhr.responseText);
-		element.innerHTML += name + ":" + getVersion(xhr.responseText) + "<br>";
+		element.innerHTML = getVersion(xhr.responseText);
 	  }
 	}
 	xhr.send();
