@@ -12,7 +12,7 @@
 (function() {
 
 	//var versionUrl = "http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa02/c/LIVE_VERSION?" + (new Date()).toString();
-	var versionUrl = "http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa00/c/LIVE_VERSION?" + (new Date()).toString();
+	var versionUrl = "http://dev-static.playfish.com.s3.amazonaws.com/game/simcity/dev-simcity-qa00/c/LIVE_VERSION?" + (new Date()).getTime();
 	var versionNumber;
 
 	function $(w){
@@ -64,7 +64,7 @@
 		url: versionUrl,
 		onload: function(resp){
 			versionNumber = getNextVersion(resp.responseText);
-			//console.log(versionNumber);
+			console.log(versionNumber);
 			setComments();
 		}
 	});
