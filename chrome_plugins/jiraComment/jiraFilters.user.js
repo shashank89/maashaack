@@ -59,14 +59,14 @@
 		}
 	}
 	
-	function createElement(url, title){
+	function createElement(url, title, className){
 		var link = document.createElement("a");
 		link.className = "lnk";
 		link.href = url;
 		link.textContent = title;
 		
 		var li = document.createElement("li");
-		li.className = "aui-dd-parent lazy"
+		li.className = className;
 		li.appendChild(link);
 		
 		return li;
@@ -77,10 +77,16 @@
 		var result = eval('('+resp+')');
 		//console.log(result);
 		
-		var items = result.sections[3].items;
+		var current = result.sections[0].items[0].title;
+		
+		var items = result.sections[result.sections.length - 1].items;
 		for(var i = 0; i < items.length; i++)
 		{
-			document.getElementById("main-nav").appendChild(createElement(items[i].url, items[i].title));
+			var className = "aui-dd-parent lazy";
+			if(items[i].title == current)
+				className = "aui-dd-parent lazy selected";
+		
+			document.getElementById("main-nav").appendChild(createElement(items[i].url, items[i].title, className));
 		}
 	}
 	
