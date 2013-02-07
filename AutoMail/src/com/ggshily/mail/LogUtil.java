@@ -49,6 +49,7 @@ public class LogUtil
 		+ (log.message != null ? log.message.replaceAll("\n", "<br>") : "null")
 		+ "<br><b>client version</b>:<br>" + log.clientVersion
 		+ "<br><b>server</b>:<br>" + log.server
+		+ "<br><a href=\"http://bigsoupbubble.appspot.com/dl?key=" + log.key + "\">"
 		+ "</div>";
 	}
 }

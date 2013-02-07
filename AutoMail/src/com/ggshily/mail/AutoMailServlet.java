@@ -79,7 +79,8 @@ public class AutoMailServlet extends HttpServlet
 			Log report = storeData(req, session);
 			
 			// 3003 is out of date
-			if(report != null && report.code != null && !report.code.equals("3003") && !report.code.equals("0"))
+			if(report != null
+					&& (report.code == null || !report.code.equals("3003")))
 			{
 				ArrayList<Log> logs = new ArrayList<Log>();
 				logs.add(report);
@@ -126,12 +127,17 @@ public class AutoMailServlet extends HttpServlet
 		errorReport.setProperty("mailSent", false);
 		errorReport.setProperty("time", new Date());
 		
+		datastore.put(errorReport);
+		
 		Log report = null;
 		String logString = "";
 		try
 		{
 			logString = LogUtil.getLogString(by);
 			report = LogUtil.getLog(logString);
+			
+			report.key = KeyFactory.keyToString(errorReport.getKey());
+			
 			log("userid:" + report.userId);
 			log("code:" + report.code);
 			log("message:" + report.message);
@@ -152,8 +158,7 @@ public class AutoMailServlet extends HttpServlet
 			e.printStackTrace();
 		}
 		
-		datastore.put(errorReport);
-		log("key:" + KeyFactory.keyToString(errorReport.getKey()));
+		log("key:" + report.key);
 		
 		return report;
 	}
@@ -226,6 +231,8 @@ public class AutoMailServlet extends HttpServlet
 			tick = 6 * 60 * 1000;
 		}
 
+		log("should send mail:" + (elipse > tick));
+		
 		if(elipse > tick)
 		{
 			lastMailTime = new Entity("LastMailTime", "LastMailTime");
@@ -265,11 +272,17 @@ public class AutoMailServlet extends HttpServlet
 				result.setProperty("mailSent", true);
 
 				Log log = LogUtil.getLog(report.getBytes());
+				
+				if(log.key == null)
+				{
+					log.key = KeyFactory.keyToString(result.getKey());
+				}
+				
 				logs.add(log);
 				mailBody += (i++) + LogUtil.getMailBody(log);
 				if(i == 2)
 				{
-					break;
+//					break;
 				}
 			}
 			datastore.put(pq.asList(FetchOptions.Builder.withDefaults()));
@@ -339,7 +352,7 @@ public class AutoMailServlet extends HttpServlet
 				attachment.setFileName(df.format(new Date())
 						+ "_client_" + i + ".txt");
 				attachment.setContent(log.clientLog, "application/txt");
-				mp.addBodyPart(attachment);
+//				mp.addBodyPart(attachment);
 			}
 			if(log.rpcActions.length() > 0)
 			{
@@ -348,7 +361,7 @@ public class AutoMailServlet extends HttpServlet
 						+ "_rpcActions_" + i + ".txt");
 				attachment1.setContent(log.rpcActions,
 						"application/txt");
-				mp.addBodyPart(attachment1);
+//				mp.addBodyPart(attachment1);
 			}
 			i++;
 		}
