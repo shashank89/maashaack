@@ -41,6 +41,7 @@ import com.google.gson.JsonSyntaxException;
 @SuppressWarnings("serial")
 public class AutoMailServlet extends HttpServlet
 {
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException
 	{
@@ -335,7 +336,7 @@ public class AutoMailServlet extends HttpServlet
 		df.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
 		msg.setSubject("Simcity error report:" + logs.size() + " "
 				+ df.format(new Date()));
-		// msg.setText(mailBody);
+		 msg.setText(mailBody);
 
 		Multipart mp = new MimeMultipart();
 
@@ -352,7 +353,7 @@ public class AutoMailServlet extends HttpServlet
 				attachment.setFileName(df.format(new Date())
 						+ "_client_" + i + ".txt");
 				attachment.setContent(log.clientLog, "application/txt");
-//				mp.addBodyPart(attachment);
+				mp.addBodyPart(attachment);
 			}
 			if(log.rpcActions.length() > 0)
 			{
@@ -361,11 +362,11 @@ public class AutoMailServlet extends HttpServlet
 						+ "_rpcActions_" + i + ".txt");
 				attachment1.setContent(log.rpcActions,
 						"application/txt");
-//				mp.addBodyPart(attachment1);
+				mp.addBodyPart(attachment1);
 			}
 			i++;
 		}
-		msg.setContent(mp);
+//		msg.setContent(mp);
 
 		Transport.send(msg);
 		log("mail sent");
